@@ -43,11 +43,19 @@ export function extractAuth(headers) {
 }
 
 /**
+ * Resolve the Workers env bindings from a Pages Function context.
+ * Works both with `context.locals.runtime.env` (classic) and `context.env`.
+ */
+export function getEnv(context) {
+  return context.locals?.runtime?.env || context.env || {};
+}
+
+/**
  * Require authentication for a Pages Function context.
  * Returns { ok: true } or { ok: false, status, body } for a quick error response.
  */
 export async function requireAuth(context) {
-  const env = context.locals.runtime.env;
+  const env = getEnv(context);
   const secret = env.JWT_SECRET || 'change-me-jwt-secret';
   const token = extractAuth(context.request.headers);
   if (!(await verifyToken(token, secret))) {

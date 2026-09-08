@@ -1,11 +1,12 @@
 // /api/products - GET: public product list (D1 or inline fallback)
 // POST: create/update product (auth required, writes to D1)
-import { requireAuth } from '../_utils.js';
+import { requireAuth, getEnv } from '../_utils.js';
 
-export async function GET(context) {
-  const locale = context.url.searchParams.get('locale') || 'en';
-  const slug = context.url.searchParams.get('slug');
-  const env = context.locals.runtime.env;
+export async function onRequestGet(context) {
+  const url = new URL(context.request.url);
+  const locale = url.searchParams.get('locale') || 'en';
+  const slug = url.searchParams.get('slug');
+  const env = getEnv(context);
   const db = env.DB;
 
   // Try D1 first (production), fallback to inline data
@@ -15,16 +16,16 @@ export async function GET(context) {
         const result = await db
           .prepare('SELECT * FROM products WHERE active = 1 ORDER BY position ASC')
           .all();
-        return context.json(rowsToProducts(result.results || [], locale));
+        return Response.json(rowsToProducts(result.results || [], locale));
       }
       const result = await db
         .prepare('SELECT * FROM products WHERE slug = ? AND active = 1')
         .bind(slug)
         .first();
       if (!result) {
-        return context.json({ error: 'Product not found' }, { status: 404 });
+        return Response.json({ error: 'Product not found' }, { status: 404 });
       }
-      return context.json(rowToProduct(result, locale));
+      return Response.json(rowToProduct(result, locale));
     } catch (e) {
       console.log('D1 query failed, using inline fallback:', e);
     }
@@ -34,25 +35,25 @@ export async function GET(context) {
   const products = INLINE_PRODUCTS.map((p) => localize(p, locale));
   if (slug) {
     const product = products.find((p) => p.slug === slug);
-    return context.json(product || { error: 'Product not found' }, {
+    return Response.json(product || { error: 'Product not found' }, {
       status: product ? 200 : 404,
     });
   }
-  return context.json(products);
+  return Response.json(products);
 }
 
-export async function POST(context) {
+export async function onRequestPost(context) {
   const auth = await requireAuth(context);
-  if (!auth.ok) return context.json(auth.body, { status: auth.status });
+  if (!auth.ok) return Response.json(auth.body, { status: auth.status });
 
   const body = await context.request.json().catch(() => null);
   if (!body || !body.slug) {
-    return context.json({ ok: false, message: 'Missing slug' }, { status: 400 });
+    return Response.json({ ok: false, message: 'Missing slug' }, { status: 400 });
   }
 
-  const db = context.locals.runtime.env.DB;
+  const db = getEnv(context).DB;
   if (!db || typeof db.prepare !== 'function') {
-    return context.json({ ok: false, message: 'Database not available' }, { status: 503 });
+    return Response.json({ ok: false, message: 'Database not available' }, { status: 503 });
   }
 
   const fields = {
@@ -70,45 +71,50 @@ export async function POST(context) {
     position: Number(body.position) || 0,
   };
 
-  const existing = await db
-    .prepare('SELECT id FROM products WHERE slug = ?')
-    .bind(body.slug)
-    .first();
+  try {
+    const existing = await db
+      .prepare('SELECT id FROM products WHERE slug = ?')
+      .bind(body.slug)
+      .first();
 
-  if (existing) {
-    await db
-      .prepare(
-        `UPDATE products SET tag_en=?, tag_zh=?, name_en=?, name_zh=?, short_en=?, short_zh=?,
-         description_en=?, description_zh=?, highlights_en=?, highlights_zh=?,
-         image_url=?, position=?, updated_at=datetime('now')
-         WHERE slug=?`
-      )
-      .bind(
-        fields.tag_en, fields.tag_zh, fields.name_en, fields.name_zh,
-        fields.short_en, fields.short_zh, fields.description_en, fields.description_zh,
-        fields.highlights_en, fields.highlights_zh, fields.image_url, fields.position,
-        body.slug
-      )
-      .run();
-  } else {
-    await db
-      .prepare(
-        `INSERT INTO products (id, slug, tag_en, tag_zh, name_en, name_zh, short_en, short_zh,
-         description_en, description_zh, highlights_en, highlights_zh, image_url, position,
-         active, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`
-      )
-      .bind(
-        'prod-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
-        body.slug,
-        fields.tag_en, fields.tag_zh, fields.name_en, fields.name_zh,
-        fields.short_en, fields.short_zh, fields.description_en, fields.description_zh,
-        fields.highlights_en, fields.highlights_zh, fields.image_url, fields.position
-      )
-      .run();
+    if (existing) {
+      await db
+        .prepare(
+          `UPDATE products SET tag_en=?, tag_zh=?, name_en=?, name_zh=?, short_en=?, short_zh=?,
+           description_en=?, description_zh=?, highlights_en=?, highlights_zh=?,
+           image_url=?, position=?, updated_at=datetime('now')
+           WHERE slug=?`
+        )
+        .bind(
+          fields.tag_en, fields.tag_zh, fields.name_en, fields.name_zh,
+          fields.short_en, fields.short_zh, fields.description_en, fields.description_zh,
+          fields.highlights_en, fields.highlights_zh, fields.image_url, fields.position,
+          body.slug
+        )
+        .run();
+    } else {
+      await db
+        .prepare(
+          `INSERT INTO products (id, slug, tag_en, tag_zh, name_en, name_zh, short_en, short_zh,
+           description_en, description_zh, highlights_en, highlights_zh, image_url, position,
+           active, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`
+        )
+        .bind(
+          'prod-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+          body.slug,
+          fields.tag_en, fields.tag_zh, fields.name_en, fields.name_zh,
+          fields.short_en, fields.short_zh, fields.description_en, fields.description_zh,
+          fields.highlights_en, fields.highlights_zh, fields.image_url, fields.position
+        )
+        .run();
+    }
+  } catch (e) {
+    console.error('D1 product upsert failed:', e);
+    return Response.json({ ok: false, message: 'Database error: ' + (e && e.message ? e.message : e) }, { status: 500 });
   }
 
-  return context.json({ ok: true, slug: body.slug });
+  return Response.json({ ok: true, slug: body.slug });
 }
 
 function rowToProduct(p, locale) {

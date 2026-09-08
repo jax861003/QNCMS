@@ -6,13 +6,15 @@ compatibility_date = "2024-11-01"
 # root) upload the built static assets AND the `functions/` directory.
 pages_build_output_dir = "dist"
 
+# D1 binding used by functions/api/*.js via `env.DB`.
+# IMPORTANT: keep database_id in sync with the real database; the binding
+# is also applied by Cloudflare Pages at build time when it reads this file.
 [[d1_databases]]
 binding = "DB"
-database_name = "nova-site-db"
-database_id = "YOUR_D1_DATABASE_ID"
+database_name = "qncms"
+database_id = "752be8a3-4ddf-44c8-a994-bf4cb32f454b"
 
-[vars]
-ADMIN_USERNAME = "admin"
-# Generate hash: node -e "console.log(require('crypto').createHash('sha256').update('your_password').digest('hex'))"
-ADMIN_PASSWORD_HASH = "PLACEHOLDER_CHANGE_ME"
-JWT_SECRET = "CHANGE-ME-TO-RANDOM-32-CHARS-STRING"
+# NOTE: No [vars] here on purpose. ADMIN_USERNAME / ADMIN_PASSWORD_HASH /
+# JWT_SECRET are secrets that must be set in the Cloudflare Pages dashboard
+# (Settings -> Environment variables) so that placeholder values committed to
+# git never override the real ones at build time.

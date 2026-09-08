@@ -1,12 +1,12 @@
 // /api/settings - GET/POST site settings (auth required)
-import { requireAuth } from '../_utils.js';
+import { requireAuth, getEnv } from '../_utils.js';
 
-export async function GET(context) {
+export async function onRequestGet(context) {
   const auth = await requireAuth(context);
-  if (!auth.ok) return context.json(auth.body, { status: auth.status });
+  if (!auth.ok) return Response.json(auth.body, { status: auth.status });
 
-  const db = context.locals.runtime.env.DB;
-  if (!db || typeof db.prepare !== 'function') return context.json({});
+  const db = getEnv(context).DB;
+  if (!db || typeof db.prepare !== 'function') return Response.json({});
 
   try {
     const result = await db.prepare('SELECT * FROM settings').all();
@@ -14,23 +14,23 @@ export async function GET(context) {
     for (const row of result.results || []) {
       try { settings[row.key] = JSON.parse(row.value); } catch { settings[row.key] = row.value; }
     }
-    return context.json(settings);
+    return Response.json(settings);
   } catch (e) {
     console.error('Settings query failed:', e);
-    return context.json({});
+    return Response.json({});
   }
 }
 
-export async function POST(context) {
+export async function onRequestPost(context) {
   const auth = await requireAuth(context);
-  if (!auth.ok) return context.json(auth.body, { status: auth.status });
+  if (!auth.ok) return Response.json(auth.body, { status: auth.status });
 
   const body = await context.request.json().catch(() => null);
   if (!body || typeof body !== 'object') {
-    return context.json({ ok: false, message: 'Invalid body' }, { status: 400 });
+    return Response.json({ ok: false, message: 'Invalid body' }, { status: 400 });
   }
 
-  const db = context.locals.runtime.env.DB;
+  const db = getEnv(context).DB;
   if (db && typeof db.prepare === 'function') {
     for (const [key, value] of Object.entries(body)) {
       const strValue = typeof value === 'string' ? value : JSON.stringify(value);
@@ -40,5 +40,5 @@ export async function POST(context) {
       ).bind(key, strValue).run();
     }
   }
-  return context.json({ ok: true });
+  return Response.json({ ok: true });
 }

@@ -1,19 +1,24 @@
 // DELETE /api/products/delete?slug=<slug> - delete a product (auth required)
-import { requireAuth } from '../../_utils.js';
+import { requireAuth, getEnv } from '../../_utils.js';
 
-export async function DELETE(context) {
+export async function onRequestDelete(context) {
   const auth = await requireAuth(context);
-  if (!auth.ok) return context.json(auth.body, { status: auth.status });
+  if (!auth.ok) return Response.json(auth.body, { status: auth.status });
 
-  const slug = context.url.searchParams.get('slug');
-  if (!slug) return context.json({ ok: false, message: 'Missing slug' }, { status: 400 });
+  const slug = new URL(context.request.url).searchParams.get('slug');
+  if (!slug) return Response.json({ ok: false, message: 'Missing slug' }, { status: 400 });
 
-  const db = context.locals.runtime.env.DB;
+  const db = getEnv(context).DB;
   if (!db || typeof db.prepare !== 'function') {
-    return context.json({ ok: false, message: 'Database not available' }, { status: 503 });
+    return Response.json({ ok: false, message: 'Database not available' }, { status: 503 });
   }
 
-  await db.prepare('DELETE FROM products WHERE slug = ?').bind(slug).run();
+  try {
+    await db.prepare('DELETE FROM products WHERE slug = ?').bind(slug).run();
+  } catch (e) {
+    console.error('D1 product delete failed:', e);
+    return Response.json({ ok: false, message: 'Database error: ' + (e && e.message ? e.message : e) }, { status: 500 });
+  }
   console.log('[Admin] Deleted product:', slug);
-  return context.json({ ok: true, slug });
+  return Response.json({ ok: true, slug });
 }
