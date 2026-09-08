@@ -15,6 +15,25 @@ export function hashPassword(password) {
   return sha256Hex(password);
 }
 
+/**
+ * Verify a login attempt against the env config. Supports three forms:
+ *   1. ADMIN_PASSWORD        - plaintext password (easiest to remember)
+ *   2. ADMIN_PASSWORD_HASH   - SHA-256 hex digest (64 hex chars) of the password
+ *   3. ADMIN_PASSWORD_HASH   - any other value is compared as plaintext
+ * Returns true when the credentials match.
+ */
+export async function verifyLogin(env, username, password) {
+  if (!env || username !== env.ADMIN_USERNAME) return false;
+  if (env.ADMIN_PASSWORD) return password === env.ADMIN_PASSWORD;
+  const stored = env.ADMIN_PASSWORD_HASH;
+  if (!stored) return false;
+  // 64-char hex => treated as a SHA-256 hash; anything else => plaintext
+  if (/^[0-9a-fA-F]{64}$/.test(stored)) {
+    return (await hashPassword(password)) === stored.toLowerCase();
+  }
+  return password === stored;
+}
+
 /** Sign a token timestamp with the JWT secret */
 export async function signToken(ts, secret) {
   const sig = await sha256Hex(ts + '.' + secret);

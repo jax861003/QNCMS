@@ -1,5 +1,5 @@
 // POST /api/auth - login, issues a signed token cookie
-import { hashPassword, signToken, getEnv } from '../_utils.js';
+import { verifyLogin, signToken, getEnv } from '../_utils.js';
 
 export async function onRequestPost(context) {
   const body = await context.request.json().catch(() => null);
@@ -10,9 +10,7 @@ export async function onRequestPost(context) {
   }
 
   const env = getEnv(context);
-  const expectedHash = await hashPassword(password);
-
-  if (username !== env.ADMIN_USERNAME || expectedHash !== env.ADMIN_PASSWORD_HASH) {
+  if (!(await verifyLogin(env, username, password))) {
     return Response.json({ ok: false, message: 'Invalid credentials' }, { status: 401 });
   }
 
