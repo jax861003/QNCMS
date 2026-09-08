@@ -1,6 +1,6 @@
 /** Shared helpers for Pages Functions */
 
-/** Hash password with SHA-256 (same as used in auth handler) */
+/** Hash password with SHA-256 */
 export async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -10,13 +10,13 @@ export async function hashPassword(password: string): Promise<string> {
     .join('');
 }
 
-/** Verify JWT-like token (format: ts.signature) */
+/** Verify JWT-like token (format: timestamp.signature) */
 export function verifyToken(token: string | null, secret: string): boolean {
   if (!token) return false;
   try {
     const [ts, sig] = token.split('.') as [string, string];
-    const expectedSig = btoa(ts + '.' + secret).slice(0, 32);
-    return sig === expectedSig && Number(ts) > Date.now() - 86400000;
+    const expected = Buffer.from(ts + '.' + secret).toString('base64').slice(0, 32);
+    return sig === expected && Number(ts) > Date.now() - 86400000;
   } catch {
     return false;
   }
@@ -31,7 +31,10 @@ export function extractAuth(headers: Headers): string | null {
 }
 
 /** Check auth and return { ok, status } */
-export async function requireAuth(request: Request, env: Record<string, unknown>): Promise<{ ok: true; status: number } | { ok: false; status: number; body: { ok: false; message: string } }> {
+export async function requireAuth(
+  request: Request,
+  env: Record<string, unknown>
+): Promise<{ ok: true; status: number } | { ok: false; status: number; body: { ok: false; message: string } }> {
   const secret = (env.JWT_SECRET as string) || 'fallback-secret';
   const token = extractAuth(request.headers);
   if (!verifyToken(token, secret)) {

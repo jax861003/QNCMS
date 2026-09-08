@@ -1,10 +1,17 @@
+name = "nova-grid-site"
+compatibility_date = "2024-11-01"
+
+# Cloudflare Pages configuration
+# Note: pages_build_output_dir is set in the Cloudflare Dashboard UI, not here.
+# This file is used by `wrangler pages dev` for local development.
+
 [[d1_databases]]
 binding = "DB"
 database_name = "nova-site-db"
-database_id = "CHANGE_ME_TO_YOUR_D1_DATABASE_ID"
+database_id = "YOUR_D1_DATABASE_ID"
 
 [vars]
 ADMIN_USERNAME = "admin"
-# Generate with: node -e "crypto.subtle.digest('SHA-256', new TextEncoder().encode('your_password')).then(h => console.log(Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')))"
+# Generate hash with: node -e "console.log(require('crypto').createHash('sha256').update('your_password').digest('hex'))"
 ADMIN_PASSWORD_HASH = "PLACEHOLDER_CHANGE_ME"
-JWT_SECRET = "CHANGE_ME_TO_RANDOM_32_CHARS"
+JWT_SECRET = "CHANGE-ME-TO-A-RANDOM-32-CHARS-STRING"
