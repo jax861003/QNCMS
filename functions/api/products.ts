@@ -1,20 +1,7 @@
 import type { APIContext } from 'astro';
 
-// Read JSON fallback data using Node fs (available in Cloudflare Pages Functions)
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const fallbackData = JSON.parse(
-  readFileSync(join(__dirname, '../../src/data/products.json'), 'utf-8')
-);
-
 interface Env {
   DB: D1Database;
-  ADMIN_USERNAME: string;
-  ADMIN_PASSWORD_HASH: string;
-  JWT_SECRET: string;
 }
 
 export async function GET(context: APIContext) {
@@ -23,7 +10,7 @@ export async function GET(context: APIContext) {
   const env = context.locals.runtime.env as unknown as Env;
   const db = env.DB;
 
-  // Try D1 first (production), fallback to JSON (local dev without D1)
+  // Use D1 in production (when available)
   if (db && typeof db.prepare === 'function') {
     try {
       if (!slug) {
@@ -56,30 +43,16 @@ export async function GET(context: APIContext) {
         });
       }
     } catch (e) {
-      console.log('D1 query failed, using JSON fallback:', e);
+      console.log('D1 query failed:', e);
+      return context.json([], { status: 500 });
     }
   }
 
-  // Fallback to local JSON data
-  const products = (fallbackData.products || []).map((p: any) => ({
-    id: p.id, slug: p.slug,
-    tag: locale === 'zh' ? p.name_zh : p.name_en,
-    name: locale === 'zh' ? p.name_zh : p.name_en,
-    short: locale === 'zh' ? p.short_zh : p.short_en,
-    description: locale === 'zh' ? p.description_zh : p.description_en,
-    highlights: JSON.parse(locale === 'zh' ? p.highlights_zh : p.highlights_en),
-    image_url: p.image_url,
-    position: p.position,
-  }));
-
-  if (slug) {
-    const product = products.find(p => p.slug === slug);
-    return context.json(product || { error: 'Product not found' }, { status: product ? 200 : 404 });
-  }
-  return context.json(products);
+  // Local dev fallback - return empty array when D1 not available
+  // In production, D1 will be connected via wrangler.toml binding
+  return context.json([]);
 }
 
 export async function POST(context: APIContext) {
-  // Auth check would go here in production
   return context.json({ ok: false, message: 'Admin access required' }, { status: 401 });
 }
