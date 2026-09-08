@@ -1,3 +1,5 @@
 # Cloudflare Pages: only fall back when a path has no matching built file.
 # /api/* is handled by `functions/api/contact.js` and takes priority over this.
+# Ensure the admin panel resolves to its index.html.
+/admin  /admin/  301
 /*  /404.html  404

@@ -5,18 +5,15 @@ import { fileURLToPath, URL } from 'node:url';
 // Deploy: upload `dist/` assets + `functions/` to Cloudflare Pages.
 export default defineConfig({
   output: 'static',
-  // Set to your production domain for correct canonical/absolute URLs
-  site: 'https://your-domain.pages.dev',
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'zh'],
-    routing: {
-      // Every page lives under /en/... and /zh/... ; the root index page
-      // redirects to a locale (Astro also emits `/` -> default-locale 302).
-      prefixDefaultLocale: true,
-      redirectToDefaultLocale: true,
-    },
-  },
+  // Production domain for canonical/absolute URLs.
+  // NOTE: Astro i18n routing was removed on purpose:
+  //  - `redirectToDefaultLocale` + `site` used to emit a root redirect to an
+  //    absolute placeholder URL (https://your-domain.pages.dev/en/).
+  //  - with `prefixDefaultLocale`, non-locale pages (e.g. /admin/) were
+  //    logged as built but never written to dist, causing a 404 on deploy.
+  // Locale routing is handled manually by src/pages/index.astro (relative
+  // URLs) and by the physical src/pages/{en,zh} directory layout.
+  site: 'https://qncms.pages.dev',
   // `@/...` -> src/...  (exposed to Vite's resolver)
   vite: {
     resolve: {
