@@ -101,16 +101,9 @@ const { locale } = Astro.props;
       <div class="modal-content">
         <h2 id="modalTitle">Add Product</h2>
         <form id="productForm">
-          <input type="hidden" id="editSlug" />
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Slug *</label>
-              <input type="text" id="slug" required placeholder="nova-ingest" />
-            </div>
-            <div class="form-group">
-              <label>Position</label>
-              <input type="number" id="position" value="0" />
-            </div>
+          <div class="form-group">
+            <label>Slug * (URL 标识，英文小写)</label>
+            <input type="text" id="slug" required placeholder="nova-ingest" />
           </div>
           <div class="form-grid">
             <div class="form-group">
@@ -124,17 +117,51 @@ const { locale } = Astro.props;
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Short Desc (EN)</label>
+              <label>Tag (EN)</label>
+              <input type="text" id="tag_en" placeholder="Streaming" />
+            </div>
+            <div class="form-group">
+              <label>Tag (ZH)</label>
+              <input type="text" id="tag_zh" placeholder="数据接入" />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Short Description (EN)</label>
               <textarea id="short_en"></textarea>
             </div>
             <div class="form-group">
-              <label>Short Desc (ZH)</label>
+              <label>Short Description (ZH)</label>
               <textarea id="short_zh"></textarea>
             </div>
           </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Description (EN)</label>
+              <textarea id="description_en"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Description (ZH)</label>
+              <textarea id="description_zh"></textarea>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Highlights (EN, JSON 数组)</label>
+              <input type="text" id="highlights_en" placeholder='["Fast", "Stable"]' />
+            </div>
+            <div class="form-group">
+              <label>Highlights (ZH, JSON 数组)</label>
+              <input type="text" id="highlights_zh" placeholder='["快速", "稳定"]' />
+            </div>
+          </div>
           <div class="form-group">
-            <label>Image URL *</label>
+            <label>Image URL * (图片外链)</label>
             <input type="url" id="image_url" required placeholder="https://example.com/image.png" />
+          </div>
+          <div class="form-group">
+            <label>Position (排序，数字越小越靠前)</label>
+            <input type="number" id="position" value="0" />
           </div>
           <div class="actions">
             <button type="submit" class="btn btn-success">Save</button>
@@ -201,19 +228,24 @@ const { locale } = Astro.props;
         list.innerHTML = 'Loading...';
 
         try {
-          const resp = await fetch('/api/products?locale=en', {
+          const resp = await fetch('/api/admin/products', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const products = await resp.json();
           
+          if (!products || products.length === 0) {
+            list.innerHTML = '<div style="color:#888;padding:16px;">No products in database. Use "+ Add Product" to create one. (提示：请执行 D1 迁移脚本创建表)</div>';
+            return;
+          }
+          
           list.innerHTML = products.map(p => `
             <div class="product-item">
-              <img src="${p.image_url}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 60%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2260%22/><text x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22>No Image</text></svg>'">
+              <img src="${p.image_url}" alt="${p.name_en}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 60%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2260%22/><text x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22>No Image</text></svg>'">
               <div class="product-info">
-                <h3>${p.name_en}</h3>
+                <h3>${p.name_en} / ${p.name_zh}</h3>
                 <p>${p.short_en}</p>
               </div>
-              <button class="btn btn-sm" onclick="editProduct('${p.slug}')">Edit</button>
+              <button class="btn btn-sm" onclick='editProduct(${JSON.stringify(p)})'>Edit</button>
               <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.slug}')">Delete</button>
             </div>
           `).join('');
@@ -222,30 +254,28 @@ const { locale } = Astro.props;
         }
       }
 
-      function openModal(slug = null) {
+      function openModal(product = null) {
         document.getElementById('productModal').classList.add('active');
-        document.getElementById('modalTitle').textContent = slug ? 'Edit Product' : 'Add Product';
-        document.getElementById('editSlug').value = slug || '';
-        document.getElementById('slug').disabled = !!slug;
-        
-        if (slug) {
-          // Load existing product data
-          fetch(`/api/products?locale=en`)
-            .then(r => r.json())
-            .then(products => {
-              const p = products.find(x => x.slug === slug);
-              if (p) {
-                document.getElementById('slug').value = p.slug;
-                document.getElementById('position').value = p.position;
-                document.getElementById('name_en').value = p.name_en || '';
-                document.getElementById('name_zh').value = p.name_zh || '';
-                document.getElementById('short_en').value = p.short_en || '';
-                document.getElementById('short_zh').value = p.short_zh || '';
-                document.getElementById('image_url').value = p.image_url || '';
-              }
-            });
+        document.getElementById('modalTitle').textContent = product ? 'Edit Product' : 'Add Product';
+        document.getElementById('slug').disabled = !!product;
+
+        if (product) {
+          document.getElementById('slug').value = product.slug;
+          document.getElementById('position').value = product.position || 0;
+          document.getElementById('name_en').value = product.name_en || '';
+          document.getElementById('name_zh').value = product.name_zh || '';
+          document.getElementById('tag_en').value = product.tag_en || '';
+          document.getElementById('tag_zh').value = product.tag_zh || '';
+          document.getElementById('short_en').value = product.short_en || '';
+          document.getElementById('short_zh').value = product.short_zh || '';
+          document.getElementById('description_en').value = product.description_en || '';
+          document.getElementById('description_zh').value = product.description_zh || '';
+          document.getElementById('highlights_en').value = product.highlights_en || '[]';
+          document.getElementById('highlights_zh').value = product.highlights_zh || '[]';
+          document.getElementById('image_url').value = product.image_url || '';
         } else {
           document.getElementById('productForm').reset();
+          document.getElementById('position').value = '0';
         }
       }
 
@@ -253,52 +283,67 @@ const { locale } = Astro.props;
         document.getElementById('productModal').classList.remove('active');
       }
 
-      function editProduct(slug) {
-        openModal(slug);
+      function editProduct(product) {
+        openModal(product);
       }
 
       async function deleteProduct(slug) {
-        if (!confirm(`Delete product "${slug}"?`)) return;
-        
+        if (!confirm(`Delete product "${slug}"? 确认删除？`)) return;
+
         try {
-          await fetch(`/api/products/delete?slug=${encodeURIComponent(slug)}`, {
+          const resp = await fetch(`/api/products/delete?slug=${encodeURIComponent(slug)}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
           });
+          const data = await resp.json();
+          if (!data.ok) {
+            alert('Delete failed: ' + (data.message || 'unknown error'));
+            return;
+          }
           loadProducts();
         } catch (err) {
-          alert('Failed to delete');
+          alert('Network error');
         }
       }
 
       document.getElementById('productForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const data = {
-          slug: document.getElementById('slug').value,
-          position: parseInt(document.getElementById('position').value) || 0,
+          slug: document.getElementById('slug').value.trim(),
+          position: parseInt(document.getElementById('position').value, 10) || 0,
           name_en: document.getElementById('name_en').value,
           name_zh: document.getElementById('name_zh').value,
+          tag_en: document.getElementById('tag_en').value,
+          tag_zh: document.getElementById('tag_zh').value,
           short_en: document.getElementById('short_en').value,
           short_zh: document.getElementById('short_zh').value,
+          description_en: document.getElementById('description_en').value,
+          description_zh: document.getElementById('description_zh').value,
+          highlights_en: document.getElementById('highlights_en').value || '[]',
+          highlights_zh: document.getElementById('highlights_zh').value || '[]',
           image_url: document.getElementById('image_url').value,
-          tag_en: '', tag_zh: '', description_en: '', description_zh: '',
-          highlights_en: '[]', highlights_zh: '[]'
         };
 
         try {
-          await fetch('/api/products', {
+          const resp = await fetch('/api/products', {
             method: 'POST',
-            headers: { 
+            headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
           });
+          const result = await resp.json();
+          if (!result.ok) {
+            alert('Save failed: ' + (result.message || 'unknown error') +
+              (result.message === 'Database not available' ? '（请确认 D1 数据库已绑定并执行过迁移脚本）' : ''));
+            return;
+          }
           closeModal();
           loadProducts();
         } catch (err) {
-          alert('Failed to save');
+          alert('Network error');
         }
       });
 

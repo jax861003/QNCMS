@@ -1,14 +1,11 @@
-// Me API - check current auth status
+// GET /api/me - current session status
+import { verifyToken, extractAuth } from '../_utils.js';
+
 export async function GET(context) {
-  const cookie = context.request.headers.get('Cookie') || '';
-  const match = cookie.match(/nova-admin=([^;]+)/);
-
-  if (match) {
-    const [ts, sig] = match[1].split('.');
-    if (ts && sig && Number(ts) > Date.now() - 86400000) {
-      return context.json({ authenticated: true, token: match[1] });
-    }
+  const env = context.locals.runtime.env;
+  const token = extractAuth(context.request.headers);
+  if (token && (await verifyToken(token, env.JWT_SECRET || 'change-me-jwt-secret'))) {
+    return context.json({ authenticated: true, token });
   }
-
   return context.json({ authenticated: false });
 }
