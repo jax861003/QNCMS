@@ -1,6 +1,28 @@
 /* NovaGrid — single vanilla client bundle (no framework, ~1KB gzipped).
-   Handles: header scroll state, mobile menu, contact form POST, scroll reveal. */
+   Handles: theme toggle, header scroll state, mobile menu, contact form POST,
+   scroll reveal. */
 (function () {
+  // ---- Theme toggle -------------------------------------------------------
+  var themeBtn = document.querySelector('[data-theme-toggle]');
+  function currentTheme() {
+    try {
+      var s = localStorage.getItem('theme');
+      if (s === 'light' || s === 'dark') return s;
+    } catch (e) { /* ignore */ }
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+  function applyTheme(t) {
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem('theme', t); } catch (e) { /* ignore */ }
+  }
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+    });
+  }
+
   // Header shadow on scroll
   var header = document.querySelector('[data-header]');
   function onScroll() {

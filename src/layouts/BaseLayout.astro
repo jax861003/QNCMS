@@ -1,7 +1,7 @@
 ---
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
-import { otherLocale, type Locale } from '@/lib/i18n';
+import { locales, type Locale } from '@/lib/i18n';
 import '../styles/global.css';
 
 interface Props {
@@ -11,12 +11,14 @@ interface Props {
 }
 
 const { title, description, locale } = Astro.props;
-const lang = locale === 'zh' ? 'zh-Hans' : 'en';
+const lang = locale === 'zh' ? 'zh-Hans' : locale;
 const self = Astro.url.href;
 
-// Locale alternates for hreflang
-const enPath = Astro.url.pathname.replace(`/${locale}`, '/en');
-const zhPath = Astro.url.pathname.replace(`/${locale}`, '/zh');
+// Locale alternates for hreflang (one per supported locale)
+const localePaths = locales.map((l) => ({
+  href: Astro.url.pathname.replace(`/${locale}`, `/${l}`),
+  l,
+}));
 ---
 
 <!doctype html>
@@ -28,8 +30,7 @@ const zhPath = Astro.url.pathname.replace(`/${locale}`, '/zh');
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={self} />
-    <link rel="alternate" hreflang="en" href={enPath} />
-    <link rel="alternate" hreflang="zh" href={zhPath} />
+    {localePaths.map((p) => <link rel="alternate" hreflang={p.l} href={p.href} />)}
     <link rel="alternate" hreflang="x-default" href={self} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -38,6 +39,20 @@ const zhPath = Astro.url.pathname.replace(`/${locale}`, '/zh');
     <meta property="og:locale:alternate" content={locale === 'zh' ? 'en_US' : 'zh_CN'} />
     <meta name="theme-color" content="#ffffff" />
     <meta name="generator" content="Astro" />
+    <!-- Apply theme before paint to avoid a flash of the wrong scheme -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t !== 'light' && t !== 'dark') {
+            t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
     <script type="module" defer src="/scripts/site.js"></script>
   </head>
   <body>

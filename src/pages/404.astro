@@ -1,10 +1,7 @@
 ---
 // Standalone 404 (used by Cloudflare Pages `/* /404.html 404` fallback).
-// Kept locale-independent and dependency-free.
-const links = [
-  { href: '/en/', label: 'English home' },
-  { href: '/zh/', label: '中文首页' },
-];
+// Kept locale-independent; links are generated from the shared locale list.
+import { locales, localeNames } from '@/lib/i18n';
 ---
 
 <!doctype html>
@@ -15,14 +12,28 @@ const links = [
     <title>404 — Page not found</title>
     <meta name="robots" content="noindex" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t !== 'light' && t !== 'dark') {
+            t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) { document.documentElement.dataset.theme = 'light'; }
+      })();
+    </script>
     <style>
       :root { color-scheme: light; }
+      html[data-theme="dark"] { color-scheme: dark; }
       * { box-sizing: border-box; }
       body {
         margin: 0; min-height: 100vh; display: grid; place-items: center;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
         color: #0b1020; background: #fff; text-align: center; padding: 24px;
+        transition: background 0.3s, color 0.3s;
       }
+      html[data-theme="dark"] body { color: #e7eaf4; background: #0b1020; }
       .wrap { max-width: 420px; }
       .code {
         font-size: clamp(4rem, 14vw, 6rem); font-weight: 800; letter-spacing: -0.03em;
@@ -31,6 +42,7 @@ const links = [
       }
       h1 { font-size: 1.4rem; margin: 18px 0 8px; }
       p { color: #475069; margin: 0 0 28px; }
+      html[data-theme="dark"] p { color: #a7b0c5; }
       .links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
       .links a {
         padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 0.95rem;
@@ -38,6 +50,7 @@ const links = [
         box-shadow: 0 10px 24px -10px rgba(37,99,235,0.7); text-decoration: none;
       }
       .links a.ghost { background: #fff; color: #0b1020; border: 1px solid #e6e9f2; box-shadow: none; }
+      html[data-theme="dark"] .links a.ghost { background: #141b30; color: #e7eaf4; border-color: #232c47; }
     </style>
   </head>
   <body>
@@ -46,7 +59,7 @@ const links = [
       <h1>Page not found</h1>
       <p>The page you're looking for doesn't exist or has moved.</p>
       <div class="links">
-        {links.map((l, i) => <a class={i === 0 ? '' : 'ghost'} href={l.href}>{l.label}</a>)}
+        {locales.map((l, i) => <a class={i === 0 ? '' : 'ghost'} href={`/${l}/`}>{localeNames[l]}</a>)}
       </div>
     </div>
   </body>

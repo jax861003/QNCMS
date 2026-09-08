@@ -2,8 +2,9 @@ name = "nova-grid-site"
 compatibility_date = "2024-11-01"
 
 # Cloudflare Pages configuration:
-# Build command and output directory are set in the Cloudflare Dashboard UI.
-# This wrangler.toml is used locally for `wrangler pages dev`.
+# `pages_build_output_dir` lets `wrangler pages deploy` (run from the repo
+# root) upload the built static assets AND the `functions/` directory.
+pages_build_output_dir = "dist"
 
 [[d1_databases]]
 binding = "DB"
