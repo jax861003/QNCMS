@@ -1,0 +1,52 @@
+---
+import { t, type Locale } from '@/lib/i18n';
+import { getProduct } from '@/lib/products';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+const product = getProduct(slug, locale)!;
+---
+
+<article class="section" style="padding-top: clamp(40px,6vw,72px);">
+  <div class="container">
+    <a class="back-link" href={`/${locale}/products/`}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+      {t(locale, 'productDetail.back')}
+    </a>
+
+    <div class="detail-hero">
+      <div>
+        <span class="product-tag" style="position:static; display:inline-block; margin-bottom:16px;">{product.tag}</span>
+        <h1>{product.name}</h1>
+        <p class="lead">{product.short}</p>
+        <a class="btn btn-primary" href={`/${locale}/contact/`}>{t(locale, 'nav.cta')}</a>
+      </div>
+      <div class="frame">
+        <img src={product.image} alt={product.name} width="800" height="600" />
+      </div>
+    </div>
+
+    <div class="detail-blocks">
+      <div class="detail-block">
+        <h3>{t(locale, 'productDetail.overview')}</h3>
+        <p>{product.description}</p>
+      </div>
+      <div class="detail-block">
+        <h3>{t(locale, 'productDetail.highlights')}</h3>
+        <ul class="feature-list">
+          {product.highlights.map((h: string) => (
+            <li>
+              <span class="ic" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+              </span>
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>

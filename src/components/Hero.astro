@@ -1,0 +1,53 @@
+---
+import { t, type Locale } from '@/lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const stats = [
+  { v: t(locale, 'hero.stat1Value'), l: t(locale, 'hero.stat1Label') },
+  { v: t(locale, 'hero.stat2Value'), l: t(locale, 'hero.stat2Label') },
+  { v: t(locale, 'hero.stat3Value'), l: t(locale, 'hero.stat3Label') },
+];
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="hero-badge">
+          <span class="dot" aria-hidden="true"></span>
+          {t(locale, 'hero.badge')}
+        </span>
+        <h1 class="hero-title">
+          {t(locale, 'hero.titleLine1')}<br />
+          <span class="grad">{t(locale, 'hero.titleLine2')}</span>
+        </h1>
+        <p class="hero-sub">{t(locale, 'hero.subtitle')}</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href={`/${locale}/products/`}>
+            {t(locale, 'hero.primaryCta')}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+          <a class="btn btn-ghost btn-lg" href={`/${locale}/contact/`}>{t(locale, 'hero.secondaryCta')}</a>
+        </div>
+      </div>
+      <div class="hero-visual" data-reveal>
+        <div class="frame">
+          <img src="/images/hero-dashboard.png" alt="NovaGrid control dashboard" width="900" height="675" fetchpriority="high" />
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      {stats.map((s, i) => (
+        <div class="stat" data-reveal>
+          <div class="num">{s.v}</div>
+          <div class="label">{s.l}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

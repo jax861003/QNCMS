@@ -1,0 +1,25 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { t } from '@/lib/i18n';
+import { productSlugs, getProduct } from '@/lib/products';
+import ProductDetailContent from '@/components/ProductDetailContent.astro';
+
+export function getStaticPaths() {
+  return productSlugs().map((slug) => ({
+    params: { slug },
+    props: { slug },
+  }));
+}
+
+const locale = 'zh';
+const { slug } = Astro.props;
+const product = getProduct(slug, locale)!;
+---
+
+<BaseLayout
+  title={`${product.name} — ${t(locale, 'brand')}`}
+  description={product.short}
+  locale={locale}
+>
+  <ProductDetailContent locale={locale} slug={slug} />
+</BaseLayout>

@@ -1,0 +1,116 @@
+{
+  "products": [
+    {
+      "slug": "nova-ingest",
+      "name": { "en": "Ingest", "zh": "Nova Ingest" },
+      "tag": { "en": "Streaming", "zh": "数据接入" },
+      "short": {
+        "en": "Real-time ingestion for structured and unstructured data with exactly-once semantics.",
+        "zh": "为结构化与非结构化数据提供实时接入，支持精确一次（exactly-once）语义。"
+      },
+      "image": "/images/products/ingest.png",
+      "description": {
+        "en": "Ingest is the front door of every NovaGrid deployment. It connects to over 60 sources — Kafka, S3, Postgres, Snowflake, and more — and normalizes the stream into a uniform format your downstream services trust. Backpressure-aware pipelines keep latency low even during traffic spikes.",
+        "zh": "Ingest 是每个 NovaGrid 部署的入口。它连接 60 多种数据源——Kafka、S3、Postgres、Snowflake 等——并将数据流归一化为下游服务可信赖的统一格式。具备背压感知能力的管道即使在流量高峰时也保持低延迟。"
+      },
+      "highlights": {
+        "en": [
+          "60+ native connectors",
+          "Exactly-once delivery guarantees",
+          "Backpressure-aware pipelines",
+          "Schema registry with time-travel"
+        ],
+        "zh": [
+          "60+ 原生连接器",
+          "精确一次投递保证",
+          "背压感知型管道",
+          "支持时间旅行的 Schema 注册表"
+        ]
+      }
+    },
+    {
+      "slug": "nova-orchestrate",
+      "name": { "en": "Orchestrate", "zh": "Nova Orchestrate" },
+      "tag": { "en": "Workflows", "zh": "任务编排" },
+      "short": {
+        "en": "Visual DAG orchestration for complex, multi-step data pipelines.",
+        "zh": "面向复杂多步骤数据管道的可视化 DAG 编排。"
+      },
+      "image": "/images/products/orchestrate.png",
+      "description": {
+        "en": "Orchestrate turns brittle cron jobs and hand-rolled glue code into declarative, dependency-aware workflows. Each node — transform, call, branch, or fan-out — is observed, retried, and replayable. Define the graph visually, then export it as code for version control.",
+        "zh": "Orchestrate 将脆弱的 cron 任务与手工胶水代码转变为声明式、具备依赖感知的可观测工作流。每个节点——转换、调用、分支或扇出——都可被观测、重试与重放。可视化定义有向图，再导出为代码纳入版本管理。"
+      },
+      "highlights": {
+        "en": [
+          "Drag-and-drop DAG designer",
+          "Declarative, versioned definitions",
+          "Smart retries & dead-letter queues",
+          "SLA-aware scheduling"
+        ],
+        "zh": [
+          "拖拽式 DAG 设计器",
+          "声明式、可版本化的定义",
+          "智能重试与死信队列",
+          "SLA 感知的调度"
+        ]
+      }
+    },
+    {
+      "slug": "nova-analytics",
+      "name": { "en": "Analytics", "zh": "Nova Analytics" },
+      "tag": { "en": "BI & SQL", "zh": "分析与 SQL" },
+      "short": {
+        "en": "A blazing-fast query engine over petabyte-scale data, with a no-code BI surface.",
+        "zh": "面向 PB 级数据的极速查询引擎，附带无代码 BI 界面。"
+      },
+      "image": "/images/products/analytics.png",
+      "description": {
+        "en": "Analytics pairs a columnar, vectorized engine with a self-serve BI canvas. Analysts can explore with drag-and-drop charts, while engineers issue ANSI SQL with sub-second response even across 100TB. Caches and materialized views keep hot dashboards instant.",
+        "zh": "Analytics 将列式向量化引擎与自助式 BI 画布相结合。分析师可用拖拽式图表进行探索，工程师则可执行 ANSI SQL，即便跨 100TB 数据也能亚秒级响应。缓存与物化视图让高频仪表盘保持即时刷新。"
+      },
+      "highlights": {
+        "en": [
+          "Vectorized, columnar query engine",
+          "Sub-second queries over 100TB",
+          "No-code BI + full ANSI SQL",
+          "Materialized views & caching"
+        ],
+        "zh": [
+          "列式向量化查询引擎",
+          "跨 100TB 亚秒级查询",
+          "无代码 BI + 完整 ANSI SQL",
+          "物化视图与缓存"
+        ]
+      }
+    },
+    {
+      "slug": "nova-observability",
+      "name": { "en": "Observe", "zh": "Nova Observe" },
+      "tag": { "en": "Monitoring", "zh": "可观测性" },
+      "short": {
+        "en": "Unified metrics, logs, and traces with adaptive, cost-aware sampling.",
+        "zh": "统一的指标、日志与链路追踪，支持自适应、成本感知采样。"
+      },
+      "image": "/images/products/observe.png",
+      "description": {
+        "en": "Observe unifies metrics, logs, and distributed traces in one pane. Adaptive sampling keeps cost predictable while preserving the signals that matter — anomalies first. Blameless, correlated debugging replaces the hours of log archaeology.",
+        "zh": "Observe 将指标、日志与分布式链路追踪汇聚到同一面板。自适应采样让成本可预测，同时保留真正重要的信号——异常优先。无指责、强关联的调试取代了过去数小时的海量日志翻找。"
+      },
+      "highlights": {
+        "en": [
+          "Metrics, logs & traces unified",
+          "Adaptive, cost-aware sampling",
+          "Anomaly-first alerting",
+          "Automatic root-cause correlation"
+        ],
+        "zh": [
+          "指标、日志、链路追踪统一",
+          "自适应、成本感知采样",
+          "异常优先的告警",
+          "自动根因关联分析"
+        ]
+      }
+    }
+  ]
+}

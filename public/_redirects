@@ -1,0 +1,3 @@
+# Cloudflare Pages: only fall back when a path has no matching built file.
+# /api/* is handled by `functions/api/contact.js` and takes priority over this.
+/*  /404.html  404

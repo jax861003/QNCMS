@@ -1,0 +1,25 @@
+---
+import { t, type Locale } from '@/lib/i18n';
+import { getProducts } from '@/lib/products';
+import ProductCard from '@/components/ProductCard.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const products = getProducts(locale);
+const learnMore = t(locale, 'products.learnMore');
+---
+
+<section class="section" style="padding-top: clamp(48px,7vw,84px);">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">{t(locale, 'products.eyebrow')}</span>
+      <h2 style="font-size: clamp(2rem,4vw,3rem);">{t(locale, 'products.title')}</h2>
+      <p style="max-width:52ch;">{t(locale, 'products.subtitle')}</p>
+    </div>
+    <div class="products-grid">
+      {products.map((p) => <ProductCard product={p} locale={locale} learnMore={learnMore} />)}
+    </div>
+  </div>
+</section>

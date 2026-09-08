@@ -1,0 +1,11 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { t } from '@/lib/i18n';
+import AboutSection from '@/components/AboutSection.astro';
+
+const locale = 'zh';
+---
+
+<BaseLayout title={`关于 — ${t(locale, 'brand')}`} description={t(locale, 'about.body')} locale={locale}>
+  <AboutSection locale={locale} />
+</BaseLayout>

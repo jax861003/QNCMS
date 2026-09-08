@@ -1,0 +1,311 @@
+---
+import { fetchProducts } from '@/lib/api';
+import type { Locale } from '@/lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<!doctype html>
+<html lang={locale === 'zh' ? 'zh-Hans' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin — NovaGrid</title>
+    <style>
+      :root {
+        --brand: #2563eb; --ink: #0b1020; --ink-soft: #475069;
+        --bg: #fff; --bg-soft: #f5f7fb; --line: #e6e9f2;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-soft); color: var(--ink); }
+      .login-screen, .app { min-height: 100vh; }
+      .login-screen { display: flex; align-items: center; justify-content: center; }
+      .login-box { background: var(--bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(11,16,32,.1); width: 100%; max-width: 360px; }
+      .login-box h1 { font-size: 1.5rem; margin-bottom: 8px; }
+      .login-box p { color: var(--ink-soft); margin-bottom: 24px; font-size: .9rem; }
+      .field { margin-bottom: 16px; }
+      .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
+      .field input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 1rem; }
+      .field input:focus { outline: none; border-color: var(--brand); }
+      .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: .95rem; transition: all .2s; }
+      .btn-primary { background: var(--brand); color: #fff; }
+      .btn-primary:hover { background: #1d4ed8; }
+      .error { color: #dc2626; font-size: .85rem; margin-top: 8px; }
+      .app { display: flex; flex-direction: column; }
+      .header { background: var(--bg); border-bottom: 1px solid var(--line); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+      .header h1 { font-size: 1.25rem; }
+      .main { flex: 1; padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+      .card { background: var(--bg); border-radius: 16px; border: 1px solid var(--line); padding: 24px; margin-bottom: 24px; }
+      .card h2 { font-size: 1.1rem; margin-bottom: 16px; }
+      .product-list { display: grid; gap: 16px; }
+      .product-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-soft); border-radius: 12px; align-items: center; }
+      .product-item img { width: 80px; height: 60px; object-fit: cover; border-radius: 8px; }
+      .product-info { flex: 1; }
+      .product-info h3 { font-size: 1rem; margin-bottom: 4px; }
+      .product-info p { font-size: .85rem; color: var(--ink-soft); }
+      .btn-sm { padding: 8px 16px; font-size: .85rem; border-radius: 8px; }
+      .btn-danger { background: #dc2626; color: #fff; }
+      .btn-success { background: #16a34a; color: #fff; }
+      .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; z-index: 100; }
+      .modal.active { display: flex; }
+      .modal-content { background: var(--bg); padding: 32px; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+      .modal-content h2 { margin-bottom: 24px; }
+      .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .form-group { margin-bottom: 16px; }
+      .form-group label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
+      .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .95rem; }
+      .form-group textarea { min-height: 100px; resize: vertical; }
+      .actions { display: flex; gap: 12px; margin-top: 24px; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+          <h1>Admin Login</h1>
+          <p>Enter your credentials to manage the site</p>
+          <form id="loginForm">
+            <div class="field">
+              <label>Username</label>
+              <input type="text" id="username" required autocomplete="username" />
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <input type="password" id="password" required autocomplete="current-password" />
+            </div>
+            <div id="loginError" class="error"></div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Sign In</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="app" id="adminApp" style="display:none">
+        <header class="header">
+          <h1>NovaGrid Admin</h1>
+          <button class="btn btn-sm" onclick="logout()">Logout</button>
+        </header>
+        <main class="main">
+          <div class="card">
+            <h2>Products</h2>
+            <button class="btn btn-primary btn-sm" onclick="openModal()" style="margin-bottom:16px">+ Add Product</button>
+            <div class="product-list" id="productList">Loading...</div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal" id="productModal">
+      <div class="modal-content">
+        <h2 id="modalTitle">Add Product</h2>
+        <form id="productForm">
+          <input type="hidden" id="editSlug" />
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Slug *</label>
+              <input type="text" id="slug" required placeholder="nova-ingest" />
+            </div>
+            <div class="form-group">
+              <label>Position</label>
+              <input type="number" id="position" value="0" />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Name (EN) *</label>
+              <input type="text" id="name_en" required />
+            </div>
+            <div class="form-group">
+              <label>Name (ZH) *</label>
+              <input type="text" id="name_zh" required />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Short Desc (EN)</label>
+              <textarea id="short_en"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Short Desc (ZH)</label>
+              <textarea id="short_zh"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Image URL *</label>
+            <input type="url" id="image_url" required placeholder="https://example.com/image.png" />
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-success">Save</button>
+            <button type="button" class="btn" onclick="closeModal()" style="background:var(--line)">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let token = localStorage.getItem('admin_token');
+      const app = document.getElementById('app');
+      const loginScreen = document.getElementById('loginScreen');
+      const adminApp = document.getElementById('adminApp');
+
+      // Check session
+      if (token) {
+        showAdmin();
+      } else {
+        loginScreen.style.display = 'flex';
+      }
+
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorEl = document.getElementById('loginError');
+
+        try {
+          const resp = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await resp.json();
+          
+          if (data.ok) {
+            token = data.token;
+            localStorage.setItem('admin_token', token);
+            showAdmin();
+          } else {
+            errorEl.textContent = data.message || 'Login failed';
+          }
+        } catch (err) {
+          errorEl.textContent = 'Network error';
+        }
+      });
+
+      function showAdmin() {
+        loginScreen.style.display = 'none';
+        adminApp.style.display = 'flex';
+        loadProducts();
+      }
+
+      function logout() {
+        token = null;
+        localStorage.removeItem('admin_token');
+        loginScreen.style.display = 'flex';
+        adminApp.style.display = 'none';
+      }
+
+      async function loadProducts() {
+        const list = document.getElementById('productList');
+        list.innerHTML = 'Loading...';
+
+        try {
+          const resp = await fetch('/api/products?locale=en', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const products = await resp.json();
+          
+          list.innerHTML = products.map(p => `
+            <div class="product-item">
+              <img src="${p.image_url}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 60%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2260%22/><text x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22>No Image</text></svg>'">
+              <div class="product-info">
+                <h3>${p.name_en}</h3>
+                <p>${p.short_en}</p>
+              </div>
+              <button class="btn btn-sm" onclick="editProduct('${p.slug}')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.slug}')">Delete</button>
+            </div>
+          `).join('');
+        } catch (err) {
+          list.innerHTML = 'Failed to load products';
+        }
+      }
+
+      function openModal(slug = null) {
+        document.getElementById('productModal').classList.add('active');
+        document.getElementById('modalTitle').textContent = slug ? 'Edit Product' : 'Add Product';
+        document.getElementById('editSlug').value = slug || '';
+        document.getElementById('slug').disabled = !!slug;
+        
+        if (slug) {
+          // Load existing product data
+          fetch(`/api/products?locale=en`)
+            .then(r => r.json())
+            .then(products => {
+              const p = products.find(x => x.slug === slug);
+              if (p) {
+                document.getElementById('slug').value = p.slug;
+                document.getElementById('position').value = p.position;
+                document.getElementById('name_en').value = p.name_en || '';
+                document.getElementById('name_zh').value = p.name_zh || '';
+                document.getElementById('short_en').value = p.short_en || '';
+                document.getElementById('short_zh').value = p.short_zh || '';
+                document.getElementById('image_url').value = p.image_url || '';
+              }
+            });
+        } else {
+          document.getElementById('productForm').reset();
+        }
+      }
+
+      function closeModal() {
+        document.getElementById('productModal').classList.remove('active');
+      }
+
+      function editProduct(slug) {
+        openModal(slug);
+      }
+
+      async function deleteProduct(slug) {
+        if (!confirm(`Delete product "${slug}"?`)) return;
+        
+        try {
+          await fetch(`/api/products/delete?slug=${encodeURIComponent(slug)}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          loadProducts();
+        } catch (err) {
+          alert('Failed to delete');
+        }
+      }
+
+      document.getElementById('productForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const data = {
+          slug: document.getElementById('slug').value,
+          position: parseInt(document.getElementById('position').value) || 0,
+          name_en: document.getElementById('name_en').value,
+          name_zh: document.getElementById('name_zh').value,
+          short_en: document.getElementById('short_en').value,
+          short_zh: document.getElementById('short_zh').value,
+          image_url: document.getElementById('image_url').value,
+          tag_en: '', tag_zh: '', description_en: '', description_zh: '',
+          highlights_en: '[]', highlights_zh: '[]'
+        };
+
+        try {
+          await fetch('/api/products', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+          });
+          closeModal();
+          loadProducts();
+        } catch (err) {
+          alert('Failed to save');
+        }
+      });
+
+      // Close modal on outside click
+      document.getElementById('productModal').addEventListener('click', (e) => {
+        if (e.target.id === 'productModal') closeModal();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { t } from '@/lib/i18n';
+import ProductsIndexContent from '@/components/ProductsIndexContent.astro';
+
+const locale = 'en';
+---
+
+<BaseLayout title={`Products — ${t(locale, 'brand')}`} description={t(locale, 'products.subtitle')} locale={locale}>
+  <ProductsIndexContent locale={locale} />
+</BaseLayout>

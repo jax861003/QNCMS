@@ -1,0 +1,13 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { t } from '@/lib/i18n';
+import HomeContent from '@/components/HomeContent.astro';
+
+const locale = 'en';
+const title = `${t(locale, 'brand')} — Cloud-native infrastructure for the data-driven enterprise`;
+const description = t(locale, 'hero.subtitle');
+---
+
+<BaseLayout title={title} description={description} locale={locale}>
+  <HomeContent locale={locale} />
+</BaseLayout>

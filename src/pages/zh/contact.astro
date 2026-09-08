@@ -1,0 +1,11 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { t } from '@/lib/i18n';
+import ContactSection from '@/components/ContactSection.astro';
+
+const locale = 'zh';
+---
+
+<BaseLayout title={`联系我们 — ${t(locale, 'brand')}`} description={t(locale, 'contact.subtitle')} locale={locale}>
+  <ContactSection locale={locale} />
+</BaseLayout>

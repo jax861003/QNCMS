@@ -1,0 +1,65 @@
+---
+import { t, type Locale } from '@/lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="logo" href={`/${locale}/`} aria-label={t(locale, 'brand')}>
+          <span class="logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 16 V8 M9 16 V4 M14 16 V7 M19 16 V10" />
+            </svg>
+          </span>
+          <span>{t(locale, 'brand')}</span>
+        </a>
+        <p>{t(locale, 'footer.tagline')}</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>{t(locale, 'footer.colProducts')}</h4>
+        <ul>
+          <li><a href={`/${locale}/products/ingest/`}>Ingest</a></li>
+          <li><a href={`/${locale}/products/orchestrate/`}>Orchestrate</a></li>
+          <li><a href={`/${locale}/products/analytics/`}>Analytics</a></li>
+          <li><a href={`/${locale}/products/observability/`}>Observe</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>{t(locale, 'footer.colCompany')}</h4>
+        <ul>
+          <li><a href={`/${locale}/about/`}>{t(locale, 'nav.about')}</a></li>
+          <li><a href={`/${locale}/contact/`}>{t(locale, 'nav.contact')}</a></li>
+          <li><a href="#careers">Careers</a></li>
+          <li><a href="#press">Press</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>{t(locale, 'footer.colLegal')}</h4>
+        <ul>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#terms">Terms</a></li>
+          <li><a href="#security">Security</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© {year} {t(locale, 'brand')}. {t(locale, 'footer.rights')}</span>
+      <span>
+        <a href="#github" style="margin-right:18px">GitHub</a>
+        <a href="#twitter">Twitter / X</a>
+        <a href="#linkedin">LinkedIn</a>
+      </span>
+    </div>
+  </div>
+</footer>

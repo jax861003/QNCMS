@@ -1,0 +1,21 @@
+---
+import { t, type Locale } from '@/lib/i18n';
+import { getProducts } from '@/lib/products';
+import Hero from '@/components/Hero.astro';
+import ProductsSection from '@/components/ProductsSection.astro';
+import AboutSection from '@/components/AboutSection.astro';
+import ContactSection from '@/components/ContactSection.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+// Use static JSON for SSR (will be hydrated client-side)
+const products = getProducts(locale);
+---
+
+<Hero locale={locale} />
+<ProductsSection locale={locale} products={products} />
+<AboutSection locale={locale} />
+<ContactSection locale={locale} />

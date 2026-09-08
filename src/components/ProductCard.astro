@@ -1,0 +1,29 @@
+---
+import type { LocalizedProduct } from '@/lib/products';
+import { type Locale } from '@/lib/i18n';
+
+interface Props {
+  product: LocalizedProduct;
+  locale: Locale;
+  /** Page-level strings for "Learn more" etc. */
+  learnMore: string;
+}
+const { product, locale, learnMore } = Astro.props;
+---
+
+<a class="product-card" href={`/${locale}/products/${product.slug}/`} data-reveal>
+  <div class="product-thumb">
+    <img src={product.image} alt={product.name} loading="lazy" width="640" height="400" />
+    <span class="product-tag">{product.tag}</span>
+  </div>
+  <div class="product-body">
+    <h3>{product.name}</h3>
+    <p>{product.short}</p>
+    <span class="product-link">
+      {learnMore}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </span>
+  </div>
+</a>

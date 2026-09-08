@@ -1,0 +1,10 @@
+[[d1_databases]]
+binding = "DB"
+database_name = "nova-site-db"
+database_id = "CHANGE_ME_TO_YOUR_D1_DATABASE_ID"
+
+[vars]
+ADMIN_USERNAME = "admin"
+# Generate with: node -e "crypto.subtle.digest('SHA-256', new TextEncoder().encode('your_password')).then(h => console.log(Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')))"
+ADMIN_PASSWORD_HASH = "PLACEHOLDER_CHANGE_ME"
+JWT_SECRET = "CHANGE_ME_TO_RANDOM_32_CHARS"

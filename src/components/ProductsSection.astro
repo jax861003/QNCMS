@@ -1,0 +1,22 @@
+---
+import { t, type Locale } from '@/lib/i18n';
+import ProductGrid from '@/components/ProductGrid.astro';
+
+interface Props {
+  locale: Locale;
+  products?: any[];
+}
+const { locale, products } = Astro.props;
+---
+
+<section class="section" id="products">
+  <div class="container">
+    <div class="section-head center">
+      <span class="eyebrow">{t(locale, 'products.eyebrow')}</span>
+      <h2>{t(locale, 'products.title')}</h2>
+      <p>{t(locale, 'products.subtitle')}</p>
+    </div>
+
+    <ProductGrid products={products || []} locale={locale} />
+  </div>
+</section>

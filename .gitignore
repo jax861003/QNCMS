@@ -1,0 +1,38 @@
+# Node modules
+node_modules/
+dist/
+build/
+.astro/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agnes local artifacts
+.agnes/
+
+# D1 local database (if any)
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Wrangler state
+.wrangler/

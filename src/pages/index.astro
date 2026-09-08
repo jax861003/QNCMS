@@ -1,0 +1,32 @@
+---
+// Root index: redirect to a locale based on the visitor's browser language.
+// With redirectToDefaultLocale:true, Astro also emits a `/` -> `/en` 302; this
+// static page is the friendly fallback and gives better UX (zh visitors -> /zh).
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Redirecting…</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="/en/" />
+    <meta http-equiv="refresh" content="0; url=/en/" />
+  </head>
+  <body>
+    <div style="min-height:100vh;display:grid;place-items:center;font-family:-apple-system,Segoe UI,PingFang SC,Microsoft YaHei,Arial,sans-serif;color:#475069;">
+      <div style="text-align:center;">
+        <p style="font-size:1rem;margin-bottom:18px;">Redirecting…</p>
+        <p style="line-height:2;">
+          <a href="/en/" style="color:#2563eb;font-weight:600;">English</a>
+          <span style="color:#8a93a8;">/</span>
+          <a href="/zh/" style="color:#2563eb;font-weight:600;">中文</a>
+        </p>
+      </div>
+    </div>
+    <script>
+      const lang = (navigator.language || 'en').toLowerCase();
+      window.location.replace(lang.startsWith('zh') ? '/zh/' : '/en/');
+    </script>
+  </body>
+</html>

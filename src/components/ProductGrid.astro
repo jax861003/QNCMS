@@ -1,0 +1,52 @@
+---
+import type { Product } from '@/lib/api';
+
+interface Props {
+  products: Product[];
+  locale: 'en' | 'zh';
+}
+const { products, locale } = Astro.props;
+const learnMore = locale === 'zh' ? '了解更多' : 'Learn more';
+---
+
+{products.length > 0 ? (
+  <div class="products-grid">
+    {products.map((p) => (
+      <a class="product-card" href={`/${locale}/products/${p.slug}/`} data-reveal>
+        <div class="product-thumb">
+          <img src={p.image_url} alt={p.name} loading="lazy" width="640" height="400" />
+          {p.tag && <span class="product-tag">{p.tag}</span>}
+        </div>
+        <div class="product-body">
+          <h3>{p.name}</h3>
+          <p>{p.short}</p>
+          <span class="product-link">
+            {learnMore}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </span>
+        </div>
+      </a>
+    ))}
+  </div>
+) : (
+  <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-soft);">Loading products...</div>
+)}
+
+<style>
+.products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+@media (max-width: 960px) { .products-grid { grid-template-columns: 1fr; } }
+.product-card { position: relative; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease); }
+.product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+.product-thumb { position: relative; overflow: hidden; background: var(--bg-muted); }
+.product-thumb img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform .6s var(--ease); }
+.product-card:hover .product-thumb img { transform: scale(1.05); }
+.product-tag { position: absolute; top: 14px; left: 14px; padding: 5px 12px; border-radius: 999px; background: #ffffffeb; backdrop-filter: blur(6px); font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); }
+.product-body { padding: 26px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.product-body h3 { font-size: 1.3rem; }
+.product-body p { color: var(--ink-soft); font-size: .98rem; flex: 1; }
+.product-link { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; color: var(--brand); margin-top: 6px; }
+.product-link svg { width: 15px; height: 15px; transition: transform .25s var(--ease); }
+.product-card:hover .product-link svg { transform: translate(4px); }
+</style>

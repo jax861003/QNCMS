@@ -1,0 +1,75 @@
+{
+  "langName": "简体中文",
+  "brand": "NovaGrid",
+  "nav": {
+    "home": "首页",
+    "products": "产品",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "cta": "立即咨询"
+  },
+  "hero": {
+    "badge": "企业级 · 云原生",
+    "titleLine1": "让基础设施",
+    "titleLine2": "随你的雄心一同扩展。",
+    "subtitle": "NovaGrid 为现代数据团队提供云原生平台，集统一的数据接入、编排与分析于一体——为可靠性而生，让复杂被优雅化解。",
+    "primaryCta": "探索产品",
+    "secondaryCta": "预约演示",
+    "stat1Value": "99.99%",
+    "stat1Label": "SLA 可用性",
+    "stat2Value": "120亿+",
+    "stat2Label": "日处理事件",
+    "stat3Value": "40+",
+    "stat3Label": "覆盖国家"
+  },
+  "products": {
+    "eyebrow": "产品",
+    "title": "为数据驱动型企业打造的一体化技术栈",
+    "subtitle": "可组合、开放、安全。按需自由搭配各个模块——每一款既能独立运行，也能协同工作。",
+    "learnMore": "了解更多",
+    "viewAll": "查看全部产品"
+  },
+  "productDetail": {
+    "back": "返回产品列表",
+    "overview": "产品概述",
+    "highlights": "核心能力",
+    "specLabel": "技术亮点"
+  },
+  "about": {
+    "eyebrow": "关于 NovaGrid",
+    "title": "我们构建那些不起眼、却支撑现代软件运转的基石。",
+    "body": "NovaGrid 成立于 2016 年，是一支由工程师、设计师与运维专家组成的全球化团队，致力于让企业级数据基础设施变得轻松。我们相信可靠性是一项功能、安全是底线、软件应当轻盈——即使它每天处理数十亿条记录。",
+    "value1Title": "可靠性优先",
+    "value1Body": "多区域、自修复系统，SLA 高达 99.99%。",
+    "value2Title": "默认安全",
+    "value2Body": "零信任访问与端到端加密，开箱即用。",
+    "value3Title": "开放且以人为本",
+    "value3Body": "标准化的 API、透明的定价、真实的客户支持。"
+  },
+  "contact": {
+    "eyebrow": "联系我们",
+    "title": "聊聊你的业务负载。",
+    "subtitle": "告诉我们你正在构建什么。我们的团队成员会在一个工作日内回复你。",
+    "formName": "姓名",
+    "formNamePh": "请填写你的姓名",
+    "formEmail": "工作邮箱",
+    "formEmailPh": "you@company.com",
+    "formMessage": "需要什么帮助？",
+    "formMessagePh": "我们正在为 200 人的团队评估一套数据平台……",
+    "submit": "发送信息",
+    "sending": "发送中…",
+    "success": "感谢留言——我们已收到你的信息。",
+    "error": "出了点问题，请直接发送邮件联系我们。",
+    "infoTitle": "或直接联系我们",
+    "infoEmail": "hello@novagrid.io",
+    "infoPhone": "+1 (415) 555-0132",
+    "infoAddress": "500 Market Street, Suite 2100, San Francisco, CA 94105"
+  },
+  "footer": {
+    "tagline": "为数据驱动型企业打造的云原生基础设施。",
+    "colProducts": "产品",
+    "colCompany": "公司",
+    "colLegal": "法律",
+    "rights": "版权所有。"
+  }
+}

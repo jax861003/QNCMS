@@ -1,0 +1,54 @@
+---
+import { t, otherLocale, type Locale } from '@/lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const other = otherLocale(locale);
+
+// Build the "other language" path by flipping the /en | /zh prefix
+const rawPath = Astro.url.pathname;
+const otherPath = rawPath.replace(`/${locale}`, `/${other}`) || `/${other}`;
+
+const linkFor = (key: string, current: string) => {
+  const currentSlug = Astro.url.pathname.split('/').filter(Boolean).pop() || '';
+  // match top-level section
+  return currentSlug === current ? 'page' : undefined;
+};
+const section = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
+---
+
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a class="logo" href={`/${locale}/`} aria-label={t(locale, 'brand')}>
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 16 V8 M9 16 V4 M14 16 V7 M19 16 V10" />
+        </svg>
+      </span>
+      <span>{t(locale, 'brand')}</span>
+    </a>
+
+    <nav class="main-nav" data-nav aria-label="Primary">
+      <a href={`/${locale}/`} aria-current={section === 'index' ? 'page' : undefined}>{t(locale, 'nav.home')}</a>
+      <a href={`/${locale}/products/`} aria-current={section.startsWith('products') ? 'page' : undefined}>{t(locale, 'nav.products')}</a>
+      <a href={`/${locale}/about/`} aria-current={section === 'about' ? 'page' : undefined}>{t(locale, 'nav.about')}</a>
+      <a href={`/${locale}/contact/`} aria-current={section === 'contact' ? 'page' : undefined}>{t(locale, 'nav.contact')}</a>
+      <a class="btn btn-primary" href={`/${locale}/contact/`}>{t(locale, 'nav.cta')}</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="lang-switch" aria-label="Language / 语言">
+        <a class="lang-link" href={otherPath} hreflang={other} aria-label={other === 'zh' ? '切换到中文' : 'Switch to English'}>
+          {other === 'zh' ? '中文' : 'EN'}
+        </a>
+      </div>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>

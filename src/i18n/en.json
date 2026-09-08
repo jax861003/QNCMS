@@ -1,0 +1,75 @@
+{
+  "langName": "English",
+  "brand": "NovaGrid",
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact",
+    "cta": "Get in touch"
+  },
+  "hero": {
+    "badge": "Enterprise-grade · Cloud-native",
+    "titleLine1": "Infra that scales",
+    "titleLine2": "with your ambition.",
+    "subtitle": "NovaGrid delivers a cloud-native platform for modern data teams. Unified ingestion, orchestration, and analytics — engineered for reliability and built to be loved.",
+    "primaryCta": "Explore products",
+    "secondaryCta": "Book a demo",
+    "stat1Value": "99.99%",
+    "stat1Label": "SLA uptime",
+    "stat2Value": "12B+",
+    "stat2Label": "Events / day",
+    "stat3Value": "40+",
+    "stat3Label": "Countries served"
+  },
+  "products": {
+    "eyebrow": "Products",
+    "title": "A complete stack for the data-driven enterprise",
+    "subtitle": "Composable, open, and secure. Mix and match the modules you need — each one designed to work beautifully on its own or together.",
+    "learnMore": "Learn more",
+    "viewAll": "View all products"
+  },
+  "productDetail": {
+    "back": "Back to products",
+    "overview": "Overview",
+    "highlights": "Key capabilities",
+    "specLabel": "Technical highlights"
+  },
+  "about": {
+    "eyebrow": "About NovaGrid",
+    "title": "We build the unglamorous foundation that makes modern software possible.",
+    "body": "Founded in 2016, NovaGrid is a global team of engineers, designers, and operators on a mission to make enterprise data infrastructure effortless. We believe reliability is a feature, security is non-negotiable, and software should feel light — even when it moves billions of records a day.",
+    "value1Title": "Reliability first",
+    "value1Body": "Multi-region, self-healing systems with a 99.99% SLA.",
+    "value2Title": "Secure by default",
+    "value2Body": "Zero-trust access and end-to-end encryption out of the box.",
+    "value3Title": "Open & human",
+    "value3Body": "Standards-based APIs, transparent pricing, real support."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Let's talk about your workload.",
+    "subtitle": "Tell us a little about what you're building. A real person from our team replies within one business day.",
+    "formName": "Full name",
+    "formNamePh": "Ada Lovelace",
+    "formEmail": "Work email",
+    "formEmailPh": "you@company.com",
+    "formMessage": "How can we help?",
+    "formMessagePh": "We're evaluating a data platform for our team of 200…",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "success": "Thanks — we've received your message.",
+    "error": "Something went wrong. Please email us directly.",
+    "infoTitle": "Or reach us directly",
+    "infoEmail": "hello@novagrid.io",
+    "infoPhone": "+1 (415) 555-0132",
+    "infoAddress": "500 Market Street, Suite 2100, San Francisco, CA 94105"
+  },
+  "footer": {
+    "tagline": "Cloud-native infrastructure for the data-driven enterprise.",
+    "colProducts": "Products",
+    "colCompany": "Company",
+    "colLegal": "Legal",
+    "rights": "All rights reserved."
+  }
+}
