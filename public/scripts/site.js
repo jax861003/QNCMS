@@ -333,10 +333,10 @@
         grid.innerHTML = list.map(function (p) {
           var isStatic = !!staticSlugs[p.slug];
           var href = '/' + locale + '/products/' + p.slug + '/';
-          var name = locale === 'zh' ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || '');
-          var cat = locale === 'zh' ? (p.category_zh || p.category_en || '') : (p.category_en || p.category_zh || '');
-          var tag = locale === 'zh' ? (p.tag_zh || p.tag_en || '') : (p.tag_en || p.tag_zh || '');
-          var short = locale === 'zh' ? (p.short_zh || p.short_en || '') : (p.short_en || p.short_zh || '');
+          var name = p.name || (locale === 'zh' ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || ''));
+          var cat = p.category || (locale === 'zh' ? (p.category_zh || p.category_en || '') : (p.category_en || p.category_zh || ''));
+          var tag = p.tag || (locale === 'zh' ? (p.tag_zh || p.tag_en || '') : (p.tag_en || p.tag_zh || ''));
+          var short = p.short || (locale === 'zh' ? (p.short_zh || p.short_en || '') : (p.short_en || p.short_zh || ''));
           var tagList = String(tag || '').split(/[,，、;；|]/).map(function (s) { return s.trim(); }).filter(Boolean);
           var tagHtml = tagList.length ? '<div class="product-tags">' + tagList.map(function (tg) { return '<span class="product-tag">' + tg + '</span>'; }).join('') + '</div>' : '';
           var img = p.image_url
