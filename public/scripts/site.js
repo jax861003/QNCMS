@@ -205,9 +205,11 @@
             img.onerror = function () {
               var holder = logoEl.parentNode;
               holder.innerHTML = '';
-              var sp = document.createElement('span');
-              sp.textContent = title || '';
-              holder.appendChild(sp);
+              var fb = document.createElement('img');
+              fb.src = '/images/logo.svg';
+              fb.alt = title || '';
+              fb.style.cssText = 'height:32px;width:auto;display:block;';
+              holder.appendChild(fb);
             };
           } else if (title) {
             // Update the site name shown in the header (主页名称)
@@ -222,7 +224,14 @@
             var hImg = document.createElement('img');
             hImg.src = s.hero_logo_url;
             hImg.alt = (title || '') + ' logo';
-            hImg.onerror = function () { heroLogo.hidden = true; heroLogo.innerHTML = ''; };
+            hImg.onerror = function () {
+              heroLogo.innerHTML = '';
+              var hf = document.createElement('img');
+              hf.src = '/images/logo.svg';
+              hf.style.cssText = 'max-height:64px;width:auto;display:block;margin:0 auto;';
+              heroLogo.appendChild(hf);
+              heroLogo.hidden = false;
+            };
             heroLogo.appendChild(hImg);
             heroLogo.hidden = false;
           } else {

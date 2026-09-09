@@ -1,22 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" role="img" aria-label="QN CMS">
-  <!-- 青柠切片图标 -->
+  <!-- 青柠切片图标（精细版） -->
   <g transform="translate(86,80)">
-    <circle r="56" fill="#65a30d"/>
-    <circle r="50" fill="#a3e635"/>
-    <circle r="38" fill="#f7fee7"/>
-    <g stroke="#a3e635" stroke-width="3.5" stroke-linecap="round">
-      <line x1="0" y1="-38" x2="0" y2="38"/>
-      <line x1="-38" y1="0" x2="38" y2="0"/>
-      <line x1="-27" y1="-27" x2="27" y2="27"/>
-      <line x1="-27" y1="27" x2="27" y2="-27"/>
-      <line x1="-14" y1="-35" x2="14" y2="35"/>
-      <line x1="-35" y1="-14" x2="35" y2="14"/>
-      <line x1="-35" y1="14" x2="35" y2="-14"/>
-      <line x1="-14" y1="35" x2="14" y2="-35"/>
+    <!-- 外皮：深绿描边 + 渐变绿环 -->
+    <circle r="57" fill="#3f6212"/>
+    <circle r="54" fill="#65a30d"/>
+    <circle r="48" fill="#a3e635"/>
+    <circle r="44" fill="#84cc16"/>
+    <!-- 果肉 -->
+    <circle r="35" fill="#fefce8"/>
+    <!-- 果瓣（间隔浅色扇形，制造切片纹理） -->
+    <g fill="#e7f7b0">
+      <path d="M0,0 L35,0 A35,35 0 0,1 24.75,-24.75 Z"/>
+      <path d="M0,0 L0,-35 A35,35 0 0,1 -24.75,-24.75 Z"/>
+      <path d="M0,0 L-35,0 A35,35 0 0,1 -24.75,24.75 Z"/>
+      <path d="M0,0 L0,35 A35,35 0 0,1 24.75,24.75 Z"/>
     </g>
-    <path d="M 34 -50 C 56 -74 84 -66 76 -40 C 68 -24 44 -34 34 -50 Z" fill="#65a30d"/>
-    <path d="M 44 -44 C 60 -62 74 -56 66 -40 C 58 -34 48 -38 44 -44 Z" fill="#4d7c0f" opacity="0.55"/>
+    <!-- 果瓣分隔线 -->
+    <g stroke="#a3e635" stroke-width="2.2" stroke-linecap="round">
+      <line x1="0" y1="-35" x2="0" y2="35"/>
+      <line x1="-35" y1="0" x2="35" y2="0"/>
+      <line x1="-24.75" y1="-24.75" x2="24.75" y2="24.75"/>
+      <line x1="-24.75" y1="24.75" x2="24.75" y2="-24.75"/>
+    </g>
+    <!-- 果肉中心 -->
+    <circle r="4.5" fill="#a3e635"/>
+    <!-- 高光 -->
+    <ellipse cx="-14" cy="-16" rx="9" ry="6" fill="#ffffff" opacity="0.5" transform="rotate(-30 -14 -16)"/>
+    <!-- 叶片（带叶脉） -->
+    <g>
+      <path d="M 32 -50 C 52 -78 86 -70 78 -42 C 70 -22 40 -32 32 -50 Z" fill="#65a30d"/>
+      <path d="M 44 -44 C 58 -62 72 -56 64 -42 C 56 -36 48 -38 44 -44 Z" fill="#4d7c0f" opacity="0.5"/>
+      <path d="M 36 -48 C 50 -58 66 -52 72 -42" stroke="#4d7c0f" stroke-width="1.6" fill="none" opacity="0.6" stroke-linecap="round"/>
+    </g>
   </g>
-  <!-- 品牌文字 -->
+  <!-- 品牌文字（白描边提升暗色可读性） -->
   <text x="196" y="99" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif" font-size="54" font-weight="700" fill="#3f6212" stroke="#ffffff" stroke-width="1.5" paint-order="stroke">QN丨CMS</text>
 </svg>
