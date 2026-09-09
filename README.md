@@ -9,8 +9,10 @@
 ## 特性
 
 - 🌐 **多语言**：内置 `en` / `zh`（URL 前缀 `/en/...` `/zh/...`），右上角**下拉菜单**切换；后台管理界面也支持**中英文一键切换**；新增语言只需改一处配置 + 复制页面目录（见下方「添加新语言」）
-- 🛒 **产品管理后台**：`/admin` 登录后增删改产品，写入 D1 实时生效；支持**价格、购买链接**字段（非必填）；后台支持**列表 / 缩略图**两种视图切换
+- 🛒 **产品管理后台**：`/admin` 登录后增删改产品，写入 D1 实时生效；支持**价格、购买链接**字段（非必填）；后台支持**列表 / 缩略图 / 表格**三种视图切换，表格视图支持**可配置列、关键词/分类筛选、批量删除**；产品支持**中英文分类**字段
 - 🚀 **产品前台实时更新**：后台新增的产品**无需重新部署**即出现在首页与产品列表页（客户端读取 `/api/products` 动态渲染），点击以**详情弹层**查看（含价格与购买按钮）；示例产品仍保留独立详情页（SEO）
+- 🗂️ **产品分类 + 搜索**：产品可设置分类（中英），前台产品板块自动生成**分类标签（二级筛选菜单）**与**搜索框**，按分类/关键词即时过滤
+- 🏷️ **产品板块文案可设置**：后台「站点设置」可编辑产品板块的标题与副标题（双语），前台实时生效
 - ⚙️ **站点设置后台**：`/admin` 的「站点设置」页分区块管理——**品牌**（网页标题、主页站点名称、Logo、Favicon）、**页首横幅**（大标题两行、副标题、主图）、**关于我们**、**联系方式**（邮箱、电话、地址），保存后前台**实时应用**，无需重新部署
 - 🦶 **动态页脚**：页脚站点名称、产品链接跟随设置与产品数据自动更新；底部含语言切换下拉；已移除模板中无效的 Careers / Press 等链接
 - 🖼️ **产品图可选**：图片链接为空时自动使用内置默认图 `/images/products/placeholder.svg`
@@ -107,14 +109,15 @@ node -e "console.log(require('crypto').createHash('sha256').update('your_passwor
 - 登录：`ADMIN_USERNAME` + 密码（`ADMIN_PASSWORD` 或对应 `ADMIN_PASSWORD_HASH` 的明文）
 - 界面语言：右上角 **EN / 中文** 按钮一键切换后台界面语言，选择会记忆在浏览器中
 - 功能：
-  - **产品管理**：新增 / 编辑 / 删除产品（双语字段、排序、图片 URL、**价格、购买链接**），支持**列表 / 缩略图**视图切换（右上角 List / Grid 按钮，选择会记忆）；图片链接**可留空**，留空自动使用默认图
-  - **站点设置**：分区块编辑——品牌（标题/主页名称/Logo/Favicon）、**页首横幅**（大标题两行、副标题、主图，双语）、关于我们（双语）、联系方式（邮箱/电话/**地址**），保存后前台实时生效
+  - **产品管理**：新增 / 编辑 / 删除产品（双语字段、分类、排序、图片 URL、**价格、购买链接**），支持**列表 / 缩略图 / 表格**三种视图切换（右上角 List / Grid / Table 按钮，选择会记忆）；**表格视图**可勾选显示哪些列（Columns 按钮）、按名称/slug 关键词搜索、按分类筛选，并可**勾选多行批量删除**；图片链接**可留空**，留空自动使用默认图
+  - **站点设置**：分区块编辑——品牌（标题/主页名称/Logo/Favicon）、**页首横幅**（大标题两行、副标题、主图，双语）、**产品板块**（标题/副标题，双语）、关于我们（双语）、联系方式（邮箱/电话/**地址**），保存后前台实时生效
 
 > 提示：如果后台提示「Failed to load products」，多半是浏览器里残留了旧的登录凭据，刷新页面重新登录即可（登录凭据失效时会自动跳回登录页）。
 
 ### 前台产品展示说明
 
 - 首页与产品列表页的产品网格**优先读取 `/api/products`**（后台写入 D1 的数据实时显示）；API 无数据时回退为构建时的示例产品。
+- 产品网格上方自动生成**分类筛选标签**与**搜索框**：分类按当前产品数据的分类字段聚合去重；搜索按产品名称即时过滤（前后台均为客户端过滤，无需额外请求）。
 - 示例产品（有静态详情页）点击后进入独立详情页；**后台新增的产品**点击后打开**详情弹层**（内容来自 API）。新增产品的分享链接 `/en/products/<slug>/` 会自动打开详情弹层。
 
 ### 产品字段
@@ -126,6 +129,7 @@ node -e "console.log(require('crypto').createHash('sha256').update('your_passwor
 | `short_en` / `short_zh` | ✓ | 简短描述（列表页显示） |
 | `description_en` / `description_zh` | 可选 | 详细描述（详情页显示） |
 | `highlights_en` / `highlights_zh` | 可选 | JSON 数组，如 `["快速", "稳定"]` |
+| `category_en` / `category_zh` | 可选 | 产品分类（英文/中文），前台自动聚合为分类筛选标签；同分类产品聚合在「Products」下，后续可扩展为二级菜单 | 
 | `image_url` | 可选 | 产品图片外链地址；留空自动使用默认图 `/images/products/placeholder.svg` |
 | `price` | 可选 | 价格展示文本（如 `$29/mo`），显示在产品卡片与详情页/详情弹层 |
 | `buy_url` | 可选 | 购买/了解更多外链；填写后产品详情显示「Buy now / 立即购买」按钮 |
@@ -141,6 +145,8 @@ node -e "console.log(require('crypto').createHash('sha256').update('your_passwor
 | 页首横幅 | `hero_title1_en/zh`、`hero_title2_en/zh` | 首页大标题两行 |
 | 页首横幅 | `hero_subtitle_en/zh` | 首页副标题 |
 | 页首横幅 | `hero_image_url` | 首页大图（建议 900×675） |
+| 产品板块 | `products_title_en/zh` | 产品板块大标题（默认“为数据驱动型企业打造的一体化技术栈…”） |
+| 产品板块 | `products_subtitle_en/zh` | 产品板块副标题 |
 | 关于我们 | `about_title_en/zh`、`about_body_en/zh` | 首页「关于我们」区块标题与内容 |
 | 联系方式 | `contact_email` / `contact_phone` / `contact_address` | 联系区块展示的邮箱、电话、地址 |
 
@@ -165,7 +171,8 @@ QNCMS/
 │       │                       # POST /api/products 新增/更新（需认证）
 │       ├── products/
 │       │   ├── create.js       # POST /api/products/create（需认证）
-│       │   └── delete.js       # DELETE /api/products/delete?slug=（需认证）
+│       │   ├── delete.js       # DELETE /api/products/delete?slug=（需认证）
+│       │   └── batch-delete.js # POST /api/products/batch-delete（需认证，批量删除）
 │       ├── admin/
 │       │   └── products.js     # GET /api/admin/products 双语完整数据（需认证）
 │       ├── settings.js         # GET /api/settings 站点设置（公开，前台读取）
@@ -274,7 +281,8 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 | GET | `/api/products?locale=en&slug=` | 否 | 产品列表 / 单个产品（公开） |
 | POST | `/api/products` | Bearer token | 新增或更新产品 |
 | POST | `/api/products/create` | Bearer token | 新增产品（别名） |
-| DELETE | `/api/products/delete?slug=x` | Bearer token | 删除产品 |
+| DELETE | `/api/products/delete?slug=x` | Bearer token | 删除单个产品 |
+| POST | `/api/products/batch-delete` | Bearer token | 批量删除（body: `{slugs: [...]}`） |
 | GET | `/api/admin/products` | Bearer token | 双语完整字段（后台编辑用） |
 | GET/POST | `/api/settings` | GET 公开 / POST 需认证 | 站点设置读取（前台用）/ 保存（后台用） |
 | POST | `/api/contact` | 否 | 联系表单 |
