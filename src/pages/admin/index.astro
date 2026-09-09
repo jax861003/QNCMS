@@ -71,7 +71,7 @@
       .hint { color: var(--ink-soft); font-size: .8rem; margin-top: 4px; }
       .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; z-index: 100; }
       .modal.active { display: flex; }
-      .modal-content { background: var(--card); padding: 32px; border-radius: 16px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; }
+      .modal-content { background: var(--card); padding: 32px; border-radius: 16px; width: 100%; max-width: 880px; max-height: 92vh; overflow-y: auto; }
       .modal-content h2 { margin-bottom: 24px; }
       .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
       .form-group { margin-bottom: 16px; }
@@ -191,10 +191,12 @@
       .fs-title { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--brand); margin-bottom: 12px; }
       .draft-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; background: #f59e0b; color: #fff; font-size: .68rem; font-weight: 700; margin-left: 8px; vertical-align: middle; }
       .status-toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg); }
-      .status-btn { padding: 10px 20px; border: none; background: transparent; color: var(--ink-soft); font-weight: 600; font-size: .9rem; cursor: pointer; transition: all .2s ease; }
+      .status-btn { padding: 13px 20px; border: none; background: transparent; color: var(--ink-soft); font-weight: 600; font-size: .9rem; cursor: pointer; transition: all .2s ease; }
       .status-btn + .status-btn { border-left: 1px solid var(--line); }
       .status-btn:hover { color: var(--brand); }
       .status-btn.active { background: var(--brand); color: #fff; }
+      .price-row { display: grid; grid-template-columns: 92px 1fr; gap: 10px; }
+      .price-row select { padding: 12px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .95rem; background: var(--bg); color: var(--ink); }
       .tpl-layout-preview { height: 74px; display: grid; gap: 6px; padding: 10px 12px; background: var(--bg-soft); }
       .tpl-layout-preview .lp-head { height: 8px; border-radius: 4px; background: var(--line); }
       .tpl-layout-preview .lp-hero { height: 18px; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--brand-2, var(--brand))); opacity: .5; }
@@ -500,36 +502,36 @@
             <div class="form-grid">
               <div class="form-group">
                 <label data-i18n="nameZh">名称 *</label>
-                <input type="text" id="name_zh" required />
+                <input type="text" id="name_zh" required data-i18n-ph="phNameZh" placeholder="Name" />
               </div>
               <div class="form-group">
                 <label data-i18n="nameEn">Name *</label>
-                <input type="text" id="name_en" required />
+                <input type="text" id="name_en" required data-i18n-ph="phNameEn" placeholder="名称" />
               </div>
               <div class="form-group">
                 <label data-i18n="tagZh">标签</label>
-                <input type="text" id="tag_zh" placeholder="数据接入" />
+                <input type="text" id="tag_zh" data-i18n-ph="phTagZh" placeholder="Tag" />
               </div>
               <div class="form-group">
                 <label data-i18n="tagEn">Tag</label>
-                <input type="text" id="tag_en" placeholder="Streaming" />
+                <input type="text" id="tag_en" data-i18n-ph="phTagEn" placeholder="标签" />
               </div>
               <div class="form-group">
                 <label data-i18n="categoryZh">分类</label>
-                <input type="text" id="category_zh" placeholder="数据管道" />
+                <input type="text" id="category_zh" data-i18n-ph="phCategoryZh" placeholder="Category" />
               </div>
               <div class="form-group">
                 <label data-i18n="categoryEn">Category</label>
-                <input type="text" id="category_en" placeholder="Data Pipeline" />
+                <input type="text" id="category_en" data-i18n-ph="phCategoryEn" placeholder="分类" />
               </div>
             </div>
             <div class="form-group">
               <label data-i18n="descZh">描述</label>
-              <textarea id="description_zh"></textarea>
+              <textarea id="description_zh" data-i18n-ph="phDescZh" placeholder="Description"></textarea>
             </div>
             <div class="form-group">
               <label data-i18n="descEn">Description</label>
-              <textarea id="description_en"></textarea>
+              <textarea id="description_en" data-i18n-ph="phDescEn" placeholder="描述"></textarea>
             </div>
           </div>
 
@@ -543,7 +545,17 @@
             <div class="form-grid">
               <div class="form-group">
                 <label data-i18n="price">Price（价格）</label>
-                <input type="text" id="price" placeholder="$29/mo" />
+                <div class="price-row">
+                  <select id="currency" aria-label="Currency / 货币单位">
+                    <option value="$">$ USD</option>
+                    <option value="€">€ EUR</option>
+                    <option value="¥">¥ CNY</option>
+                    <option value="£">£ GBP</option>
+                    <option value="₽">₽ RUB</option>
+                    <option value="₩">₩ KRW</option>
+                  </select>
+                  <input type="text" id="price" placeholder="29/mo" />
+                </div>
               </div>
               <div class="form-group">
                 <label data-i18n="buyUrl">Buy Link（购买链接）</label>
@@ -575,12 +587,13 @@
           loading: 'Loading...', noProducts: 'No products in database yet. Use "+ Add Product" to create one.',
           failedLoad: 'Failed to load products', sessionExpired: 'Session expired, please sign in again.',
           addProductTitle: 'Add Product', editProductTitle: 'Edit Product',
-          slugLabel: 'Slug（标识）*', nameEn: 'Name *', nameZh: '名称 *',
-          tagEn: 'Tag', tagZh: '标签', descEn: 'Description', descZh: '描述',
+          slugLabel: 'Slug（标识）*', nameEn: 'Name (EN) *', nameZh: 'Name (ZH) *',
+          tagEn: 'Tag', tagZh: 'Tag (ZH)', descEn: 'Description', descZh: 'Description (ZH)',
           imageUrl: 'Image URL（图片链接）', position: 'Position（排序）',
-          imgHint: '为空时使用默认产品图',
+          imgHint: 'Leave empty to use the default product image',
           statusLabel: 'Status（状态）', statusPublished: 'Published（发布）', statusDraft: 'Draft（草稿）',
           fsZh: '中文内容', fsEn: 'English Content', fsShared: '共用参数 Shared',
+          phNameZh: '名称', phNameEn: 'Name', phTagZh: '标签', phTagEn: 'Tag', phCategoryZh: '分类', phCategoryEn: 'Category', phDescZh: '描述', phDescEn: 'Description',
           viewList: 'List', viewGrid: 'Grid', viewTable: 'Table', columns: 'Columns',
           searchPlaceholder: 'Search name or slug...',
           categoryEn: 'Category (EN)', categoryZh: 'Category (ZH)',
@@ -626,12 +639,13 @@
           loading: '加载中...', noProducts: '数据库中暂无产品。点击"+ 新增产品"创建。',
           failedLoad: '产品加载失败', sessionExpired: '登录已过期，请重新登录。',
           addProductTitle: '新增产品', editProductTitle: '编辑产品',
-          slugLabel: 'Slug（标识）*', nameEn: 'Name *', nameZh: '名称 *',
+          slugLabel: 'Slug（标识）*', nameEn: 'Name (EN) *', nameZh: '名称 *',
           tagEn: 'Tag', tagZh: '标签', descEn: 'Description', descZh: '描述',
           imageUrl: 'Image URL（图片链接）', position: 'Position（排序）',
           imgHint: '为空时使用默认产品图',
-          statusLabel: 'Status（状态）', statusPublished: 'Published（发布）', statusDraft: 'Draft（草稿）',
+          statusLabel: 'Status（状态）', statusPublished: '发布', statusDraft: '草稿',
           fsZh: '中文内容', fsEn: 'English Content', fsShared: '共用参数 Shared',
+          phNameZh: 'Name', phNameEn: '名称', phTagZh: 'Tag', phTagEn: '标签', phCategoryZh: 'Category', phCategoryEn: '分类', phDescZh: 'Description', phDescEn: '描述',
           viewList: '列表', viewGrid: '缩略图', viewTable: '表格', columns: '列设置',
           searchPlaceholder: '搜索名称或 slug...',
           categoryEn: '分类（英文）', categoryZh: '分类（中文）',
@@ -671,7 +685,7 @@
         }
       };
 
-      var curLang = 'en';
+      var curLang = 'zh';
       try {
         var savedLang = localStorage.getItem('admin_lang');
         if (savedLang === 'en' || savedLang === 'zh') curLang = savedLang;
@@ -683,6 +697,10 @@
         document.querySelectorAll('[data-i18n]').forEach(function (el) {
           var key = el.getAttribute('data-i18n');
           if (key && UI.en[key]) el.textContent = ui(key);
+        });
+        document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n-ph');
+          if (key && UI.en[key]) el.placeholder = ui(key);
         });
         document.querySelectorAll('[data-lang-btn]').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-lang-btn') === curLang);
@@ -960,6 +978,13 @@
       }
       function draftBadge(p) { return p.active === 0 ? '<span class="draft-badge">' + ui('statusDraft') + '</span>' : ''; }
       var activeVal = 1;
+      function splitPrice(v) {
+        var syms = ['$', '€', '¥', '£', '₽', '₩'];
+        for (var i = 0; i < syms.length; i++) {
+          if ((v || '').indexOf(syms[i]) === 0) return { cur: syms[i], rest: v.slice(syms[i].length).trim() };
+        }
+        return { cur: '$', rest: v || '' };
+      }
       function setActive(v) {
         activeVal = v;
         document.querySelectorAll('#activeToggle .status-btn').forEach(function (b) {
@@ -1157,7 +1182,9 @@
           document.getElementById('description_en').value = modalProduct.description_en || '';
           document.getElementById('description_zh').value = modalProduct.description_zh || '';
           document.getElementById('image_url').value = modalProduct.image_url || '';
-          document.getElementById('price').value = modalProduct.price || '';
+          var sp = splitPrice(modalProduct.price);
+          document.getElementById('currency').value = sp.cur;
+          document.getElementById('price').value = sp.rest;
           document.getElementById('buy_url').value = modalProduct.buy_url || '';
         } else {
           document.getElementById('productForm').reset();
@@ -1206,7 +1233,7 @@
           description_zh: document.getElementById('description_zh').value,
           active: activeVal === 0 ? 0 : 1,
           image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg',
-          price: document.getElementById('price').value.trim(),
+          price: (document.getElementById('price').value.trim() ? document.getElementById('currency').value + document.getElementById('price').value.trim() : ''),
           buy_url: document.getElementById('buy_url').value.trim()
         };
         try {

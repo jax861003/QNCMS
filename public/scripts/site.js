@@ -125,6 +125,52 @@
     revealEls.forEach(function (el) { el.classList.add('in'); });
   }
 
+  // ---- Modern layout: hero carousel (auto-rotating hero visual) ----
+  function initModernHero() {
+    if (document.documentElement.getAttribute('data-layout') !== 'modern') return;
+    var frame = document.querySelector('.hero-visual .frame');
+    if (!frame) return;
+    var imgs = [];
+    var heroImg = document.querySelector('[data-hero-img]');
+    if (heroImg && heroImg.src && heroImg.src.indexOf('placeholder') < 0) imgs.push(heroImg.src);
+    document.querySelectorAll('[data-product-grid] .product-thumb img').forEach(function (img) {
+      var src = img && img.src;
+      if (src && src.indexOf('placeholder') < 0 && imgs.indexOf(src) < 0) imgs.push(src);
+    });
+    imgs = imgs.slice(0, 5);
+    if (imgs.length < 1) return;
+    var key = imgs.join('|');
+    if (frame.dataset.hcKey === key && frame.querySelector('.hero-carousel')) return;
+    frame.dataset.hcKey = key;
+    var slides = imgs.map(function (src, i) {
+      return '<div class="hc-slide' + (i === 0 ? ' active' : '') + '"><img src="' + src + '" alt="" loading="' + (i === 0 ? 'eager' : 'lazy') + '" /></div>';
+    }).join('');
+    var dots = imgs.length > 1
+      ? '<div class="hc-dots">' + imgs.map(function (_, i) {
+          return '<button type="button" class="hc-dot' + (i === 0 ? ' active' : '') + '" data-hc="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
+        }).join('') + '</div>'
+      : '';
+    frame.innerHTML = '<div class="hero-carousel"><div class="hc-track">' + slides + '</div>' + dots + '</div>';
+    if (imgs.length < 2) return;
+    var idx = 0, timer = null;
+    function go(n) {
+      idx = (n + imgs.length) % imgs.length;
+      var track = frame.querySelector('.hc-track');
+      if (track) track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      frame.querySelectorAll('.hc-dot').forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+      frame.querySelectorAll('.hc-slide').forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+    }
+    function start() { stop(); timer = setInterval(function () { go(idx + 1); }, 4200); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    frame.addEventListener('mouseenter', stop);
+    frame.addEventListener('mouseleave', function () { if (!timer) start(); });
+    frame.addEventListener('click', function (e) {
+      var d = e.target && e.target.closest ? e.target.closest('.hc-dot') : null;
+      if (d) go(parseInt(d.getAttribute('data-hc'), 10));
+    });
+    start();
+  }
+
   // ---- Site settings (public /api/settings) ------------------------------
   // Applies admin-configured site title, favicon, logo, about and contact
   // info at runtime, so a content change needs no rebuild/redeploy.
@@ -260,6 +306,7 @@
         }).join('');
         setupProductFilters(grid);
         filterProductGrid();
+        initModernHero();
         // replay reveal animation
         var els = Array.prototype.slice.call(grid.querySelectorAll('[data-reveal]'));
         if ('IntersectionObserver' in window) {
