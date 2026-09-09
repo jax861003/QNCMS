@@ -128,6 +128,8 @@ export async function ensureTables(db) {
           highlights_en TEXT NOT NULL DEFAULT '[]',
           highlights_zh TEXT NOT NULL DEFAULT '[]',
           image_url   TEXT NOT NULL DEFAULT '',
+          category_en TEXT NOT NULL DEFAULT '',
+          category_zh TEXT NOT NULL DEFAULT '',
           price       TEXT NOT NULL DEFAULT '',
           buy_url     TEXT NOT NULL DEFAULT '',
           position    INTEGER NOT NULL DEFAULT 0,
@@ -157,6 +159,8 @@ export async function ensureTables(db) {
       };
       await addCol('price', "price TEXT NOT NULL DEFAULT ''");
       await addCol('buy_url', "buy_url TEXT NOT NULL DEFAULT ''");
+      await addCol('category_en', "category_en TEXT NOT NULL DEFAULT ''");
+      await addCol('category_zh', "category_zh TEXT NOT NULL DEFAULT ''");
     } catch (e) {
       console.error('ensureColumns failed:', e);
     }

@@ -9,6 +9,7 @@
         "zh": "为结构化与非结构化数据提供实时接入，支持精确一次（exactly-once）语义。"
       },
       "image": "/images/products/ingest.png",
+      "category": { "en": "Data Pipeline", "zh": "数据管道" },
       "price": "$29/mo",
       "buy_url": "",
       "description": {
@@ -39,6 +40,7 @@
         "zh": "面向复杂多步骤数据管道的可视化 DAG 编排。"
       },
       "image": "/images/products/orchestrate.png",
+      "category": { "en": "Data Pipeline", "zh": "数据管道" },
       "price": "$99/mo",
       "buy_url": "",
       "description": {
@@ -69,6 +71,7 @@
         "zh": "面向 PB 级数据的极速查询引擎，附带无代码 BI 界面。"
       },
       "image": "/images/products/analytics.png",
+      "category": { "en": "Analytics", "zh": "数据分析" },
       "price": "$199/mo",
       "buy_url": "",
       "description": {
@@ -99,6 +102,7 @@
         "zh": "统一的指标、日志与链路追踪，支持自适应、成本感知采样。"
       },
       "image": "/images/products/observe.png",
+      "category": { "en": "Observability", "zh": "可观测性" },
       "price": "",
       "buy_url": "",
       "description": {

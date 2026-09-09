@@ -13,8 +13,13 @@ const { locale, products } = Astro.props;
   <div class="container">
     <div class="section-head center">
       <span class="eyebrow">{t(locale, 'products.eyebrow')}</span>
-      <h2>{t(locale, 'products.title')}</h2>
-      <p>{t(locale, 'products.subtitle')}</p>
+      <h2 data-products-title>{t(locale, 'products.title')}</h2>
+      <p data-products-sub>{t(locale, 'products.subtitle')}</p>
+    </div>
+
+    <div class="product-filters">
+      <div class="cat-tabs" data-cat-tabs></div>
+      <input type="search" class="product-search" data-product-search placeholder={locale === 'zh' ? '搜索产品...' : 'Search products...'} aria-label="Search products" />
     </div>
 
     <ProductGrid products={products || []} locale={locale} />

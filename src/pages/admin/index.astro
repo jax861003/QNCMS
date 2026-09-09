@@ -92,6 +92,19 @@
       .pg-body h4 { font-size: .95rem; margin-bottom: 4px; }
       .pg-body p { font-size: .8rem; color: var(--ink-soft); margin-bottom: 10px; }
       .pg-actions { display: flex; gap: 8px; }
+      .table-tools { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+      .table-tools input, .table-tools select { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .9rem; background: var(--bg); color: var(--ink); }
+      .table-tools input { width: 260px; max-width: 100%; }
+      .col-panel { display: flex; gap: 14px; flex-wrap: wrap; padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 16px; }
+      .col-panel label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; cursor: pointer; }
+      .product-table-wrap { overflow-x: auto; }
+      .product-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+      .product-table th, .product-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+      .product-table th { font-weight: 700; color: var(--ink-soft); background: var(--bg-soft); white-space: nowrap; }
+      .product-table tr:hover td { background: var(--bg-soft); }
+      .product-table .timg { width: 56px; height: 40px; object-fit: cover; border-radius: 6px; }
+      .product-table .row-check { width: 16px; height: 16px; }
+      .product-table .t-actions { white-space: nowrap; }
       @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
   </head>
@@ -144,7 +157,16 @@
             <div class="view-toggle">
               <button class="view-btn active" id="viewListBtn" onclick="setProductView('list')" data-i18n="viewList">List</button>
               <button class="view-btn" id="viewGridBtn" onclick="setProductView('grid')" data-i18n="viewGrid">Grid</button>
+              <button class="view-btn" id="viewTableBtn" onclick="setProductView('table')" data-i18n="viewTable">Table</button>
+              <button class="view-btn" id="colSettingsBtn" onclick="toggleColPanel()" data-i18n="columns">Columns</button>
             </div>
+            <div class="table-tools" id="tableTools" style="display:none">
+              <input type="search" id="tableSearch" data-i18n-ph="searchPlaceholder" placeholder="Search name or slug..." />
+              <select id="tableCategory"></select>
+              <span id="batchInfo" style="font-size:.85rem;color:var(--ink-soft);margin-left:auto"></span>
+              <button class="btn btn-sm btn-danger" id="batchDeleteBtn" onclick="batchDelete()" data-i18n="batchDelete">Delete Selected</button>
+            </div>
+            <div class="col-panel" id="colPanel" style="display:none"></div>
             <div class="product-list" id="productList">Loading...</div>
           </div>
 
@@ -209,6 +231,27 @@
               <div class="form-group">
                 <label data-i18n="heroImageUrl">Hero Image URL (optional, e.g. 900x675)</label>
                 <input type="url" id="hero_image_url" placeholder="https://example.com/hero.png" />
+              </div>
+              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secProducts">Products Section</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="productsTitleEn">Products Section Title (EN)</label>
+                  <input type="text" id="products_title_en" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="productsTitleZh">Products Section Title (ZH)</label>
+                  <input type="text" id="products_title_zh" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="productsSubtitleEn">Products Section Subtitle (EN)</label>
+                  <textarea id="products_subtitle_en"></textarea>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="productsSubtitleZh">Products Section Subtitle (ZH)</label>
+                  <textarea id="products_subtitle_zh"></textarea>
+                </div>
               </div>
               <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secAbout">About</h3>
               <div class="form-grid">
@@ -287,6 +330,16 @@
           </div>
           <div class="form-grid">
             <div class="form-group">
+              <label data-i18n="categoryEn">Category (EN)</label>
+              <input type="text" id="category_en" placeholder="Data Pipeline" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="categoryZh">Category (ZH)</label>
+              <input type="text" id="category_zh" placeholder="数据管道" />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
               <label data-i18n="shortEn">Short Description (EN)</label>
               <textarea id="short_en"></textarea>
             </div>
@@ -359,7 +412,15 @@
           hlEn: 'Highlights (EN, JSON array)', hlZh: 'Highlights (ZH, JSON array)',
           imageUrl: 'Image URL (external link)', position: 'Position (sort, lower first)',
           imgHint: 'Leave empty to use the default product image',
-          viewList: 'List', viewGrid: 'Grid',
+          viewList: 'List', viewGrid: 'Grid', viewTable: 'Table', columns: 'Columns',
+          searchPlaceholder: 'Search name or slug...',
+          categoryEn: 'Category (EN)', categoryZh: 'Category (ZH)',
+          batchDelete: 'Delete Selected', batchDeleteConfirm: 'Delete selected products',
+          colSlug: 'Slug', colName: 'Name', colCategory: 'Category', colTag: 'Tag',
+          colPrice: 'Price', colPosition: 'Position', colImage: 'Image',
+          allCategories: 'All categories', noMatch: 'No products match the filter.',
+          secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
+          productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
           price: 'Price (optional)', buyUrl: 'Buy URL (optional)',
           secBranding: 'Branding', secHero: 'Hero (Homepage Banner)', secAbout: 'About', secContact: 'Contact',
           heroTitle1En: 'Hero Title Line 1 (EN)', heroTitle1Zh: 'Hero Title Line 1 (ZH)',
@@ -392,7 +453,15 @@
           hlEn: '亮点（英文，JSON 数组）', hlZh: '亮点（中文，JSON 数组）',
           imageUrl: '图片 URL（外链）', position: '排序（数字越小越靠前）',
           imgHint: '留空将使用默认产品图片',
-          viewList: '列表', viewGrid: '缩略图',
+          viewList: '列表', viewGrid: '缩略图', viewTable: '表格', columns: '列设置',
+          searchPlaceholder: '搜索名称或 slug...',
+          categoryEn: '分类（英文）', categoryZh: '分类（中文）',
+          batchDelete: '删除选中', batchDeleteConfirm: '确定删除选中的产品',
+          colSlug: 'Slug', colName: '名称', colCategory: '分类', colTag: '标签',
+          colPrice: '价格', colPosition: '排序', colImage: '图片',
+          allCategories: '全部分类', noMatch: '没有符合筛选条件的产品。',
+          secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
+          productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
           price: '价格（可选）', buyUrl: '购买链接（可选）',
           secBranding: '品牌', secHero: '页首横幅（首页大图区）', secAbout: '关于我们', secContact: '联系方式',
           heroTitle1En: '页首标题 第1行（英文）', heroTitle1Zh: '页首标题 第1行（中文）',
@@ -561,36 +630,187 @@
 
       // ====== Product view toggle (list / grid) ======
       var productView = 'list';
-      try { var pv = localStorage.getItem('admin_product_view'); if (pv === 'list' || pv === 'grid') productView = pv; } catch (e) { /* ignore */ }
+      try { var pv = localStorage.getItem('admin_product_view'); if (pv === 'list' || pv === 'grid' || pv === 'table') productView = pv; } catch (e) { /* ignore */ }
+      document.addEventListener('DOMContentLoaded', function () {
+        var s = document.getElementById('tableSearch');
+        if (s) s.addEventListener('input', onTableFilter);
+        var cat = document.getElementById('tableCategory');
+        if (cat) cat.addEventListener('change', function () { tableFilter.category = cat.value; if (window._currentProducts) renderProducts(window._currentProducts); });
+      });
 
       function setProductView(v) {
         productView = v;
         try { localStorage.setItem('admin_product_view', v); } catch (e) { /* ignore */ }
         var lb = document.getElementById('viewListBtn');
         var gb = document.getElementById('viewGridBtn');
+        var tb = document.getElementById('viewTableBtn');
         if (lb) lb.classList.toggle('active', v === 'list');
         if (gb) gb.classList.toggle('active', v === 'grid');
+        if (tb) tb.classList.toggle('active', v === 'table');
+        document.getElementById('colPanel').style.display = 'none';
         if (window._currentProducts) renderProducts(window._currentProducts);
+      }
+
+      // ====== Table column config ======
+      var colConfig = { slug: true, name: true, category: true, tag: true, price: true, position: true, image: false };
+      try {
+        var cc = JSON.parse(localStorage.getItem('admin_col_config') || 'null');
+        if (cc && typeof cc === 'object') colConfig = Object.assign({}, colConfig, cc);
+      } catch (e) { /* ignore */ }
+      function saveColConfig() {
+        try { localStorage.setItem('admin_col_config', JSON.stringify(colConfig)); } catch (e) { /* ignore */ }
+      }
+      function colKeys() { return Object.keys(colConfig); }
+      function renderColPanel() {
+        var panel = document.getElementById('colPanel');
+        if (!panel) return;
+        var labels = {
+          slug: ui('colSlug'), name: ui('colName'), category: ui('colCategory'), tag: ui('colTag'),
+          price: ui('colPrice'), position: ui('colPosition'), image: ui('colImage')
+        };
+        panel.innerHTML = colKeys().map(function (k) {
+          return '<label><input type="checkbox" ' + (colConfig[k] ? 'checked' : '') + ' onchange="setCol(\'' + k + '\', this.checked)"> ' + (labels[k] || k) + '</label>';
+        }).join('');
+      }
+      function setCol(k, v) {
+        colConfig[k] = v;
+        saveColConfig();
+        renderColPanel();
+        if (window._currentProducts) renderProducts(window._currentProducts);
+      }
+      function toggleColPanel() {
+        var panel = document.getElementById('colPanel');
+        var visible = panel.style.display === 'block';
+        panel.style.display = visible ? 'none' : 'block';
+        renderColPanel();
+      }
+
+      // ====== Table filters ======
+      var tableFilter = { text: '', category: '' };
+      function matchFilters(p) {
+        var t = tableFilter.text.toLowerCase();
+        if (t) {
+          var hay = ((p.name_en || '') + ' ' + (p.name_zh || '') + ' ' + (p.slug || '')).toLowerCase();
+          if (hay.indexOf(t) < 0) return false;
+        }
+        if (tableFilter.category) {
+          if (p.category_en !== tableFilter.category && p.category_zh !== tableFilter.category) return false;
+        }
+        return true;
+      }
+      function updateCategoryFilter(products) {
+        var sel = document.getElementById('tableCategory');
+        if (!sel) return;
+        var cats = {};
+        products.forEach(function (p) {
+          if (p.category_en) cats[p.category_en] = true;
+          if (p.category_zh) cats[p.category_zh] = true;
+        });
+        var current = tableFilter.category;
+        sel.innerHTML = '<option value="">' + ui('allCategories') + '</option>' +
+          Object.keys(cats).map(function (k) { return '<option value="' + k + '">' + k + '</option>'; }).join('');
+        sel.value = current;
+      }
+      function onTableFilter() {
+        var textEl = document.getElementById('tableSearch');
+        tableFilter.text = textEl ? textEl.value : '';
+        if (window._currentProducts) renderProducts(window._currentProducts);
+      }
+
+      // ====== Batch delete ======
+      function selectedSlugs() {
+        return Array.prototype.map.call(document.querySelectorAll('.row-check:checked'), function (cb) { return cb.value; })
+          .filter(Boolean);
+      }
+      function updateBatchInfo() {
+        var info = document.getElementById('batchInfo');
+        if (info) info.textContent = selectedSlugs().length ? selectedSlugs().length + ' selected' : '';
+      }
+      function toggleAllRows(cb) {
+        document.querySelectorAll('.row-check').forEach(function (r) { r.checked = cb.checked; });
+        updateBatchInfo();
+      }
+      async function batchDelete() {
+        var slugs = selectedSlugs();
+        if (!slugs.length) return;
+        if (!confirm(ui('batchDeleteConfirm') + ' (' + slugs.length + ')?')) return;
+        try {
+          var resp = await fetch('/api/products/batch-delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ slugs: slugs })
+          });
+          if (resp.status === 401) { sessionExpired(); return; }
+          var data = await resp.json();
+          if (!data.ok) { alert(ui('deleteFailed') + (data.message || '')); return; }
+          loadProducts();
+        } catch (err) { alert('Network error'); }
       }
 
       function renderProducts(products) {
         window._currentProducts = products;
+        updateCategoryFilter(products);
         var list = document.getElementById('productList');
         if (!list) return;
         var placeholder = '/images/products/placeholder.svg';
+        if (productView === 'table') {
+          document.getElementById('tableTools').style.display = 'flex';
+          var filtered = products.filter(matchFilters);
+          var keys = colKeys().filter(function (k) { return colConfig[k]; });
+          var head = '<th style="width:28px"><input type="checkbox" class="row-check" id="checkAll" onchange="toggleAllRows(this)"></th>';
+          head += keys.map(function (k) {
+            var labels = { slug: ui('colSlug'), name: ui('colName'), category: ui('colCategory'), tag: ui('colTag'), price: ui('colPrice'), position: ui('colPosition'), image: ui('colImage') };
+            return '<th>' + (labels[k] || k) + '</th>';
+          }).join('');
+          head += '<th>' + ui('edit') + '</th>';
+          if (filtered.length === 0) {
+            list.className = 'product-table-wrap';
+            list.innerHTML = '<div style="padding:24px;color:#888;">' + ui('noMatch') + '</div>';
+            return;
+          }
+          var rows = filtered.map(function (p) {
+            var cells = keys.map(function (k) {
+              if (k === 'slug') return p.slug;
+              if (k === 'name') return (p.name_en || '') + ' / ' + (p.name_zh || '');
+              if (k === 'category') return (p.category_en || '') + (p.category_en && p.category_zh ? ' / ' : '') + (p.category_zh || '');
+              if (k === 'tag') return (p.tag_en || '') + (p.tag_en && p.tag_zh ? ' / ' : '') + (p.tag_zh || '');
+              if (k === 'price') return p.price || '';
+              if (k === 'position') return p.position;
+              if (k === 'image') {
+                return p.image_url
+                  ? '<img class="timg" src="' + p.image_url + '" onerror="this.src=\'' + placeholder + '\'">'
+                  : '<img class="timg" src="' + placeholder + '">';
+              }
+              return '';
+            }).map(function (x) { return '<td>' + x + '</td>'; }).join('');
+            var editBtn = '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>';
+            var delBtn = '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>';
+            return '<tr><td><input type="checkbox" class="row-check" value="' + p.slug + '" onchange="updateBatchInfo()"></td>' +
+              cells + '<td class="t-actions">' + editBtn + ' ' + delBtn + '</td></tr>';
+          }).join('');
+          list.className = 'product-table-wrap';
+          list.innerHTML = '<table class="product-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table>';
+          var ca = document.getElementById('checkAll');
+          if (ca) ca.checked = selectedSlugs().length === filtered.length && filtered.length > 0;
+          updateBatchInfo();
+          return;
+        }
+        document.getElementById('tableTools').style.display = 'none';
         var cards = products.map(function (p) {
           var img = p.image_url
             ? '<img src="' + p.image_url + '" alt="' + (p.name_en || '') + '" onerror="this.src=\'' + placeholder + '\'">'
             : '<img src="' + placeholder + '" alt="' + (p.name_en || '') + '">';
           var editBtn = '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>';
           var delBtn = '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>';
-          return { img: img, editBtn: editBtn, delBtn: delBtn, name: (p.name_en || '') + ' / ' + (p.name_zh || ''), short: p.short_en || '' };
+          var priceTag = p.price ? '<div style="color:var(--brand);font-weight:700;">' + p.price + '</div>' : '';
+          var catTag = p.category_en || p.category_zh ? '<div style="font-size:.8rem;color:var(--ink-soft);">' + (p.category_en || p.category_zh) + '</div>' : '';
+          return { img: img, editBtn: editBtn, delBtn: delBtn, name: (p.name_en || '') + ' / ' + (p.name_zh || ''), short: p.short_en || '', priceTag: priceTag, catTag: catTag };
         });
         if (productView === 'grid') {
           list.className = 'products-admin-grid';
           list.innerHTML = cards.map(function (p) {
             return '<div class="pg-card">' + p.img +
-              '<div class="pg-body"><h4>' + p.name + '</h4>' +
+              '<div class="pg-body"><h4>' + p.name + '</h4>' + p.catTag + p.priceTag +
               '<p>' + p.short + '</p>' +
               '<div class="pg-actions">' + p.editBtn + p.delBtn + '</div></div></div>';
           }).join('');
@@ -598,7 +818,7 @@
           list.className = 'product-list';
           list.innerHTML = cards.map(function (p) {
             return '<div class="product-item">' + p.img +
-              '<div class="product-info"><h3>' + p.name + '</h3>' +
+              '<div class="product-info"><h3>' + p.name + '</h3>' + p.catTag + p.priceTag +
               '<p>' + p.short + '</p></div>' + p.editBtn + p.delBtn + '</div>';
           }).join('');
         }
@@ -615,6 +835,8 @@
           document.getElementById('name_en').value = modalProduct.name_en || '';
           document.getElementById('name_zh').value = modalProduct.name_zh || '';
           document.getElementById('tag_en').value = modalProduct.tag_en || '';
+          document.getElementById('category_en').value = modalProduct.category_en || '';
+          document.getElementById('category_zh').value = modalProduct.category_zh || '';
           document.getElementById('tag_zh').value = modalProduct.tag_zh || '';
           document.getElementById('short_en').value = modalProduct.short_en || '';
           document.getElementById('short_zh').value = modalProduct.short_zh || '';
@@ -666,6 +888,8 @@
           name_zh: document.getElementById('name_zh').value,
           tag_en: document.getElementById('tag_en').value,
           tag_zh: document.getElementById('tag_zh').value,
+          category_en: document.getElementById('category_en').value,
+          category_zh: document.getElementById('category_zh').value,
           short_en: document.getElementById('short_en').value,
           short_zh: document.getElementById('short_zh').value,
           description_en: document.getElementById('description_en').value,
@@ -719,7 +943,9 @@
             hero_title1_en: 'hero_title1_en', hero_title1_zh: 'hero_title1_zh',
             hero_title2_en: 'hero_title2_en', hero_title2_zh: 'hero_title2_zh',
             hero_subtitle_en: 'hero_subtitle_en', hero_subtitle_zh: 'hero_subtitle_zh',
-            hero_image_url: 'hero_image_url'
+            hero_image_url: 'hero_image_url',
+            products_title_en: 'products_title_en', products_title_zh: 'products_title_zh',
+            products_subtitle_en: 'products_subtitle_en', products_subtitle_zh: 'products_subtitle_zh'
           };
           Object.keys(map).forEach(function (key) {
             var el = document.getElementById(map[key]);
@@ -748,7 +974,11 @@
           hero_title2_zh: document.getElementById('hero_title2_zh').value,
           hero_subtitle_en: document.getElementById('hero_subtitle_en').value,
           hero_subtitle_zh: document.getElementById('hero_subtitle_zh').value,
-          hero_image_url: document.getElementById('hero_image_url').value
+          hero_image_url: document.getElementById('hero_image_url').value,
+          products_title_en: document.getElementById('products_title_en').value,
+          products_title_zh: document.getElementById('products_title_zh').value,
+          products_subtitle_en: document.getElementById('products_subtitle_en').value,
+          products_subtitle_zh: document.getElementById('products_subtitle_zh').value
         };
         var statusEl = document.getElementById('settingsStatus');
         statusEl.className = 'status';
@@ -798,6 +1028,12 @@
       window.editProduct = editProduct;
       window.deleteProduct = deleteProduct;
       window.setProductView = setProductView;
+      window.toggleColPanel = toggleColPanel;
+      window.setCol = setCol;
+      window.toggleAllRows = toggleAllRows;
+      window.updateBatchInfo = updateBatchInfo;
+      window.batchDelete = batchDelete;
+      window.onTableFilter = onTableFilter;
     </script>
   </body>
 </html>

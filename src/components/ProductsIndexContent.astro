@@ -15,8 +15,12 @@ const learnMore = t(locale, 'products.learnMore');
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">{t(locale, 'products.eyebrow')}</span>
-      <h2 style="font-size: clamp(2rem,4vw,3rem);">{t(locale, 'products.title')}</h2>
-      <p style="max-width:52ch;">{t(locale, 'products.subtitle')}</p>
+      <h2 data-products-title style="font-size: clamp(2rem,4vw,3rem);">{t(locale, 'products.title')}</h2>
+      <p data-products-sub style="max-width:52ch;">{t(locale, 'products.subtitle')}</p>
+    </div>
+    <div class="product-filters">
+      <div class="cat-tabs" data-cat-tabs></div>
+      <input type="search" class="product-search" data-product-search placeholder={locale === 'zh' ? '搜索产品...' : 'Search products...'} aria-label="Search products" />
     </div>
     <div class="products-grid" data-product-grid>
       {products.map((p) => <ProductCard product={p} locale={locale} learnMore={learnMore} />)}

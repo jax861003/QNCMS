@@ -41,6 +41,7 @@ export function localizeProducts(productsData: typeof products, locale: Locale) 
     name: pick(p.name, locale),
     tag: pick(p.tag, locale),
     short: pick(p.short, locale),
+    category: pick((p as any).category, locale),
     description: pick(p.description, locale),
     highlights: (p.highlights as any)[locale] ?? (p.highlights as any)[defaultLocale],
     // Static JSON uses `image`; the API uses `image_url`. Expose both so every

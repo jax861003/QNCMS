@@ -149,6 +149,11 @@
         if (hs) { var el3 = document.querySelector('[data-hero-sub]'); if (el3) el3.textContent = hs; }
         if (s.hero_image_url) { var hi = document.querySelector('[data-hero-img]'); if (hi) hi.src = s.hero_image_url; }
 
+        // Products section title/subtitle
+        var pt = s['products_title_' + locale], ps = s['products_subtitle_' + locale];
+        if (pt) { var ptEl = document.querySelector('[data-products-title]'); if (ptEl) ptEl.textContent = pt; }
+        if (ps) { var psEl = document.querySelector('[data-products-sub]'); if (psEl) psEl.textContent = ps; }
+
         // Footer brand + copyright
         if (title) {
           var fb = document.querySelector('[data-footer-brand]');
@@ -267,7 +272,7 @@
           var img = p.image_url
             ? '<img src="' + p.image_url + '" alt="' + (p.name || '') + '" loading="lazy" width="640" height="400" onerror="this.src=\'' + placeholder + '\'" />'
             : '<img src="' + placeholder + '" alt="' + (p.name || '') + '" loading="lazy" width="640" height="400" />';
-          return '<a class="product-card' + (isStatic ? '' : ' is-dynamic') + '" href="' + href + '" data-slug="' + p.slug + '" data-reveal>' +
+          return '<a class="product-card' + (isStatic ? '' : ' is-dynamic') + '" href="' + href + '" data-slug="' + p.slug + '" data-cat="' + (p.category || '') + '" data-name="' + ((p.name || '').toLowerCase()) + '" data-reveal>' +
             '<div class="product-thumb">' + img + tag + '</div>' +
             '<div class="product-body"><h3>' + (p.name || '') + '</h3>' +
             (p.price ? '<span style="color:var(--brand);font-weight:700;font-size:1rem;">' + p.price + '</span>' : '') +
@@ -275,6 +280,8 @@
             '<span class="product-link">' + learn +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>';
         }).join('');
+        setupProductFilters(grid);
+        filterProductGrid();
         // replay reveal animation
         var els = Array.prototype.slice.call(grid.querySelectorAll('[data-reveal]'));
         if ('IntersectionObserver' in window) {
@@ -291,6 +298,48 @@
       .catch(function () { /* keep static */ });
   }
   applyProducts();
+
+  // ---- Product filters: category tabs + search (home & list pages) ----
+  function setupProductFilters(grid) {
+    var locale = currentLocale();
+    var filters = document.querySelector('[data-cat-tabs]');
+    var search = document.querySelector('[data-product-search]');
+    if (!filters) return;
+    var cats = [];
+    grid.querySelectorAll('.product-card').forEach(function (card) {
+      var cat = card.getAttribute('data-cat');
+      if (cat && cats.indexOf(cat) < 0) cats.push(cat);
+    });
+    filters.innerHTML = '<button class="cat-tab active" data-cat="">' + (locale === 'zh' ? '全部' : 'All') + '</button>' +
+      cats.map(function (cat) { return '<button class="cat-tab" data-cat="' + cat + '">' + cat + '</button>'; }).join('');
+    if (!filters.dataset.bound) {
+      filters.dataset.bound = '1';
+      filters.addEventListener('click', function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest('.cat-tab') : null;
+        if (!btn) return;
+        filters.querySelectorAll('.cat-tab').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        filterProductGrid();
+      });
+    }
+    if (search && !search.dataset.bound) {
+      search.dataset.bound = '1';
+      search.addEventListener('input', filterProductGrid);
+    }
+  }
+  function filterProductGrid() {
+    var grid = document.querySelector('[data-product-grid]');
+    if (!grid) return;
+    var active = grid.parentNode.querySelector('.cat-tab.active');
+    var cat = active ? active.getAttribute('data-cat') : '';
+    var search = grid.parentNode.querySelector('[data-product-search]');
+    var text = search ? search.value.trim().toLowerCase() : '';
+    grid.querySelectorAll('.product-card').forEach(function (card) {
+      var okCat = !cat || card.getAttribute('data-cat') === cat;
+      var okText = !text || (card.getAttribute('data-name') || '').indexOf(text) > -1;
+      card.style.display = okCat && okText ? '' : 'none';
+    });
+  }
 
   // Card click: dynamic products open the modal; static ones navigate normally
   document.addEventListener('click', function (e) {
