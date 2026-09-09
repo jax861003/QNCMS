@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" role="img" aria-label="青柠 CMS">
+  <!-- 青柠切片图标 -->
+  <g transform="translate(86,80)">
+    <circle r="56" fill="#65a30d"/>
+    <circle r="50" fill="#a3e635"/>
+    <circle r="38" fill="#f7fee7"/>
+    <g stroke="#a3e635" stroke-width="3.5" stroke-linecap="round">
+      <line x1="0" y1="-38" x2="0" y2="38"/>
+      <line x1="-38" y1="0" x2="38" y2="0"/>
+      <line x1="-27" y1="-27" x2="27" y2="27"/>
+      <line x1="-27" y1="27" x2="27" y2="-27"/>
+      <line x1="-14" y1="-35" x2="14" y2="35"/>
+      <line x1="-35" y1="-14" x2="35" y2="14"/>
+      <line x1="-35" y1="14" x2="35" y2="-14"/>
+      <line x1="-14" y1="35" x2="14" y2="-35"/>
+    </g>
+    <path d="M 34 -50 C 56 -74 84 -66 76 -40 C 68 -24 44 -34 34 -50 Z" fill="#65a30d"/>
+    <path d="M 44 -44 C 60 -62 74 -56 66 -40 C 58 -34 48 -38 44 -44 Z" fill="#4d7c0f" opacity="0.55"/>
+  </g>
+  <!-- 品牌文字 -->
+  <text x="196" y="99" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif" font-size="54" font-weight="700" fill="#3f6212" stroke="#ffffff" stroke-width="1.5" paint-order="stroke">青柠丨CMS</text>
+</svg>
