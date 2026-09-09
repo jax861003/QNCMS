@@ -193,11 +193,12 @@
         }
 
         var logoEl = document.querySelector('[data-site-logo]');
+        var logoUrl = s.logo_url === '/images/logo.jpg' ? '/images/logo.svg' : s.logo_url;
         if (logoEl) {
-          if (s.logo_url) {
+          if (logoUrl) {
             // Replace the text logo with an image logo
             var img = document.createElement('img');
-            img.src = s.logo_url;
+            img.src = logoUrl;
             img.alt = title || '';
             img.style.cssText = 'height:30px;width:auto;display:block;';
             logoEl.parentNode.innerHTML = '';
@@ -218,11 +219,12 @@
         }
 
         var heroLogo = document.querySelector('[data-hero-logo]');
+        var heroLogoUrl = s.hero_logo_url === '/images/logo.jpg' ? '/images/logo.svg' : s.hero_logo_url;
         if (heroLogo) {
-          if (s.hero_logo_url) {
+          if (heroLogoUrl) {
             heroLogo.innerHTML = '';
             var hImg = document.createElement('img');
-            hImg.src = s.hero_logo_url;
+            hImg.src = heroLogoUrl;
             hImg.alt = (title || '') + ' logo';
             hImg.onerror = function () {
               heroLogo.innerHTML = '';
