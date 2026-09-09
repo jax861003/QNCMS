@@ -1440,6 +1440,14 @@
       window.batchDelete = batchDelete;
       window.onTableFilter = onTableFilter;
       window.deleteMessage = deleteMessage;
+      // language menus open on hover too (same as the public site)
+      document.querySelectorAll('.lang-menu').forEach(function (menu) {
+        var tg = menu.querySelector('.lang-toggle');
+        var pop = menu.querySelector('.lang-pop');
+        if (!tg || !pop) return;
+        tg.addEventListener('mouseenter', function () { pop.hidden = false; });
+        pop.addEventListener('mouseleave', function () { pop.hidden = true; });
+      });
       document.addEventListener('click', function (e) {
         document.querySelectorAll('.lang-pop').forEach(function (pop) {
           if (!pop.hidden && !pop.contains(e.target) && !(e.target && e.target.closest && e.target.closest('.lang-menu'))) pop.hidden = true;

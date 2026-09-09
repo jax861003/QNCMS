@@ -1,0 +1,9 @@
+/admin
+  Cache-Control: no-store
+
+/admin/*
+  Cache-Control: no-store
+
+/*.html
+  Cache-Control: no-cache
+

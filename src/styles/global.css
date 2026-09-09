@@ -286,6 +286,20 @@ section {
   color: var(--ink);
   background: var(--bg-soft);
 }
+.main-nav .nav-cta {
+  background: transparent;
+  border: none;
+  color: var(--brand);
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+}
+.main-nav .nav-cta:hover {
+  color: var(--brand-2, var(--brand));
+  background: var(--bg-muted);
+}
 .main-nav a[aria-current="page"] {
   color: #fff;
   background: var(--brand);
