@@ -117,6 +117,7 @@
       .product-table .row-check { width: 16px; height: 16px; margin: 0 auto; }
       .product-table .t-actions { white-space: nowrap; }
       .t-actions .btn-sm { display: flex; width: 100%; justify-content: center; margin: 0; }
+      .msg-cell { max-width: 320px; word-break: break-word; white-space: normal; }
       .t-actions { display: flex; flex-direction: column; gap: 4px; }
       .th-resizer { position: absolute; top: 0; right: -1px; width: 7px; height: 100%; cursor: col-resize; z-index: 3; }
       .th-resizer:hover, .th-resizer.dragging { background: var(--brand); opacity: .5; }
@@ -161,6 +162,7 @@
           <div class="header-actions">
             <div class="tabs">
               <button class="tab-btn active" id="tabProductsBtn" onclick="switchTab('products')" data-i18n="tabProducts">Products</button>
+              <button class="tab-btn" id="tabMessagesBtn" onclick="switchTab('messages')" data-i18n="tabMessages">Messages</button>
               <button class="tab-btn" id="tabSettingsBtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
             </div>
             <button class="btn btn-sm btn-ghost" onclick="setUiLang('en')" data-lang-btn="en">EN</button>
@@ -317,11 +319,39 @@
                 <label data-i18n="contactAddress">Contact Address</label>
                 <input type="text" id="contact_address" />
               </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="contactQq">QQ</label>
+                  <input type="text" id="contact_qq" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="contactWechat">WeChat</label>
+                  <input type="text" id="contact_wechat" />
+                </div>
+              </div>
+              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secFooter">Footer</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="footerGithub">GitHub URL (footer)</label>
+                  <input type="url" id="footer_github" placeholder="https://github.com/your-org" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="footerTwitter">Twitter / X URL (footer)</label>
+                  <input type="url" id="footer_twitter" placeholder="https://x.com/your-handle" />
+                </div>
+              </div>
               <div class="actions">
                 <button type="submit" class="btn btn-success" data-i18n="saveSettings">Save Settings</button>
                 <div class="status" id="settingsStatus"></div>
               </div>
             </form>
+          </div>
+
+          <!-- Messages -->
+          <div class="card" id="panelMessages" style="display:none">
+            <h2 data-i18n="tabMessages">Contact Messages</h2>
+            <p class="sub" data-i18n="messagesSub">Messages submitted through the public contact form.</p>
+            <div id="messagesList">Loading...</div>
           </div>
         </main>
       </div>
@@ -449,6 +479,11 @@
           allCategories: 'All categories', noMatch: 'No products match the filter.', tableLangLabel: 'Display language:', select: 'Select', selectedLabel: '{n} selected',
           secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
           productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
+          secFooter: 'Footer', footerGithub: 'GitHub URL (footer)', footerTwitter: 'Twitter / X URL (footer)',
+          contactQq: 'QQ', contactWechat: 'WeChat',
+          tabMessages: 'Messages', messagesSub: 'Messages submitted through the public contact form.',
+          msgName: 'Name', msgEmail: 'Email', msgPhone: 'Phone', msgCompany: 'Company', msgContent: 'Message', msgTime: 'Time', msgActions: 'Actions',
+          msgEmpty: 'No messages yet.', msgLoadFailed: 'Failed to load messages', msgDeleteConfirm: 'Delete this message?',
           price: 'Price (optional)', buyUrl: 'Buy URL (optional)',
           secBranding: 'Branding', secHero: 'Hero (Homepage Banner)', secAbout: 'About', secContact: 'Contact',
           heroTitle1En: 'Hero Title Line 1 (EN)', heroTitle1Zh: 'Hero Title Line 1 (ZH)',
@@ -490,6 +525,11 @@
           allCategories: '全部分类', noMatch: '没有符合筛选条件的产品。', tableLangLabel: '显示语言：', select: '选择', selectedLabel: '已选 {n} 项',
           secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
           productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
+          secFooter: '页脚', footerGithub: 'GitHub 链接（页脚）', footerTwitter: 'Twitter / X 链接（页脚）',
+          contactQq: 'QQ', contactWechat: '微信',
+          tabMessages: '留言管理', messagesSub: '前台联系表单提交的留言。',
+          msgName: '姓名', msgEmail: '邮箱', msgPhone: '电话', msgCompany: '公司', msgContent: '留言内容', msgTime: '时间', msgActions: '操作',
+          msgEmpty: '暂无留言。', msgLoadFailed: '留言加载失败', msgDeleteConfirm: '确定删除这条留言？',
           price: '价格（可选）', buyUrl: '购买链接（可选）',
           secBranding: '品牌', secHero: '页首横幅（首页大图区）', secAbout: '关于我们', secContact: '联系方式',
           heroTitle1En: '页首标题 第1行（英文）', heroTitle1Zh: '页首标题 第1行（中文）',
@@ -620,15 +660,21 @@
       function switchTab(name) {
         var p = document.getElementById('panelProducts');
         var s = document.getElementById('panelSettings');
+        var m = document.getElementById('panelMessages');
         var pb = document.getElementById('tabProductsBtn');
         var sb = document.getElementById('tabSettingsBtn');
+        var mb = document.getElementById('tabMessagesBtn');
         if (name === 'settings') {
-          p.style.display = 'none'; s.style.display = 'block';
-          pb.classList.remove('active'); sb.classList.add('active');
+          p.style.display = 'none'; m.style.display = 'none'; s.style.display = 'block';
+          pb.classList.remove('active'); mb.classList.remove('active'); sb.classList.add('active');
           loadSettings();
+        } else if (name === 'messages') {
+          p.style.display = 'none'; s.style.display = 'none'; m.style.display = 'block';
+          pb.classList.remove('active'); sb.classList.remove('active'); mb.classList.add('active');
+          loadMessages();
         } else {
-          s.style.display = 'none'; p.style.display = 'block';
-          sb.classList.remove('active'); pb.classList.add('active');
+          s.style.display = 'none'; m.style.display = 'none'; p.style.display = 'block';
+          sb.classList.remove('active'); mb.classList.remove('active'); pb.classList.add('active');
           loadProducts();
         }
       }
@@ -1064,7 +1110,9 @@
             hero_subtitle_en: 'hero_subtitle_en', hero_subtitle_zh: 'hero_subtitle_zh',
             hero_image_url: 'hero_image_url',
             products_title_en: 'products_title_en', products_title_zh: 'products_title_zh',
-            products_subtitle_en: 'products_subtitle_en', products_subtitle_zh: 'products_subtitle_zh'
+            products_subtitle_en: 'products_subtitle_en', products_subtitle_zh: 'products_subtitle_zh',
+            contact_qq: 'contact_qq', contact_wechat: 'contact_wechat',
+            footer_github: 'footer_github', footer_twitter: 'footer_twitter'
           };
           Object.keys(map).forEach(function (key) {
             var el = document.getElementById(map[key]);
@@ -1097,7 +1145,11 @@
           products_title_en: document.getElementById('products_title_en').value,
           products_title_zh: document.getElementById('products_title_zh').value,
           products_subtitle_en: document.getElementById('products_subtitle_en').value,
-          products_subtitle_zh: document.getElementById('products_subtitle_zh').value
+          products_subtitle_zh: document.getElementById('products_subtitle_zh').value,
+          contact_qq: document.getElementById('contact_qq').value,
+          contact_wechat: document.getElementById('contact_wechat').value,
+          footer_github: document.getElementById('footer_github').value,
+          footer_twitter: document.getElementById('footer_twitter').value
         };
         var statusEl = document.getElementById('settingsStatus');
         statusEl.className = 'status';
@@ -1130,6 +1182,60 @@
         if (e.target.id === 'productModal') closeModal();
       });
 
+      // ====== Contact messages ======
+      async function loadMessages() {
+        var list = document.getElementById('messagesList');
+        if (!list) return;
+        list.innerHTML = ui('loading');
+        try {
+          var resp = await fetch('/api/admin/messages', { headers: { 'Authorization': 'Bearer ' + token } });
+          if (resp.status === 401) { sessionExpired(); return; }
+          var msgs = await resp.json();
+          if (!Array.isArray(msgs)) throw new Error('bad response');
+          renderMessages(msgs);
+        } catch (err) {
+          list.innerHTML = '<div style="color:#dc2626;padding:16px;">' + ui('msgLoadFailed') + '</div>';
+        }
+      }
+      function renderMessages(msgs) {
+        var list = document.getElementById('messagesList');
+        if (!list) return;
+        if (msgs.length === 0) {
+          list.className = 'product-list';
+          list.innerHTML = '<div style="color:#888;padding:16px;">' + ui('msgEmpty') + '</div>';
+          return;
+        }
+        list.className = 'product-table-wrap';
+        var labels = { time: ui('msgTime'), name: ui('msgName'), email: ui('msgEmail'), phone: ui('msgPhone'), company: ui('msgCompany'), message: ui('msgContent'), actions: ui('msgActions') };
+        var head = ['time', 'name', 'email', 'phone', 'company', 'message', 'actions'].map(function (k) {
+          return '<th>' + (labels[k] || k) + '</th>';
+        }).join('');
+        var rows = msgs.map(function (m) {
+          var t = (m.created_at || '').replace('T', ' ').replace(/\..+Z?$/, '').replace('Z', '');
+          return '<tr><td style="white-space:nowrap">' + esc(t) + '</td>' +
+            '<td>' + esc(m.name || '') + '</td>' +
+            '<td>' + esc(m.email || '') + '</td>' +
+            '<td>' + esc(m.phone || '') + '</td>' +
+            '<td>' + esc(m.company || '') + '</td>' +
+            '<td class="msg-cell">' + esc(m.message || '') + '</td>' +
+            '<td style="white-space:nowrap"><button class="btn btn-sm btn-danger" onclick="deleteMessage(\'' + m.id + '\')">' + ui('delete') + '</button></td></tr>';
+        }).join('');
+        list.innerHTML = '<table class="product-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table>';
+      }
+      async function deleteMessage(id) {
+        if (!confirm(ui('msgDeleteConfirm'))) return;
+        try {
+          var resp = await fetch('/api/admin/messages?id=' + encodeURIComponent(id), {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (resp.status === 401) { sessionExpired(); return; }
+          var data = await resp.json();
+          if (!data.ok) { alert(ui('deleteFailed') + (data.message || '')); return; }
+          loadMessages();
+        } catch (err) { alert('Network error'); }
+      }
+
       // ====== Boot ======
       applyUi();
       if (token) {
@@ -1153,6 +1259,7 @@
       window.updateBatchInfo = updateBatchInfo;
       window.batchDelete = batchDelete;
       window.onTableFilter = onTableFilter;
+      window.deleteMessage = deleteMessage;
     </script>
   </body>
 </html>

@@ -63,13 +63,14 @@
     "infoTitle": "Or reach us directly",
     "infoEmail": "hello@novagrid.io",
     "infoPhone": "+1 (415) 555-0132",
-    "infoAddress": "500 Market Street, Suite 2100, San Francisco, CA 94105"
+    "infoAddress": "500 Market Street, Suite 2100, San Francisco, CA 94105",
+  "infoQQ": "—",
+  "infoWechat": "—"
   },
   "footer": {
     "tagline": "Cloud-native infrastructure for the data-driven enterprise.",
     "colProducts": "Products",
     "colCompany": "Company",
-    "colLegal": "Legal",
     "rights": "All rights reserved."
   }
 }

@@ -153,6 +153,22 @@
         if (pt) { var ptEl = document.querySelector('[data-products-title]'); if (ptEl) ptEl.textContent = pt; }
         if (ps) { var psEl = document.querySelector('[data-products-sub]'); if (psEl) psEl.textContent = ps; }
 
+        // Contact QQ / WeChat
+        if (s.contact_qq) { var qqEl = document.querySelector('[data-contact-qq]'); if (qqEl) qqEl.textContent = s.contact_qq; }
+        if (s.contact_wechat) { var wcEl = document.querySelector('[data-contact-wechat]'); if (wcEl) wcEl.textContent = s.contact_wechat; }
+
+        // Footer social links (GitHub / Twitter-X) - shown only when configured
+        var gh = document.querySelector('[data-footer-github]');
+        if (gh) {
+          if (s.footer_github) { gh.href = s.footer_github; gh.style.display = ''; }
+          else gh.style.display = 'none';
+        }
+        var tw = document.querySelector('[data-footer-twitter]');
+        if (tw) {
+          if (s.footer_twitter) { tw.href = s.footer_twitter; tw.style.display = ''; }
+          else tw.style.display = 'none';
+        }
+
         // Footer brand + copyright
         if (title) {
           var fb = document.querySelector('[data-footer-brand]');

@@ -148,6 +148,19 @@ export async function ensureTables(db) {
         )`
       )
       .run();
+    await db
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS messages (
+          id         TEXT PRIMARY KEY,
+          name       TEXT NOT NULL DEFAULT '',
+          email      TEXT NOT NULL DEFAULT '',
+          phone      TEXT NOT NULL DEFAULT '',
+          company    TEXT NOT NULL DEFAULT '',
+          message    TEXT NOT NULL DEFAULT '',
+          created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+        )`
+      )
+      .run();
     // Upgrade existing products tables with columns added after the first deploy
     try {
       const cols = await db.prepare('PRAGMA table_info(products)').all();
