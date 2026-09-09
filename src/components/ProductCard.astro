@@ -18,6 +18,7 @@ const { product, locale, learnMore } = Astro.props;
   </div>
   <div class="product-body">
     <h3>{product.name}</h3>
+    {product.price ? <span style="color:var(--brand);font-weight:700;font-size:1rem;">{product.price}</span> : ''}
     <p>{product.short}</p>
     <span class="product-link">
       {learnMore}

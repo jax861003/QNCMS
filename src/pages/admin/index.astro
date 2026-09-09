@@ -151,8 +151,9 @@
           <!-- Settings -->
           <div class="card" id="panelSettings" style="display:none">
             <h2 data-i18n="tabSettings">Site Settings</h2>
-            <p class="sub" data-i18n="settingsSub">Site title, logo, favicon, about and contact info (applied to the public site without redeploy)</p>
+            <p class="sub" data-i18n="settingsSub">Site title, logo, favicon, hero banner, about and contact info (applied to the public site without redeploy)</p>
             <form id="settingsForm">
+              <h3 style="font-size:1rem;margin:8px 0 16px;color:var(--brand);" data-i18n="secBranding">Branding</h3>
               <div class="form-grid">
                 <div class="form-group">
                   <label data-i18n="siteTitleEn">Site Title (EN)</label>
@@ -174,6 +175,42 @@
                   <input type="url" id="favicon_url" placeholder="https://example.com/favicon.ico" />
                 </div>
               </div>
+              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secHero">Hero (Homepage Banner)</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="heroTitle1En">Hero Title Line 1 (EN)</label>
+                  <input type="text" id="hero_title1_en" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="heroTitle1Zh">Hero Title Line 1 (ZH)</label>
+                  <input type="text" id="hero_title1_zh" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="heroTitle2En">Hero Title Line 2 (EN)</label>
+                  <input type="text" id="hero_title2_en" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="heroTitle2Zh">Hero Title Line 2 (ZH)</label>
+                  <input type="text" id="hero_title2_zh" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="heroSubtitleEn">Hero Subtitle (EN)</label>
+                  <textarea id="hero_subtitle_en"></textarea>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="heroSubtitleZh">Hero Subtitle (ZH)</label>
+                  <textarea id="hero_subtitle_zh"></textarea>
+                </div>
+              </div>
+              <div class="form-group">
+                <label data-i18n="heroImageUrl">Hero Image URL (optional, e.g. 900x675)</label>
+                <input type="url" id="hero_image_url" placeholder="https://example.com/hero.png" />
+              </div>
+              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secAbout">About</h3>
               <div class="form-grid">
                 <div class="form-group">
                   <label data-i18n="aboutTitleEn">About Title (EN)</label>
@@ -194,6 +231,7 @@
                   <textarea id="about_body_zh"></textarea>
                 </div>
               </div>
+              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secContact">Contact</h3>
               <div class="form-grid">
                 <div class="form-group">
                   <label data-i18n="contactEmail">Contact Email</label>
@@ -203,6 +241,10 @@
                   <label data-i18n="contactPhone">Contact Phone</label>
                   <input type="text" id="contact_phone" />
                 </div>
+              </div>
+              <div class="form-group">
+                <label data-i18n="contactAddress">Contact Address</label>
+                <input type="text" id="contact_address" />
               </div>
               <div class="actions">
                 <button type="submit" class="btn btn-success" data-i18n="saveSettings">Save Settings</button>
@@ -278,6 +320,16 @@
             <input type="url" id="image_url" placeholder="https://example.com/image.png" />
             <div class="hint" data-i18n="imgHint">Leave empty to use the default product image</div>
           </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label data-i18n="price">Price (optional)</label>
+              <input type="text" id="price" placeholder="$29/mo" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="buyUrl">Buy URL (optional)</label>
+              <input type="url" id="buy_url" placeholder="https://example.com/buy" />
+            </div>
+          </div>
           <div class="form-group">
             <label data-i18n="position">Position (sort, lower first)</label>
             <input type="number" id="position" value="0" />
@@ -308,6 +360,13 @@
           imageUrl: 'Image URL (external link)', position: 'Position (sort, lower first)',
           imgHint: 'Leave empty to use the default product image',
           viewList: 'List', viewGrid: 'Grid',
+          price: 'Price (optional)', buyUrl: 'Buy URL (optional)',
+          secBranding: 'Branding', secHero: 'Hero (Homepage Banner)', secAbout: 'About', secContact: 'Contact',
+          heroTitle1En: 'Hero Title Line 1 (EN)', heroTitle1Zh: 'Hero Title Line 1 (ZH)',
+          heroTitle2En: 'Hero Title Line 2 (EN)', heroTitle2Zh: 'Hero Title Line 2 (ZH)',
+          heroSubtitleEn: 'Hero Subtitle (EN)', heroSubtitleZh: 'Hero Subtitle (ZH)',
+          heroImageUrl: 'Hero Image URL (optional, e.g. 900x675)',
+          contactAddress: 'Contact Address',
           save: 'Save', cancel: 'Cancel', edit: 'Edit', delete: 'Delete',
           settingsSub: 'Site title, logo, favicon, about and contact info (applied to the public site without redeploy)',
           siteTitleEn: 'Site Title (EN)', siteTitleZh: 'Site Title (ZH)',
@@ -334,6 +393,13 @@
           imageUrl: '图片 URL（外链）', position: '排序（数字越小越靠前）',
           imgHint: '留空将使用默认产品图片',
           viewList: '列表', viewGrid: '缩略图',
+          price: '价格（可选）', buyUrl: '购买链接（可选）',
+          secBranding: '品牌', secHero: '页首横幅（首页大图区）', secAbout: '关于我们', secContact: '联系方式',
+          heroTitle1En: '页首标题 第1行（英文）', heroTitle1Zh: '页首标题 第1行（中文）',
+          heroTitle2En: '页首标题 第2行（英文）', heroTitle2Zh: '页首标题 第2行（中文）',
+          heroSubtitleEn: '页首副标题（英文）', heroSubtitleZh: '页首副标题（中文）',
+          heroImageUrl: '页首大图 URL（可选，建议 900x675）',
+          contactAddress: '联系地址',
           save: '保存', cancel: '取消', edit: '编辑', delete: '删除',
           settingsSub: '站点标题、Logo、Favicon、关于我们和联系方式（保存后前台实时生效，无需重新部署）',
           siteTitleEn: '站点标题（英文）', siteTitleZh: '站点标题（中文）',
@@ -557,6 +623,8 @@
           document.getElementById('highlights_en').value = modalProduct.highlights_en || '[]';
           document.getElementById('highlights_zh').value = modalProduct.highlights_zh || '[]';
           document.getElementById('image_url').value = modalProduct.image_url || '';
+          document.getElementById('price').value = modalProduct.price || '';
+          document.getElementById('buy_url').value = modalProduct.buy_url || '';
         } else {
           document.getElementById('productForm').reset();
           document.getElementById('position').value = '0';
@@ -604,7 +672,9 @@
           description_zh: document.getElementById('description_zh').value,
           highlights_en: document.getElementById('highlights_en').value || '[]',
           highlights_zh: document.getElementById('highlights_zh').value || '[]',
-          image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg'
+          image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg',
+          price: document.getElementById('price').value.trim(),
+          buy_url: document.getElementById('buy_url').value.trim()
         };
         try {
           var resp = await fetch('/api/products', {
@@ -644,7 +714,12 @@
             logo_url: 'logo_url', favicon_url: 'favicon_url',
             about_title_en: 'about_title_en', about_title_zh: 'about_title_zh',
             about_body_en: 'about_body_en', about_body_zh: 'about_body_zh',
-            contact_email: 'contact_email', contact_phone: 'contact_phone'
+            contact_email: 'contact_email', contact_phone: 'contact_phone',
+            contact_address: 'contact_address',
+            hero_title1_en: 'hero_title1_en', hero_title1_zh: 'hero_title1_zh',
+            hero_title2_en: 'hero_title2_en', hero_title2_zh: 'hero_title2_zh',
+            hero_subtitle_en: 'hero_subtitle_en', hero_subtitle_zh: 'hero_subtitle_zh',
+            hero_image_url: 'hero_image_url'
           };
           Object.keys(map).forEach(function (key) {
             var el = document.getElementById(map[key]);
@@ -665,7 +740,15 @@
           about_body_en: document.getElementById('about_body_en').value,
           about_body_zh: document.getElementById('about_body_zh').value,
           contact_email: document.getElementById('contact_email').value,
-          contact_phone: document.getElementById('contact_phone').value
+          contact_phone: document.getElementById('contact_phone').value,
+          contact_address: document.getElementById('contact_address').value,
+          hero_title1_en: document.getElementById('hero_title1_en').value,
+          hero_title1_zh: document.getElementById('hero_title1_zh').value,
+          hero_title2_en: document.getElementById('hero_title2_en').value,
+          hero_title2_zh: document.getElementById('hero_title2_zh').value,
+          hero_subtitle_en: document.getElementById('hero_subtitle_en').value,
+          hero_subtitle_zh: document.getElementById('hero_subtitle_zh').value,
+          hero_image_url: document.getElementById('hero_image_url').value
         };
         var statusEl = document.getElementById('settingsStatus');
         statusEl.className = 'status';

@@ -22,7 +22,11 @@ const product = getProduct(slug, locale)!;
         <span class="product-tag" style="position:static; display:inline-block; margin-bottom:16px;">{product.tag}</span>
         <h1>{product.name}</h1>
         <p class="lead">{product.short}</p>
-        <a class="btn btn-primary" href={`/${locale}/contact/`}>{t(locale, 'nav.cta')}</a>
+        {product.price ? <div style="font-size:1.6rem;font-weight:800;color:var(--brand);margin-bottom:18px;">{product.price}</div> : ''}
+
+        <a class="btn btn-primary" href={product.buy_url || `/${locale}/contact/`}>
+          {product.buy_url ? (locale === 'zh' ? '立即购买' : 'Buy now') : t(locale, 'nav.cta')}
+        </a>
       </div>
       <div class="frame">
         <img src={product.image} alt={product.name} width="800" height="600" />

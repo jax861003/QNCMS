@@ -128,6 +128,8 @@ export async function ensureTables(db) {
           highlights_en TEXT NOT NULL DEFAULT '[]',
           highlights_zh TEXT NOT NULL DEFAULT '[]',
           image_url   TEXT NOT NULL DEFAULT '',
+          price       TEXT NOT NULL DEFAULT '',
+          buy_url     TEXT NOT NULL DEFAULT '',
           position    INTEGER NOT NULL DEFAULT 0,
           active      INTEGER NOT NULL DEFAULT 1,
           created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
@@ -144,6 +146,20 @@ export async function ensureTables(db) {
         )`
       )
       .run();
+    // Upgrade existing products tables with columns added after the first deploy
+    try {
+      const cols = await db.prepare('PRAGMA table_info(products)').all();
+      const names = new Set((cols.results || []).map((c) => c.name));
+      const addCol = async (col, ddl) => {
+        if (!names.has(col)) {
+          await db.prepare('ALTER TABLE products ADD COLUMN ' + ddl).run();
+        }
+      };
+      await addCol('price', "price TEXT NOT NULL DEFAULT ''");
+      await addCol('buy_url', "buy_url TEXT NOT NULL DEFAULT ''");
+    } catch (e) {
+      console.error('ensureColumns failed:', e);
+    }
     return true;
   } catch (e) {
     console.error('ensureTables failed:', e);

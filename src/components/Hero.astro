@@ -22,10 +22,10 @@ const stats = [
           {t(locale, 'hero.badge')}
         </span>
         <h1 class="hero-title">
-          {t(locale, 'hero.titleLine1')}<br />
-          <span class="grad">{t(locale, 'hero.titleLine2')}</span>
+          <span data-hero-line1>{t(locale, 'hero.titleLine1')}</span><br />
+          <span class="grad" data-hero-line2>{t(locale, 'hero.titleLine2')}</span>
         </h1>
-        <p class="hero-sub">{t(locale, 'hero.subtitle')}</p>
+        <p class="hero-sub" data-hero-sub>{t(locale, 'hero.subtitle')}</p>
         <div class="hero-cta">
           <a class="btn btn-primary btn-lg" href={`/${locale}/products/`}>
             {t(locale, 'hero.primaryCta')}
@@ -36,7 +36,7 @@ const stats = [
       </div>
       <div class="hero-visual" data-reveal>
         <div class="frame">
-          <img src="/images/hero-dashboard.png" alt="NovaGrid control dashboard" width="900" height="675" fetchpriority="high" />
+          <img src="/images/hero-dashboard.png" alt="NovaGrid control dashboard" width="900" height="675" fetchpriority="high" data-hero-img />
         </div>
       </div>
     </div>
