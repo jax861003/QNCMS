@@ -1,6 +1,7 @@
 ---
 import { t, type Locale } from '@/lib/i18n';
 import { getProduct } from '@/lib/products';
+import { renderMd } from '@/lib/md';
 
 interface Props {
   locale: Locale;
@@ -19,8 +20,8 @@ const product = getProduct(slug, locale)!;
 
     <div class="detail-hero">
       <div>
-        <span class="product-tag" style="position:static; display:inline-block; margin-bottom:16px;">{product.tag}</span>
         <h1>{product.name}</h1>
+        {product.tag ? <span class="product-tag" style="position:static; display:inline-block; margin-top:12px; margin-bottom:16px;">{product.tag}</span> : ''}
         <p class="lead">{product.short}</p>
         {product.price ? <div style="font-size:1.6rem;font-weight:800;color:var(--brand);margin-bottom:18px;">{product.price}</div> : ''}
 
@@ -36,7 +37,7 @@ const product = getProduct(slug, locale)!;
     <div class="detail-blocks">
       <div class="detail-block">
         <h3>{t(locale, 'productDetail.overview')}</h3>
-        <p>{product.description}</p>
+        <div class="md" set:html={renderMd(product.description)} />
       </div>
       <div class="detail-block">
         <h3>{t(locale, 'productDetail.highlights')}</h3>

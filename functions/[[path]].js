@@ -4,6 +4,7 @@
 // fields) for products added in the admin (no static page).
 // Static seeded products are forwarded to their built static pages.
 import { getEnv, getDB, ensureTables } from './_utils.js';
+import { renderMd } from './_md.js';
 
 function safeParseArray(json) {
   try {
@@ -85,9 +86,7 @@ function shellHtml(p, locale, settings) {
       '</div>'
     : '';
 
-  const img = p.image_url
-    ? '<div class="frame"><img src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" /></div>'
-    : '';
+  const img = '<div class="frame"><img src="' + esc(p.image_url || '/images/products/placeholder.svg') + '" alt="' + esc(p.name) + '" /></div>';
   const price = p.price
     ? '<div class="detail-meta-row"><span class="meta-label">' + L.price + '</span><span class="meta-value price">' + esc(p.price) + '</span></div>'
     : '';
@@ -137,7 +136,8 @@ function shellHtml(p, locale, settings) {
   '.section{min-height:calc(100vh - 68px)}.detail-wrap{max-width:1040px;margin:0 auto;padding:44px 24px 80px}' +
   '.d-back{display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);text-decoration:none;font-weight:600;margin-bottom:28px;transition:color .2s}.d-back:hover{color:var(--brand)}' +
   '.d-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center;margin-bottom:44px}@media(max-width:760px){.d-hero{grid-template-columns:1fr}.main-nav .nav-cta{display:none}}' +
-  '.d-tag{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--bg-muted);color:var(--brand);font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}' +
+  '.d-tag{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--bg-muted);color:var(--brand);font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:12px;margin-bottom:14px}' +
+  '.md h1,.md h2,.md h3{margin:18px 0 8px;font-size:1.15rem}.md h1{font-size:1.35rem}.md h2{font-size:1.25rem}.md p{margin:0 0 12px}.md ul,.md ol{margin:0 0 12px;padding-left:22px}.md li{margin-bottom:6px}.md a{color:var(--brand);text-decoration:underline}.md pre{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;margin:0 0 12px}.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}.md pre code{border:none;padding:0;background:transparent}' +
   '.d-hero h1{font-size:clamp(1.9rem,3.4vw,2.7rem);margin:0 0 14px;line-height:1.15}' +
   '.d-lead{color:var(--ink-soft);font-size:1.08rem;margin:0 0 18px;line-height:1.6}' +
   '.detail-meta{display:grid;gap:8px;margin-bottom:22px}' +
@@ -195,8 +195,8 @@ function shellHtml(p, locale, settings) {
   '<main class="section"><div class="detail-wrap">' +
   '<a class="d-back" href="/' + locale + '/products/">← ' + L.back + '</a>' +
   '<div class="d-hero"><div>' +
-  '<span class="d-tag">' + esc(p.tag || '') + '</span>' +
   '<h1>' + esc(p.name) + '</h1>' +
+  (p.tag ? '<span class="d-tag">' + esc(p.tag) + '</span>' : '') +
   '<p class="d-lead">' + esc(p.short || '') + '</p>' +
   '<div class="detail-meta">' + category + price + '</div>' +
   (p.buy_url
@@ -204,7 +204,7 @@ function shellHtml(p, locale, settings) {
     : '<a class="d-buy" href="/' + locale + '/contact/">' + L.contact + '</a>') +
   '</div>' + img + '</div>' +
   '<div class="d-blocks">' +
-  (desc ? '<div class="detail-block"><h3>' + L.overview + '</h3><p>' + esc(desc) + '</p></div>' : '') +
+  (desc ? '<div class="detail-block"><h3>' + L.overview + '</h3><div class="md">' + renderMd(desc) + '</div></div>' : '') +
   features +
   '</div></div></main>' +
 

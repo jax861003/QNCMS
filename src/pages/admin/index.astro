@@ -527,11 +527,11 @@
             </div>
             <div class="form-group">
               <label data-i18n="descZh">描述</label>
-              <textarea id="description_zh" data-i18n-ph="phDescZh" placeholder="Description"></textarea>
+              <textarea id="description_zh" data-i18n-ph="phDescZh" placeholder="支持 Markdown 排版（# 标题、- 列表、**加粗** 等）"></textarea>
             </div>
             <div class="form-group">
               <label data-i18n="descEn">Description</label>
-              <textarea id="description_en" data-i18n-ph="phDescEn" placeholder="描述"></textarea>
+              <textarea id="description_en" data-i18n-ph="phDescEn" placeholder="Markdown supported (# headings, - lists, **bold**...)"></textarea>
             </div>
           </div>
 
@@ -539,7 +539,7 @@
             <div class="fs-title" data-i18n="fsShared">共用参数 Shared</div>
             <div class="form-group">
               <label data-i18n="imageUrl">Image URL（图片链接）</label>
-              <input type="url" id="image_url" placeholder="https://example.com/image.png" />
+              <input type="text" id="image_url" placeholder="https://example.com/image.png（留空使用默认产品图）" />
               <div class="hint" data-i18n="imgHint">为空时使用默认产品图</div>
             </div>
             <div class="form-grid">
@@ -701,6 +701,7 @@
         document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
           var key = el.getAttribute('data-i18n-ph');
           if (key && UI.en[key]) el.placeholder = ui(key);
+        if (window._currentProducts) updateCategoryFilter(window._currentProducts);
         });
         document.querySelectorAll('[data-lang-btn]').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-lang-btn') === curLang);
@@ -949,7 +950,7 @@
         var sel = document.getElementById('tableCategory');
         if (!sel) return;
         var cats = {};
-        var lang = tableLang === 'zh' ? 'zh' : 'en';
+        var lang = curLang === 'zh' ? 'zh' : 'en';
         products.forEach(function (p) {
           var cat = lang === 'zh' ? (p.category_zh || p.category_en) : (p.category_en || p.category_zh);
           if (cat) cats[cat] = true;
@@ -1183,7 +1184,9 @@
           document.getElementById('tag_zh').value = modalProduct.tag_zh || '';
           document.getElementById('description_en').value = modalProduct.description_en || '';
           document.getElementById('description_zh').value = modalProduct.description_zh || '';
-          document.getElementById('image_url').value = modalProduct.image_url || '';
+          var imgVal = modalProduct.image_url || '';
+          if (imgVal === '/images/products/placeholder.svg') imgVal = '';
+          document.getElementById('image_url').value = imgVal;
           var sp = splitPrice(modalProduct.price);
           document.getElementById('currency').value = sp.cur;
           document.getElementById('price').value = sp.rest;
@@ -1234,7 +1237,7 @@
           description_en: document.getElementById('description_en').value,
           description_zh: document.getElementById('description_zh').value,
           active: activeVal === 0 ? 0 : 1,
-          image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg',
+          image_url: document.getElementById('image_url').value.trim(),
           price: (document.getElementById('price').value.trim() ? document.getElementById('currency').value + document.getElementById('price').value.trim() : ''),
           buy_url: document.getElementById('buy_url').value.trim()
         };
