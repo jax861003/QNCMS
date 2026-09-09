@@ -11,6 +11,7 @@ const { locale } = Astro.props;
   <div class="container">
     <div class="hero-grid">
       <div>
+        <div class="hero-logo" data-hero-logo hidden></div>
         <h1 class="hero-title">
           <span data-hero-line1>{t(locale, 'hero.titleLine1')}</span><br />
           <span class="grad" data-hero-line2>{t(locale, 'hero.titleLine2')}</span>

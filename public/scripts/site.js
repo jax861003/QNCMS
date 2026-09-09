@@ -208,6 +208,21 @@
           }
         }
 
+        var heroLogo = document.querySelector('[data-hero-logo]');
+        if (heroLogo) {
+          if (s.hero_logo_url) {
+            heroLogo.innerHTML = '';
+            var hImg = document.createElement('img');
+            hImg.src = s.hero_logo_url;
+            hImg.alt = (title || '') + ' logo';
+            heroLogo.appendChild(hImg);
+            heroLogo.hidden = false;
+          } else {
+            heroLogo.hidden = true;
+            heroLogo.innerHTML = '';
+          }
+        }
+
         var at = s['about_title_' + locale], ab = s['about_body_' + locale];
         if (at) { var atEl = document.querySelector('[data-about-title]'); if (atEl) atEl.textContent = at; }
         if (ab) { var abEl = document.querySelector('[data-about-body]'); if (abEl) abEl.textContent = ab; }

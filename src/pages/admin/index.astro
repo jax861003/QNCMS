@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin — QNCMS</title>
+    <title>站点管理 / Site Admin</title>
     <script>
       (function () {
         try {
@@ -325,13 +325,19 @@
               </div>
               <div class="form-grid">
                 <div class="form-group">
-                  <label data-i18n="logoUrl">Logo URL (optional, replaces text logo)</label>
+                  <label data-i18n="logoUrl">主页 Logo（导航栏 / 页脚品牌）</label>
                   <input type="url" id="logo_url" placeholder="https://example.com/logo.png" />
-                  <div class="hint" data-i18n="logoUrlHint">Leave empty to keep the default text logo</div>
+                  <div class="hint" data-i18n="logoUrlHint">推荐 200×60 横版 PNG/SVG 透明底；留空使用文字标题</div>
                 </div>
                 <div class="form-group">
-                  <label data-i18n="faviconUrl">Favicon URL (optional)</label>
-                  <input type="url" id="favicon_url" placeholder="https://example.com/favicon.ico" />
+                  <label data-i18n="faviconUrl">Favicon 图标（浏览器标签页图标）</label>
+                  <input type="url" id="favicon_url" placeholder="https://example.com/favicon.png" />
+                  <div class="hint" data-i18n="faviconUrlHint">推荐 32×32 或 64×64（PNG/SVG/ICO）</div>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="heroLogoUrl">主页标题 Logo（首页大标题上方品牌标识，可选）</label>
+                  <input type="url" id="hero_logo_url" placeholder="https://example.com/hero-logo.png" />
+                  <div class="hint" data-i18n="heroLogoUrlHint">推荐 240×80 横版 PNG/SVG 透明底；留空不显示</div>
                 </div>
               </div>
               <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secHero">Hero (Homepage Banner)</h3>
@@ -623,8 +629,10 @@
           save: 'Save', cancel: 'Cancel', edit: 'Edit', delete: 'Delete',
           settingsSub: 'Site title, logo, favicon, about and contact info (applied to the public site without redeploy)',
           siteTitleEn: 'Site Title (EN)', siteTitleZh: 'Site Title (ZH)',
-          logoUrl: 'Logo URL (optional, replaces text logo)', logoUrlHint: 'Leave empty to keep the default text logo',
-          faviconUrl: 'Favicon URL (optional)', aboutTitleEn: 'About Title (EN)', aboutTitleZh: 'About Title (ZH)',
+          adminTitle: 'Site Admin',
+          logoUrl: 'Homepage Logo (header / footer brand)', logoUrlHint: 'Recommended 200x60 horizontal PNG/SVG with transparency; leave empty for the text logo',
+          faviconUrl: 'Favicon (browser tab icon)', faviconUrlHint: 'Recommended 32x32 or 64x64 (PNG/SVG/ICO)',
+          heroLogoUrl: 'Hero Logo (brand above the homepage title, optional)', heroLogoUrlHint: 'Recommended 240x80 horizontal PNG/SVG with transparency; leave empty to hide', aboutTitleEn: 'About Title (EN)', aboutTitleZh: 'About Title (ZH)',
           aboutBodyEn: 'About Body (EN)', aboutBodyZh: 'About Body (ZH)',
           contactEmail: 'Contact Email', contactPhone: 'Contact Phone',
           saveSettings: 'Save Settings', saved: 'Settings saved. Refresh the public site to see changes.',
@@ -675,8 +683,10 @@
           save: '保存', cancel: '取消', edit: '编辑', delete: '删除',
           settingsSub: '站点标题、Logo、Favicon、关于我们和联系方式（保存后前台实时生效，无需重新部署）',
           siteTitleEn: '站点标题（英文）', siteTitleZh: '站点标题（中文）',
-          logoUrl: 'Logo 图片 URL（可选，替换文字 Logo）', logoUrlHint: '留空则使用默认文字 Logo',
-          faviconUrl: 'Favicon URL（可选）', aboutTitleEn: '关于我们标题（英文）', aboutTitleZh: '关于我们标题（中文）',
+          adminTitle: '站点管理',
+          logoUrl: '主页 Logo（导航栏 / 页脚品牌）', logoUrlHint: '推荐 200×60 横版 PNG/SVG 透明底；留空使用文字标题',
+          faviconUrl: 'Favicon 图标（浏览器标签页图标）', faviconUrlHint: '推荐 32×32 或 64×64（PNG/SVG/ICO）',
+          heroLogoUrl: '主页标题 Logo（首页大标题上方品牌标识，可选）', heroLogoUrlHint: '推荐 240×80 横版 PNG/SVG 透明底；留空不显示', aboutTitleEn: '关于我们标题（英文）', aboutTitleZh: '关于我们标题（中文）',
           aboutBodyEn: '关于我们内容（英文）', aboutBodyZh: '关于我们内容（中文）',
           contactEmail: '联系邮箱', contactPhone: '联系电话',
           saveSettings: '保存设置', saved: '设置已保存，刷新前台即可生效。',
@@ -694,6 +704,7 @@
       function ui(key) { return (UI[curLang] && UI[curLang][key]) || UI.en[key] || key; }
 
       function applyUi() {
+        document.title = ui('adminTitle');
         document.querySelectorAll('[data-i18n]').forEach(function (el) {
           var key = el.getAttribute('data-i18n');
           if (key && UI.en[key]) el.textContent = ui(key);
@@ -1291,7 +1302,7 @@
           if (!s || typeof s !== 'object') return;
           var map = {
             site_title_en: 'site_title_en', site_title_zh: 'site_title_zh',
-            logo_url: 'logo_url', favicon_url: 'favicon_url',
+            logo_url: 'logo_url', favicon_url: 'favicon_url', hero_logo_url: 'hero_logo_url',
             about_title_en: 'about_title_en', about_title_zh: 'about_title_zh',
             about_body_en: 'about_body_en', about_body_zh: 'about_body_zh',
             contact_email: 'contact_email', contact_phone: 'contact_phone',
@@ -1325,6 +1336,7 @@
           site_title_zh: document.getElementById('site_title_zh').value,
           logo_url: document.getElementById('logo_url').value,
           favicon_url: document.getElementById('favicon_url').value,
+          hero_logo_url: document.getElementById('hero_logo_url').value,
           about_title_en: document.getElementById('about_title_en').value,
           about_title_zh: document.getElementById('about_title_zh').value,
           about_body_en: document.getElementById('about_body_en').value,
