@@ -137,6 +137,9 @@
         document.documentElement.setAttribute('data-variant', s.theme_name || 'default');
         var title = s['site_title_' + locale] || s.site_title_en;
         if (title) document.title = title;
+        // Layout template (page structure) selected in the admin
+        document.documentElement.setAttribute('data-layout', s.layout_name || 'classic');
+        initModernHero();
 
         if (s.favicon_url) {
           var icon = document.querySelector('link[rel="icon"]');

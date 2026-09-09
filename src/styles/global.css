@@ -1209,3 +1209,85 @@ html[data-layout="modern"] .form-card {
 
 /* Footer: soft band */
 html[data-layout="modern"] .site-footer { background: var(--bg-soft); }
+
+/* Modern layout: stronger visual differences + hero carousel */
+html[data-layout="modern"] .site-header::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--brand-grad);
+  z-index: 2;
+}
+html[data-layout="modern"] .hero {
+  min-height: 76vh;
+  display: flex;
+  align-items: center;
+  padding-top: clamp(40px, 6vw, 80px);
+}
+html[data-layout="modern"] .hero::before {
+  inset: -30% -10% auto -10%;
+  width: auto;
+  height: 560px;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 0%, rgba(37, 99, 235, 0.22), transparent 70%),
+    radial-gradient(ellipse 40% 45% at 78% 10%, rgba(124, 58, 237, 0.14), transparent 70%);
+  filter: blur(8px);
+}
+html[data-layout="modern"] .hero-title {
+  font-size: clamp(2.8rem, 6vw, 4.6rem);
+}
+html[data-layout="modern"] .hero-sub {
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+}
+html[data-layout="modern"] .hero-visual {
+  max-width: 660px;
+  margin: 0 auto;
+  width: 100%;
+}
+html[data-layout="modern"] .hero-visual .frame {
+  border-radius: 28px;
+  border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
+  box-shadow: 0 34px 90px -34px rgba(11, 16, 32, 0.45);
+}
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-muted);
+}
+.hc-track { display: flex; height: 100%; transition: transform 0.7s var(--ease); }
+.hc-slide { flex: 0 0 100%; height: 100%; }
+.hc-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hc-dots {
+  position: absolute;
+  bottom: 14px; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 8px;
+}
+.hc-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: none; padding: 0;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+}
+.hc-dot.active {
+  background: #fff;
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.22);
+}
+html[data-layout="modern"] .product-card:hover .product-thumb img { transform: scale(1.07); }
+html[data-layout="modern"] .product-thumb img { transition: transform 0.65s var(--ease); }
+html[data-layout="modern"] .product-card {
+  border-radius: 20px;
+  overflow: hidden;
+}
+html[data-layout="modern"] .products-grid {
+  row-gap: 28px;
+  column-gap: 22px;
+}
+html[data-layout="modern"] .site-footer {
+  background: var(--bg-soft);
+  border-top: 1px solid var(--line-soft);
+}

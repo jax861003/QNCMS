@@ -190,6 +190,22 @@
       .form-fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-soft); }
       .fs-title { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--brand); margin-bottom: 12px; }
       .draft-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; background: #f59e0b; color: #fff; font-size: .68rem; font-weight: 700; margin-left: 8px; vertical-align: middle; }
+      .status-toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg); }
+      .status-btn { padding: 10px 20px; border: none; background: transparent; color: var(--ink-soft); font-weight: 600; font-size: .9rem; cursor: pointer; transition: all .2s ease; }
+      .status-btn + .status-btn { border-left: 1px solid var(--line); }
+      .status-btn:hover { color: var(--brand); }
+      .status-btn.active { background: var(--brand); color: #fff; }
+      .tpl-layout-preview { height: 74px; display: grid; gap: 6px; padding: 10px 12px; background: var(--bg-soft); }
+      .tpl-layout-preview .lp-head { height: 8px; border-radius: 4px; background: var(--line); }
+      .tpl-layout-preview .lp-hero { height: 18px; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--brand-2, var(--brand))); opacity: .5; }
+      .tpl-layout-preview .lp-hero2 { height: 18px; width: 55%; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--brand-2, var(--brand))); opacity: .45; }
+      .tpl-layout-preview .lp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .tpl-layout-preview.modern .lp-cards i { border-radius: 4px; background: var(--line); }
+      .tpl-layout-preview.modern .lp-cards i:nth-child(2) { background: var(--brand); opacity: .25; }
+      .tpl-layout-preview.classic .lp-cards { grid-template-columns: 1fr; }
+      .tpl-layout-preview.classic .lp-cards i { height: 6px; width: 100%; border-radius: 3px; background: var(--line); }
+      .tpl-layout-preview.classic .lp-cards i:nth-child(2) { width: 70%; }
+      .tpl-layout-preview.classic .lp-cards i:nth-child(3) { width: 85%; }
       .tpl-group-title { font-size: .95rem; margin: 22px 0 4px; color: var(--ink-soft); font-weight: 700; }
 
       /* Template (color scheme) overrides — admin UI preview follows the applied template */
@@ -472,10 +488,10 @@
             </div>
             <div class="form-group">
               <label data-i18n="statusLabel">Status（状态）</label>
-              <select id="active">
-                <option value="1" data-i18n="statusPublished">Published（发布）</option>
-                <option value="0" data-i18n="statusDraft">Draft（草稿）</option>
-              </select>
+              <div class="status-toggle" id="activeToggle">
+                <button type="button" class="status-btn active" data-active="1" onclick="setActive(1)" data-i18n="statusPublished">Published（发布）</button>
+                <button type="button" class="status-btn" data-active="0" onclick="setActive(0)" data-i18n="statusDraft">Draft（草稿）</button>
+              </div>
             </div>
           </div>
 
@@ -943,6 +959,13 @@
         }
       }
       function draftBadge(p) { return p.active === 0 ? '<span class="draft-badge">' + ui('statusDraft') + '</span>' : ''; }
+      var activeVal = 1;
+      function setActive(v) {
+        activeVal = v;
+        document.querySelectorAll('#activeToggle .status-btn').forEach(function (b) {
+          b.classList.toggle('active', parseInt(b.getAttribute('data-active'), 10) === v);
+        });
+      }
       function toggleAllRows(cb) {
         document.querySelectorAll('.row-check').forEach(function (r) { r.checked = cb.checked; });
         updateBatchInfo();
@@ -1124,7 +1147,7 @@
         if (modalProduct) {
           document.getElementById('slug').value = modalProduct.slug || '';
           document.getElementById('position').value = modalProduct.position || 0;
-          document.getElementById('active').value = modalProduct.active === 0 ? '0' : '1';
+          setActive(modalProduct.active === 0 ? 0 : 1);
           document.getElementById('name_en').value = modalProduct.name_en || '';
           document.getElementById('name_zh').value = modalProduct.name_zh || '';
           document.getElementById('tag_en').value = modalProduct.tag_en || '';
@@ -1181,7 +1204,7 @@
           category_zh: document.getElementById('category_zh').value,
           description_en: document.getElementById('description_en').value,
           description_zh: document.getElementById('description_zh').value,
-          active: parseInt(document.getElementById('active').value, 10) === 0 ? 0 : 1,
+          active: activeVal === 0 ? 0 : 1,
           image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg',
           price: document.getElementById('price').value.trim(),
           buy_url: document.getElementById('buy_url').value.trim()
@@ -1389,9 +1412,11 @@
         grid.innerHTML = LAYOUTS.map(function (t) {
           var active = t.id === currentLayout;
           return '<div class="template-card' + (active ? ' active' : '') + '" data-tpl="' + t.id + '">' +
-            '<div class="tpl-preview" style="background:' + (t.id === 'modern'
-              ? 'linear-gradient(135deg,#1e293b 0%,#0f766e 100%)'
-              : 'linear-gradient(135deg,#94a3b8 0%,#475569 100%)') + '"></div>' +
+            '<div class="tpl-preview" style="padding:0">' +
+            (t.id === 'modern'
+              ? '<div class="tpl-layout-preview modern"><span class="lp-head"></span><span class="lp-hero"></span><span class="lp-cards"><i></i><i></i><i></i></span></div>'
+              : '<div class="tpl-layout-preview classic"><span class="lp-head"></span><span class="lp-hero2"></span><span class="lp-cards"><i></i><i></i></span></div>') +
+            '</div>' +
             '<div class="tpl-body">' +
             '<div class="tpl-name">' + ui(t.nameKey) + '</div>' +
             (active
@@ -1486,6 +1511,7 @@
       window.batchDelete = batchDelete;
       window.onTableFilter = onTableFilter;
       window.deleteMessage = deleteMessage;
+      window.setActive = setActive;
       window.applyLayout = applyLayout;
       window.applyTheme = applyTheme;
       window.loadTemplates = loadTemplates;
