@@ -281,7 +281,14 @@
   function renderGrid(list) {
     var grid = document.querySelector('[data-product-grid]');
     if (!grid) return;
-    if (!Array.isArray(list) || list.length === 0) return; // keep static content
+    if (!Array.isArray(list)) return;
+    if (list.length === 0) {
+      // All products were deleted in the admin: show an empty state instead
+      // of keeping the statically built grid.
+      grid.innerHTML = '<div class="grid-empty">' + (currentLocale() === 'zh' ? '暂无产品，请在后台添加' : 'No products yet') + '</div>';
+      initModernHero();
+      return;
+    }
     var locale = currentLocale();
     var staticSlugs = {};
     grid.querySelectorAll('[data-slug]').forEach(function (el) {
@@ -331,7 +338,13 @@
     fetch('/api/products?locale=' + locale)
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (list) {
-        if (!Array.isArray(list) || list.length === 0) return; // keep cached / static content
+        if (!Array.isArray(list)) return;
+        if (list.length === 0) {
+          // everything deleted: drop the stale cache and clear the grid
+          try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+          renderGrid([]);
+          return;
+        }
         renderGrid(list);
         try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* ignore */ }
       })
