@@ -344,10 +344,7 @@
             : '<img src="' + placeholder + '" alt="' + name + '" loading="lazy" width="640" height="400" />';
           return '<a class="product-card' + (isStatic ? '' : ' is-dynamic') + '" href="' + href + '" data-slug="' + p.slug + '" data-cat="' + cat + '" data-name="' + name.toLowerCase() + '" data-reveal>' +
             '<div class="product-thumb">' + img + tagHtml + '</div>' +
-            '<div class="product-body"><h3>' + name + '</h3>' +
-            '<p>' + short + '</p>' +
-            '<span class="product-link">' + learn +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>';
+            '<div class="product-body"><h3>' + name + '</h3></div></a>';
         }).join('');
         setupProductFilters(grid);
         filterProductGrid();
