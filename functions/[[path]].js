@@ -101,7 +101,9 @@ function shellHtml(p, locale, settings) {
     : '';
   const desc = p.description || p.short || '';
 
-  return '<!doctype html><html lang="' + locale + '">' +
+  const layoutAttr = settings.layout_name === 'modern' ? ' data-layout="modern"' : '';
+  const variantAttr = settings.theme_name && settings.theme_name !== 'default' ? ' data-variant="' + settings.theme_name + '"' : '';
+  return '<!doctype html><html lang="' + locale + '"' + layoutAttr + variantAttr + '>' +
   '<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />' +
   '<title>' + esc(p.name) + ' — ' + esc(brand) + '</title>' +
   '<meta name="description" content="' + esc(p.short || p.name || '') + '" />' +
@@ -162,6 +164,12 @@ function shellHtml(p, locale, settings) {
   '.scroll-fab{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:200}' +
   '.fab-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--ink-soft);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;transition:all .25s}.fab-btn:hover{border-color:var(--brand);color:var(--brand)}' +
   '@media(max-width:620px){.main-nav a{padding:8px 10px;font-size:.9rem}.header-inner{gap:12px}}' +
+  'html[data-layout="modern"] .site-header{background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom-color:transparent}' +
+  'html[data-layout="modern"] .main-nav a[aria-current="page"]{background:transparent;color:var(--brand);box-shadow:none}' +
+  'html[data-layout="modern"] .main-nav a[aria-current="page"]::after{content:"";display:block;height:2px;border-radius:2px;background:var(--brand);margin-top:5px}' +
+  'html[data-layout="modern"] .site-footer{background:var(--bg-soft)}' +
+  'html[data-layout="modern"] .d-hero{text-align:center}' +
+  'html[data-layout="modern"] .d-hero .frame{max-width:560px;margin:0 auto}' +
   '</style></head><body>' +
 
   '<header class="site-header"><div class="container header-inner">' +

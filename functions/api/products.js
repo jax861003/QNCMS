@@ -75,6 +75,7 @@ export async function onRequestPost(context) {
     category_en: body.category_en || '',
     category_zh: body.category_zh || '',
     position: Number(body.position) || 0,
+    active: (body.active === 0 || body.active === '0') ? 0 : 1,
   };
 
   try {
@@ -88,7 +89,7 @@ export async function onRequestPost(context) {
         .prepare(
           `UPDATE products SET tag_en=?, tag_zh=?, name_en=?, name_zh=?, short_en=?, short_zh=?,
            description_en=?, description_zh=?, highlights_en=?, highlights_zh=?,
-           image_url=?, price=?, buy_url=?, category_en=?, category_zh=?, position=?, updated_at=datetime('now')
+           image_url=?, price=?, buy_url=?, category_en=?, category_zh=?, position=?, active=?, updated_at=datetime('now')
            WHERE slug=?`
         )
         .bind(
@@ -97,6 +98,7 @@ export async function onRequestPost(context) {
           fields.highlights_en, fields.highlights_zh, fields.image_url, fields.price, fields.buy_url,
           fields.category_en, fields.category_zh,
           fields.position,
+          fields.active,
           body.slug
         )
         .run();
@@ -105,9 +107,8 @@ export async function onRequestPost(context) {
         .prepare(
           `INSERT INTO products (id, slug, tag_en, tag_zh, name_en, name_zh, short_en, short_zh,
            description_en, description_zh, highlights_en, highlights_zh, image_url, price, buy_url,
-           category_en, category_zh, position,
-           active, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`
+           category_en, category_zh, position, active, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
         )
         .bind(
           'prod-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
@@ -116,7 +117,8 @@ export async function onRequestPost(context) {
           fields.short_en, fields.short_zh, fields.description_en, fields.description_zh,
           fields.highlights_en, fields.highlights_zh, fields.image_url, fields.price, fields.buy_url,
           fields.category_en, fields.category_zh,
-          fields.position
+          fields.position,
+          fields.active
         )
         .run();
     }

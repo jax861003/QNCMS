@@ -186,6 +186,12 @@
       }
       .lang-opt.active .lang-abbr { background: var(--brand); color: #fff; }
 
+      /* Product form groups & draft badge */
+      .form-fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-soft); }
+      .fs-title { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--brand); margin-bottom: 12px; }
+      .draft-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; background: #f59e0b; color: #fff; font-size: .68rem; font-weight: 700; margin-left: 8px; vertical-align: middle; }
+      .tpl-group-title { font-size: .95rem; margin: 22px 0 4px; color: var(--ink-soft); font-weight: 700; }
+
       /* Template (color scheme) overrides — admin UI preview follows the applied template */
       html[data-variant="ocean"] { --brand: #0e7490; --brand-grad: linear-gradient(135deg,#06b6d4,#2563eb); }
       html[data-variant="forest"] { --brand: #059669; --brand-grad: linear-gradient(135deg,#10b981,#0d9488); }
@@ -259,6 +265,11 @@
               <select id="tableCategory"></select>
               <button class="btn btn-sm btn-danger" id="batchDeleteBtn" onclick="batchDelete()" data-i18n="batchDelete">Delete Selected</button>
               <span id="batchInfo" class="batch-info"></span>
+              <select id="statusFilter" onchange="onStatusFilter(this.value)" title="Status / 状态">
+                <option value="">All（全部）</option>
+                <option value="published">Published（已发布）</option>
+                <option value="draft">Draft（草稿）</option>
+              </select>
               <span class="view-toggle">
                 <button class="view-btn active" id="viewListBtn" onclick="setProductView('list')" data-i18n="viewList">List</button>
                 <button class="view-btn" id="viewGridBtn" onclick="setProductView('grid')" data-i18n="viewGrid">Grid</button>
@@ -432,8 +443,11 @@
           <!-- Templates -->
           <div class="card" id="panelTemplates" style="display:none">
             <h2 data-i18n="tabTemplates">Templates</h2>
-            <p class="sub" data-i18n="templatesSub">Color-scheme templates for the public site. Layout templates will be supported later.</p>
-            <div class="template-grid" id="templateGrid"></div>
+            <p class="sub" data-i18n="templatesSub">Choose a page layout and a color scheme. Layout and colors are independent — any layout can use any color.</p>
+            <h3 class="tpl-group-title" data-i18n="layoutGroup">Layout（布局）</h3>
+            <div class="template-grid" id="layoutGrid"></div>
+            <h3 class="tpl-group-title" data-i18n="themeGroup">Color Scheme（配色）</h3>
+            <div class="template-grid" id="themeGrid"></div>
           </div>
 
           <!-- Messages -->
@@ -451,89 +465,81 @@
       <div class="modal-content">
         <h2 id="modalTitle">Add Product</h2>
         <form id="productForm">
-          <div class="form-group">
-            <label data-i18n="slugLabel">Slug * (URL identifier, lowercase)</label>
-            <input type="text" id="slug" required placeholder="nova-ingest" />
-          </div>
           <div class="form-grid">
             <div class="form-group">
-              <label data-i18n="nameEn">Name (EN) *</label>
-              <input type="text" id="name_en" required />
+              <label data-i18n="slugLabel">Slug（标识）*</label>
+              <input type="text" id="slug" required placeholder="nova-ingest" />
             </div>
             <div class="form-group">
-              <label data-i18n="nameZh">Name (ZH) *</label>
-              <input type="text" id="name_zh" required />
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label data-i18n="tagEn">Tag (EN)</label>
-              <input type="text" id="tag_en" placeholder="Streaming" />
-            </div>
-            <div class="form-group">
-              <label data-i18n="tagZh">Tag (ZH)</label>
-              <input type="text" id="tag_zh" placeholder="数据接入" />
+              <label data-i18n="statusLabel">Status（状态）</label>
+              <select id="active">
+                <option value="1" data-i18n="statusPublished">Published（发布）</option>
+                <option value="0" data-i18n="statusDraft">Draft（草稿）</option>
+              </select>
             </div>
           </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label data-i18n="categoryEn">Category (EN)</label>
-              <input type="text" id="category_en" placeholder="Data Pipeline" />
+
+          <div class="form-fieldset">
+            <div class="fs-title" data-i18n="fsZh">中文内容</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label data-i18n="nameZh">名称 *</label>
+                <input type="text" id="name_zh" required />
+              </div>
+              <div class="form-group">
+                <label data-i18n="nameEn">Name *</label>
+                <input type="text" id="name_en" required />
+              </div>
+              <div class="form-group">
+                <label data-i18n="tagZh">标签</label>
+                <input type="text" id="tag_zh" placeholder="数据接入" />
+              </div>
+              <div class="form-group">
+                <label data-i18n="tagEn">Tag</label>
+                <input type="text" id="tag_en" placeholder="Streaming" />
+              </div>
+              <div class="form-group">
+                <label data-i18n="categoryZh">分类</label>
+                <input type="text" id="category_zh" placeholder="数据管道" />
+              </div>
+              <div class="form-group">
+                <label data-i18n="categoryEn">Category</label>
+                <input type="text" id="category_en" placeholder="Data Pipeline" />
+              </div>
             </div>
             <div class="form-group">
-              <label data-i18n="categoryZh">Category (ZH)</label>
-              <input type="text" id="category_zh" placeholder="数据管道" />
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label data-i18n="shortEn">Short Description (EN)</label>
-              <textarea id="short_en"></textarea>
-            </div>
-            <div class="form-group">
-              <label data-i18n="shortZh">Short Description (ZH)</label>
-              <textarea id="short_zh"></textarea>
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label data-i18n="descEn">Description (EN)</label>
-              <textarea id="description_en"></textarea>
-            </div>
-            <div class="form-group">
-              <label data-i18n="descZh">Description (ZH)</label>
+              <label data-i18n="descZh">描述</label>
               <textarea id="description_zh"></textarea>
             </div>
-          </div>
-          <div class="form-grid">
             <div class="form-group">
-              <label data-i18n="hlEn">Highlights (EN, JSON array)</label>
-              <input type="text" id="highlights_en" placeholder='["Fast", "Stable"]' />
-            </div>
-            <div class="form-group">
-              <label data-i18n="hlZh">Highlights (ZH, JSON array)</label>
-              <input type="text" id="highlights_zh" placeholder='["快速", "稳定"]' />
+              <label data-i18n="descEn">Description</label>
+              <textarea id="description_en"></textarea>
             </div>
           </div>
-          <div class="form-group">
-            <label data-i18n="imageUrl">Image URL (external link)</label>
-            <input type="url" id="image_url" placeholder="https://example.com/image.png" />
-            <div class="hint" data-i18n="imgHint">Leave empty to use the default product image</div>
-          </div>
-          <div class="form-grid">
+
+          <div class="form-fieldset">
+            <div class="fs-title" data-i18n="fsShared">共用参数 Shared</div>
             <div class="form-group">
-              <label data-i18n="price">Price (optional)</label>
-              <input type="text" id="price" placeholder="$29/mo" />
+              <label data-i18n="imageUrl">Image URL（图片链接）</label>
+              <input type="url" id="image_url" placeholder="https://example.com/image.png" />
+              <div class="hint" data-i18n="imgHint">为空时使用默认产品图</div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label data-i18n="price">Price（价格）</label>
+                <input type="text" id="price" placeholder="$29/mo" />
+              </div>
+              <div class="form-group">
+                <label data-i18n="buyUrl">Buy Link（购买链接）</label>
+                <input type="url" id="buy_url" placeholder="https://example.com/buy" />
+              </div>
             </div>
             <div class="form-group">
-              <label data-i18n="buyUrl">Buy URL (optional)</label>
-              <input type="url" id="buy_url" placeholder="https://example.com/buy" />
+              <label data-i18n="position">Position（排序）</label>
+              <input type="number" id="position" value="0" />
             </div>
           </div>
-          <div class="form-group">
-            <label data-i18n="position">Position (sort, lower first)</label>
-            <input type="number" id="position" value="0" />
-          </div>
+
           <div class="actions">
             <button type="submit" class="btn btn-success" data-i18n="save">Save</button>
             <button type="button" class="btn" onclick="closeModal()" style="background:var(--line)" data-i18n="cancel">Cancel</button>
@@ -553,12 +559,12 @@
           loading: 'Loading...', noProducts: 'No products in database yet. Use "+ Add Product" to create one.',
           failedLoad: 'Failed to load products', sessionExpired: 'Session expired, please sign in again.',
           addProductTitle: 'Add Product', editProductTitle: 'Edit Product',
-          slugLabel: 'Slug * (URL identifier, lowercase)', nameEn: 'Name (EN) *', nameZh: 'Name (ZH) *',
-          tagEn: 'Tag (EN)', tagZh: 'Tag (ZH)', shortEn: 'Short Description (EN)', shortZh: 'Short Description (ZH)',
-          descEn: 'Description (EN)', descZh: 'Description (ZH)',
-          hlEn: 'Highlights (EN, JSON array)', hlZh: 'Highlights (ZH, JSON array)',
-          imageUrl: 'Image URL (external link)', position: 'Position (sort, lower first)',
-          imgHint: 'Leave empty to use the default product image',
+          slugLabel: 'Slug（标识）*', nameEn: 'Name *', nameZh: '名称 *',
+          tagEn: 'Tag', tagZh: '标签', descEn: 'Description', descZh: '描述',
+          imageUrl: 'Image URL（图片链接）', position: 'Position（排序）',
+          imgHint: '为空时使用默认产品图',
+          statusLabel: 'Status（状态）', statusPublished: 'Published（发布）', statusDraft: 'Draft（草稿）',
+          fsZh: '中文内容', fsEn: 'English Content', fsShared: '共用参数 Shared',
           viewList: 'List', viewGrid: 'Grid', viewTable: 'Table', columns: 'Columns',
           searchPlaceholder: 'Search name or slug...',
           categoryEn: 'Category (EN)', categoryZh: 'Category (ZH)',
@@ -569,7 +575,9 @@
           secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
           productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
           secFooter: 'Footer', footerGithub: 'GitHub URL (footer)', footerTwitter: 'Twitter / X URL (footer)', footerCopyright: 'Copyright Text (footer)',
-          tabTemplates: 'Templates', templatesSub: 'Color-scheme templates for the public site. Layout templates will be supported later.',
+          tabTemplates: 'Templates', templatesSub: 'Choose a page layout and a color scheme. Layout and colors are independent — any layout can use any color.',
+          layoutGroup: 'Layout（布局）', themeGroup: 'Color Scheme（配色）',
+          layoutClassic: 'Official Layout（官方布局）', layoutModern: 'Modern Layout（新布局）',
           tplDefault: 'Official Template - Blue-Violet', tplOcean: 'Official Template - Cyan', tplForest: 'Official Template - Green', tplSunset: 'Official Template - Orange',
           tplApplied: 'In use', tplApply: 'Apply',
           contactQq: 'QQ', contactWechat: 'WeChat',
@@ -602,12 +610,12 @@
           loading: '加载中...', noProducts: '数据库中暂无产品。点击"+ 新增产品"创建。',
           failedLoad: '产品加载失败', sessionExpired: '登录已过期，请重新登录。',
           addProductTitle: '新增产品', editProductTitle: '编辑产品',
-          slugLabel: 'Slug *（URL 标识，英文小写）', nameEn: '名称（英文）*', nameZh: '名称（中文）*',
-          tagEn: '标签（英文）', tagZh: '标签（中文）', shortEn: '简介（英文）', shortZh: '简介（中文）',
-          descEn: '详细描述（英文）', descZh: '详细描述（中文）',
-          hlEn: '亮点（英文，JSON 数组）', hlZh: '亮点（中文，JSON 数组）',
-          imageUrl: '图片 URL（外链）', position: '排序（数字越小越靠前）',
-          imgHint: '留空将使用默认产品图片',
+          slugLabel: 'Slug（标识）*', nameEn: 'Name *', nameZh: '名称 *',
+          tagEn: 'Tag', tagZh: '标签', descEn: 'Description', descZh: '描述',
+          imageUrl: 'Image URL（图片链接）', position: 'Position（排序）',
+          imgHint: '为空时使用默认产品图',
+          statusLabel: 'Status（状态）', statusPublished: 'Published（发布）', statusDraft: 'Draft（草稿）',
+          fsZh: '中文内容', fsEn: 'English Content', fsShared: '共用参数 Shared',
           viewList: '列表', viewGrid: '缩略图', viewTable: '表格', columns: '列设置',
           searchPlaceholder: '搜索名称或 slug...',
           categoryEn: '分类（英文）', categoryZh: '分类（中文）',
@@ -618,7 +626,9 @@
           secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
           productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
           secFooter: '页脚', footerGithub: 'GitHub 链接（页脚）', footerTwitter: 'Twitter / X 链接（页脚）', footerCopyright: '版权文字（页脚）',
-          tabTemplates: '模板', templatesSub: '前台站点的配色模板。布局模板将在后续版本支持。',
+          tabTemplates: '模板', templatesSub: '选择页面布局与配色方案，布局与配色相互独立、可任意组合。',
+          layoutGroup: '布局', themeGroup: '配色',
+          layoutClassic: '官方布局', layoutModern: '新布局',
           tplDefault: '官方模板-蓝紫色', tplOcean: '官方模板-青色', tplForest: '官方模板-绿色', tplSunset: '官方模板-橙色',
           tplApplied: '使用中', tplApply: '应用',
           contactQq: 'QQ', contactWechat: '微信',
@@ -886,7 +896,8 @@
       }
 
       // ====== Table filters ======
-      var tableFilter = { text: '', category: '' };
+      var tableFilter = { text: '', category: '', status: '' };
+      function onStatusFilter(v) { tableFilter.status = v; if (window._currentProducts) renderProducts(window._currentProducts); }
       function matchFilters(p) {
         var t = tableFilter.text.toLowerCase();
         if (t) {
@@ -896,6 +907,8 @@
         if (tableFilter.category) {
           if (p.category_en !== tableFilter.category && p.category_zh !== tableFilter.category) return false;
         }
+        if (tableFilter.status === 'draft' && p.active !== 0) return false;
+        if (tableFilter.status === 'published' && p.active === 0) return false;
         return true;
       }
       function updateCategoryFilter(products) {
@@ -929,6 +942,7 @@
           info.textContent = n ? ui('selectedLabel').replace('{n}', n) : '';
         }
       }
+      function draftBadge(p) { return p.active === 0 ? '<span class="draft-badge">' + ui('statusDraft') + '</span>' : ''; }
       function toggleAllRows(cb) {
         document.querySelectorAll('.row-check').forEach(function (r) { r.checked = cb.checked; });
         updateBatchInfo();
@@ -974,7 +988,7 @@
           var rows = filtered.map(function (p) {
             var cells = keys.map(function (k) {
               if (k === 'slug') return esc(p.slug);
-              if (k === 'name') return esc(tableLang === 'zh' ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || ''));
+              if (k === 'name') return esc(tableLang === 'zh' ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || '')) + draftBadge(p);
               if (k === 'category') return esc(tableLang === 'zh' ? (p.category_zh || p.category_en || '') : (p.category_en || p.category_zh || ''));
               if (k === 'tag') return esc(tableLang === 'zh' ? (p.tag_zh || p.tag_en || '') : (p.tag_en || p.tag_zh || ''));
               if (k === 'price') return esc(p.price || '');
@@ -1024,7 +1038,7 @@
           list.innerHTML = cards.map(function (p) {
             return '<div class="pg-card">' +
               '<div class="pg-thumb">' + p.img + p.check + '</div>' +
-              '<div class="pg-body"><h4>' + p.name + '</h4>' + p.catTag + p.priceTag +
+              '<div class="pg-body"><h4>' + p.name + draftBadge(p) + '</h4>' + p.catTag + p.priceTag +
               '<p>' + p.short + '</p>' +
               '<div class="pg-actions">' + p.editBtn + p.delBtn + '</div></div></div>';
           }).join('');
@@ -1032,7 +1046,7 @@
           list.className = 'product-list';
           list.innerHTML = cards.map(function (p) {
             return '<div class="product-item">' + p.check + p.img +
-              '<div class="product-info"><h3>' + p.name + '</h3>' + p.catTag + p.priceTag +
+              '<div class="product-info"><h3>' + p.name + draftBadge(p) + '</h3>' + p.catTag + p.priceTag +
               '<p>' + p.short + '</p></div>' + p.editBtn + p.delBtn + '</div>';
           }).join('');
         }
@@ -1110,18 +1124,15 @@
         if (modalProduct) {
           document.getElementById('slug').value = modalProduct.slug || '';
           document.getElementById('position').value = modalProduct.position || 0;
+          document.getElementById('active').value = modalProduct.active === 0 ? '0' : '1';
           document.getElementById('name_en').value = modalProduct.name_en || '';
           document.getElementById('name_zh').value = modalProduct.name_zh || '';
           document.getElementById('tag_en').value = modalProduct.tag_en || '';
           document.getElementById('category_en').value = modalProduct.category_en || '';
           document.getElementById('category_zh').value = modalProduct.category_zh || '';
           document.getElementById('tag_zh').value = modalProduct.tag_zh || '';
-          document.getElementById('short_en').value = modalProduct.short_en || '';
-          document.getElementById('short_zh').value = modalProduct.short_zh || '';
           document.getElementById('description_en').value = modalProduct.description_en || '';
           document.getElementById('description_zh').value = modalProduct.description_zh || '';
-          document.getElementById('highlights_en').value = modalProduct.highlights_en || '[]';
-          document.getElementById('highlights_zh').value = modalProduct.highlights_zh || '[]';
           document.getElementById('image_url').value = modalProduct.image_url || '';
           document.getElementById('price').value = modalProduct.price || '';
           document.getElementById('buy_url').value = modalProduct.buy_url || '';
@@ -1168,12 +1179,9 @@
           tag_zh: document.getElementById('tag_zh').value,
           category_en: document.getElementById('category_en').value,
           category_zh: document.getElementById('category_zh').value,
-          short_en: document.getElementById('short_en').value,
-          short_zh: document.getElementById('short_zh').value,
           description_en: document.getElementById('description_en').value,
           description_zh: document.getElementById('description_zh').value,
-          highlights_en: document.getElementById('highlights_en').value || '[]',
-          highlights_zh: document.getElementById('highlights_zh').value || '[]',
+          active: parseInt(document.getElementById('active').value, 10) === 0 ? 0 : 1,
           image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg',
           price: document.getElementById('price').value.trim(),
           buy_url: document.getElementById('buy_url').value.trim()
@@ -1295,9 +1303,6 @@
         }
       });
 
-      document.getElementById('productModal').addEventListener('click', function (e) {
-        if (e.target.id === 'productModal') closeModal();
-      });
 
       // ====== Contact messages ======
       async function loadMessages() {
@@ -1352,30 +1357,53 @@
         } catch (err) { alert('Network error'); }
       }
 
-      // ====== Templates (color schemes) ======
-      var TEMPLATES = [
+      // ====== Templates (layout + color scheme) ======
+      var LAYOUTS = [
+        { id: 'classic', nameKey: 'layoutClassic', desc: 'classic' },
+        { id: 'modern', nameKey: 'layoutModern', desc: 'modern' }
+      ];
+      var THEMES = [
         { id: 'default', grad: 'linear-gradient(135deg,#2563eb,#7c3aed)', nameKey: 'tplDefault' },
         { id: 'ocean', grad: 'linear-gradient(135deg,#06b6d4,#2563eb)', nameKey: 'tplOcean' },
         { id: 'forest', grad: 'linear-gradient(135deg,#10b981,#0d9488)', nameKey: 'tplForest' },
         { id: 'sunset', grad: 'linear-gradient(135deg,#f97316,#db2777)', nameKey: 'tplSunset' }
       ];
+      var currentLayout = 'classic';
       var currentTemplate = 'default';
 
       async function loadTemplates() {
-        var grid = document.getElementById('templateGrid');
-        if (!grid) return;
         try {
           var resp = await fetch('/api/settings', { headers: { Accept: 'application/json' } });
           var s = await resp.json();
+          if (s && s.layout_name) currentLayout = s.layout_name;
           if (s && s.theme_name) currentTemplate = s.theme_name;
-        } catch (e) { /* keep default */ }
+        } catch (e) { /* keep defaults */ }
+        document.documentElement.setAttribute('data-layout', currentLayout);
         document.documentElement.setAttribute('data-variant', currentTemplate);
-        renderTemplates();
+        renderLayouts();
+        renderThemes();
       }
-      function renderTemplates() {
-        var grid = document.getElementById('templateGrid');
+      function renderLayouts() {
+        var grid = document.getElementById('layoutGrid');
         if (!grid) return;
-        grid.innerHTML = TEMPLATES.map(function (t) {
+        grid.innerHTML = LAYOUTS.map(function (t) {
+          var active = t.id === currentLayout;
+          return '<div class="template-card' + (active ? ' active' : '') + '" data-tpl="' + t.id + '">' +
+            '<div class="tpl-preview" style="background:' + (t.id === 'modern'
+              ? 'linear-gradient(135deg,#1e293b 0%,#0f766e 100%)'
+              : 'linear-gradient(135deg,#94a3b8 0%,#475569 100%)') + '"></div>' +
+            '<div class="tpl-body">' +
+            '<div class="tpl-name">' + ui(t.nameKey) + '</div>' +
+            (active
+              ? '<span class="tpl-badge">' + ui('tplApplied') + '</span>'
+              : '<button class="btn btn-sm btn-primary" onclick="applyLayout(\'' + t.id + '\')">' + ui('tplApply') + '</button>') +
+            '</div></div>';
+        }).join('');
+      }
+      function renderThemes() {
+        var grid = document.getElementById('themeGrid');
+        if (!grid) return;
+        grid.innerHTML = THEMES.map(function (t) {
           var active = t.id === currentTemplate;
           return '<div class="template-card' + (active ? ' active' : '') + '" data-tpl="' + t.id + '">' +
             '<div class="tpl-preview" style="background:' + t.grad + '"></div>' +
@@ -1383,11 +1411,26 @@
             '<div class="tpl-name">' + ui(t.nameKey) + '</div>' +
             (active
               ? '<span class="tpl-badge">' + ui('tplApplied') + '</span>'
-              : '<button class="btn btn-sm btn-primary" onclick="applyTemplate(\'' + t.id + '\')">' + ui('tplApply') + '</button>') +
+              : '<button class="btn btn-sm btn-primary" onclick="applyTheme(\'' + t.id + '\')">' + ui('tplApply') + '</button>') +
             '</div></div>';
         }).join('');
       }
-      async function applyTemplate(id) {
+      async function applyLayout(id) {
+        try {
+          var resp = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ layout_name: id })
+          });
+          var data = await resp.json();
+          if (resp.status === 401) { sessionExpired(); return; }
+          if (!data.ok) { alert(ui('saveFailed') + (data.message || '')); return; }
+          currentLayout = id;
+          document.documentElement.setAttribute('data-layout', id);
+          renderLayouts();
+        } catch (err) { alert('Network error'); }
+      }
+      async function applyTheme(id) {
         try {
           var resp = await fetch('/api/settings', {
             method: 'POST',
@@ -1399,7 +1442,7 @@
           if (!data.ok) { alert(ui('saveFailed') + (data.message || '')); return; }
           currentTemplate = id;
           document.documentElement.setAttribute('data-variant', id);
-          renderTemplates();
+          renderThemes();
         } catch (err) { alert('Network error'); }
       }
 
@@ -1414,6 +1457,9 @@
               var v = (s && s.theme_name) || 'default';
               currentTemplate = v;
               document.documentElement.setAttribute('data-variant', v);
+              var l = (s && s.layout_name) || 'classic';
+              currentLayout = l;
+              document.documentElement.setAttribute('data-layout', l);
             })
             .catch(function () { /* keep default */ });
         } catch (e) { /* ignore */ }
@@ -1440,7 +1486,9 @@
       window.batchDelete = batchDelete;
       window.onTableFilter = onTableFilter;
       window.deleteMessage = deleteMessage;
-      window.applyTemplate = applyTemplate;
+      window.applyLayout = applyLayout;
+      window.applyTheme = applyTheme;
+      window.loadTemplates = loadTemplates;
       window.toggleLangMenu = toggleLangMenu;
       window.hideLangMenu = hideLangMenu;
       // language menus open on hover too (same as the public site)
