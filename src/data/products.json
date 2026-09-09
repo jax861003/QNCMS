@@ -13,8 +13,8 @@
       "price": "$29/mo",
       "buy_url": "",
       "description": {
-        "en": "Ingest is the front door of every NovaGrid deployment. It connects to over 60 sources — Kafka, S3, Postgres, Snowflake, and more — and normalizes the stream into a uniform format your downstream services trust. Backpressure-aware pipelines keep latency low even during traffic spikes.",
-        "zh": "Ingest 是每个 NovaGrid 部署的入口。它连接 60 多种数据源——Kafka、S3、Postgres、Snowflake 等——并将数据流归一化为下游服务可信赖的统一格式。具备背压感知能力的管道即使在流量高峰时也保持低延迟。"
+        "en": "Ingest is the front door of every QN丨CMS deployment. It connects to over 60 sources — Kafka, S3, Postgres, Snowflake, and more — and normalizes the stream into a uniform format your downstream services trust. Backpressure-aware pipelines keep latency low even during traffic spikes.",
+        "zh": "Ingest 是每个 青柠丨CMS 部署的入口。它连接 60 多种数据源——Kafka、S3、Postgres、Snowflake 等——并将数据流归一化为下游服务可信赖的统一格式。具备背压感知能力的管道即使在流量高峰时也保持低延迟。"
       },
       "highlights": {
         "en": [

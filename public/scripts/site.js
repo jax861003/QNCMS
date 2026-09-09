@@ -1,4 +1,4 @@
-/* NovaGrid — single vanilla client bundle (no framework, ~1KB gzipped).
+/* QN丨CMS — single vanilla client bundle (no framework).
    Handles: theme toggle, header scroll state, mobile menu, contact form POST,
    scroll reveal, site settings application, dynamic product grid + detail modal. */
 (function () {

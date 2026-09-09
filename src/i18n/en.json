@@ -1,6 +1,6 @@
 {
   "langName": "English",
-  "brand": "NovaGrid",
+  "brand": "QN丨CMS",
   "nav": {
     "home": "Home",
     "products": "Products",
@@ -11,7 +11,7 @@
   "hero": {
     "titleLine1": "Infra that scales",
     "titleLine2": "with your ambition.",
-    "subtitle": "NovaGrid delivers a cloud-native platform for modern data teams. Unified ingestion, orchestration, and analytics — engineered for reliability and built to be loved.",
+    "subtitle": "QN丨CMS delivers a cloud-native platform for modern data teams. Unified ingestion, orchestration, and analytics — engineered for reliability and built to be loved.",
     "primaryCta": "Explore products",
     "secondaryCta": "Contact us"
   },
@@ -29,9 +29,9 @@
     "specLabel": "Technical highlights"
   },
   "about": {
-    "eyebrow": "About NovaGrid",
+    "eyebrow": "About QN丨CMS",
     "title": "We build the unglamorous foundation that makes modern software possible.",
-    "body": "Founded in 2016, NovaGrid is a global team of engineers, designers, and operators on a mission to make enterprise data infrastructure effortless. We believe reliability is a feature, security is non-negotiable, and software should feel light — even when it moves billions of records a day.",
+    "body": "Founded in 2016, QN丨CMS is a global team of engineers, designers, and operators on a mission to make enterprise data infrastructure effortless. We believe reliability is a feature, security is non-negotiable, and software should feel light — even when it moves billions of records a day.",
     "value1Title": "Reliability first",
     "value1Body": "Multi-region, self-healing systems with a 99.99% SLA.",
     "value2Title": "Secure by default",
