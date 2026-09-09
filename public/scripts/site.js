@@ -299,15 +299,19 @@
         grid.innerHTML = list.map(function (p) {
           var isStatic = !!staticSlugs[p.slug];
           var href = '/' + locale + '/products/' + p.slug + '/';
-          var tag = p.tag ? '<span class="product-tag">' + p.tag + '</span>' : '';
+          var name = locale === 'zh' ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || '');
+          var cat = locale === 'zh' ? (p.category_zh || p.category_en || '') : (p.category_en || p.category_zh || '');
+          var tag = locale === 'zh' ? (p.tag_zh || p.tag_en || '') : (p.tag_en || p.tag_zh || '');
+          var short = locale === 'zh' ? (p.short_zh || p.short_en || '') : (p.short_en || p.short_zh || '');
+          var tagHtml = tag ? '<span class="product-tag">' + tag + '</span>' : '';
           var img = p.image_url
-            ? '<img src="' + p.image_url + '" alt="' + (p.name || '') + '" loading="lazy" width="640" height="400" onerror="this.src=\'' + placeholder + '\'" />'
-            : '<img src="' + placeholder + '" alt="' + (p.name || '') + '" loading="lazy" width="640" height="400" />';
-          return '<a class="product-card' + (isStatic ? '' : ' is-dynamic') + '" href="' + href + '" data-slug="' + p.slug + '" data-cat="' + (p.category || '') + '" data-name="' + ((p.name || '').toLowerCase()) + '" data-reveal>' +
-            '<div class="product-thumb">' + img + tag + '</div>' +
-            '<div class="product-body"><h3>' + (p.name || '') + '</h3>' +
+            ? '<img src="' + p.image_url + '" alt="' + name + '" loading="lazy" width="640" height="400" onerror="this.src=\'' + placeholder + '\'" />'
+            : '<img src="' + placeholder + '" alt="' + name + '" loading="lazy" width="640" height="400" />';
+          return '<a class="product-card' + (isStatic ? '' : ' is-dynamic') + '" href="' + href + '" data-slug="' + p.slug + '" data-cat="' + cat + '" data-name="' + name.toLowerCase() + '" data-reveal>' +
+            '<div class="product-thumb">' + img + tagHtml + '</div>' +
+            '<div class="product-body"><h3>' + name + '</h3>' +
             (p.price ? '<span style="color:var(--brand);font-weight:700;font-size:1rem;">' + p.price + '</span>' : '') +
-            '<p>' + (p.short || '') + '</p>' +
+            '<p>' + short + '</p>' +
             '<span class="product-link">' + learn +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>';
         }).join('');
