@@ -17,7 +17,7 @@
         } catch (e) { document.documentElement.dataset.theme = 'light'; }
       })();
     </script>
-    <style>
+    <style is:global>
       :root {
         --brand: #2563eb; --ink: #0b1020; --ink-soft: #475069;
         --bg: #fff; --bg-soft: #f5f7fb; --line: #e6e9f2;
@@ -97,16 +97,26 @@
       .table-tools input { width: 220px; max-width: 100%; }
       .batch-info { font-size: .85rem; color: var(--ink-soft); }
       .view-toggle { display: inline-flex; gap: 4px; margin-left: auto; }
-      .col-panel { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 14px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; margin-top: 14px; }
+      .col-panel { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; padding: 10px 14px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 14px; }
+      .col-lang { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; color: var(--ink-soft); }
+      .col-lang select { padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: .85rem; }
+      .col-boxes { display: flex; gap: 14px; flex-wrap: wrap; }
       .col-panel label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; cursor: pointer; }
       .product-table-wrap { overflow-x: auto; }
-      .product-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-      .product-table th, .product-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
-      .product-table th { font-weight: 700; color: var(--ink-soft); background: var(--bg-soft); white-space: nowrap; }
-      .product-table tr:hover td { background: var(--bg-soft); }
-      .product-table .timg { width: 48px; height: 30px; object-fit: cover; border-radius: 5px; }
+      .product-table { width: 100%; border-collapse: collapse; font-size: .85rem; table-layout: fixed; }
+      .product-table th, .product-table td { padding: 8px 10px; border: 1px solid var(--line); text-align: left; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative; }
+      .product-table thead th { font-weight: 700; color: var(--ink-soft); background: var(--bg-soft); user-select: none; }
+      .product-table tbody tr:nth-child(even) td { background: var(--bg-soft); }
+      .product-table tbody tr:hover td { background: rgba(37,99,235,.07); }
+      .product-table .timg { width: 44px; height: 28px; object-fit: cover; border-radius: 4px; display: block; }
       .product-table .row-check { width: 16px; height: 16px; }
       .product-table .t-actions { white-space: nowrap; }
+      .t-actions .btn-sm { display: flex; width: 100%; justify-content: center; margin: 0; }
+      .t-actions { display: flex; flex-direction: column; gap: 4px; }
+      .th-resizer { position: absolute; top: 0; right: -1px; width: 7px; height: 100%; cursor: col-resize; z-index: 3; }
+      .th-resizer:hover, .th-resizer.dragging { background: var(--brand); opacity: .5; }
+      .td-resizer { position: absolute; left: 0; bottom: -1px; height: 5px; width: 100%; cursor: row-resize; z-index: 2; }
+      .td-resizer:hover, .td-resizer.dragging { background: var(--brand); opacity: .4; }
       .product-item .row-check { width: 16px; height: 16px; flex: none; }
       .pg-thumb { position: relative; }
       .pg-thumb .row-check { position: absolute; top: 8px; left: 8px; z-index: 2; width: 16px; height: 16px; background: #fff; border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
@@ -170,8 +180,17 @@
                 <button class="view-btn" id="viewTableBtn" onclick="setProductView('table')" data-i18n="viewTable">Table</button>
               </span>
             </div>
+            <div class="col-panel" id="colPanel" style="display:none">
+              <span class="col-lang">
+                <span data-i18n="tableLangLabel">Display language:</span>
+                <select id="tableLang">
+                  <option value="en">EN</option>
+                  <option value="zh">中文</option>
+                </select>
+              </span>
+              <span class="col-boxes" id="colPanelBoxes"></span>
+            </div>
             <div class="product-list" id="productList">Loading...</div>
-            <div class="col-panel" id="colPanel" style="display:none"></div>
           </div>
 
           <!-- Settings -->
@@ -422,7 +441,7 @@
           batchDelete: 'Delete Selected', batchDeleteConfirm: 'Delete selected products',
           colSlug: 'Slug', colName: 'Name', colCategory: 'Category', colTag: 'Tag',
           colPrice: 'Price', colPosition: 'Position', colImage: 'Image',
-          allCategories: 'All categories', noMatch: 'No products match the filter.',
+          allCategories: 'All categories', noMatch: 'No products match the filter.', tableLangLabel: 'Display language:',
           secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
           productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
           price: 'Price (optional)', buyUrl: 'Buy URL (optional)',
@@ -463,7 +482,7 @@
           batchDelete: '删除选中', batchDeleteConfirm: '确定删除选中的产品',
           colSlug: 'Slug', colName: '名称', colCategory: '分类', colTag: '标签',
           colPrice: '价格', colPosition: '排序', colImage: '图片',
-          allCategories: '全部分类', noMatch: '没有符合筛选条件的产品。',
+          allCategories: '全部分类', noMatch: '没有符合筛选条件的产品。', tableLangLabel: '显示语言：',
           secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
           productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
           price: '价格（可选）', buyUrl: '购买链接（可选）',
@@ -640,6 +659,17 @@
         if (s) s.addEventListener('input', onTableFilter);
         var cat = document.getElementById('tableCategory');
         if (cat) cat.addEventListener('change', function () { tableFilter.category = cat.value; if (window._currentProducts) renderProducts(window._currentProducts); });
+        var tlSel = document.getElementById('tableLang');
+        if (tlSel) {
+          tlSel.value = tableLang;
+          tlSel.addEventListener('change', function () {
+            tableLang = tlSel.value;
+            try { localStorage.setItem('admin_table_lang', tableLang); } catch (e) { /* ignore */ }
+            if (window._currentProducts) renderProducts(window._currentProducts);
+          });
+        }
+        initTableResize();
+        initRowResize();
       });
 
       function setProductView(v) {
@@ -664,14 +694,17 @@
         try { localStorage.setItem('admin_col_config', JSON.stringify(colConfig)); } catch (e) { /* ignore */ }
       }
       function colKeys() { return Object.keys(colConfig); }
+      var tableLang = 'en';
+      try { var tl = localStorage.getItem('admin_table_lang'); if (tl === 'en' || tl === 'zh') tableLang = tl; } catch (e) { /* ignore */ }
+      function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
       function renderColPanel() {
-        var panel = document.getElementById('colPanel');
-        if (!panel) return;
+        var box = document.getElementById('colPanelBoxes');
+        if (!box) return;
         var labels = {
           slug: ui('colSlug'), name: ui('colName'), category: ui('colCategory'), tag: ui('colTag'),
           price: ui('colPrice'), position: ui('colPosition'), image: ui('colImage')
         };
-        panel.innerHTML = colKeys().map(function (k) {
+        box.innerHTML = colKeys().map(function (k) {
           return '<label><input type="checkbox" ' + (colConfig[k] ? 'checked' : '') + ' onchange="setCol(\'' + k + '\', this.checked)"> ' + (labels[k] || k) + '</label>';
         }).join('');
       }
@@ -760,11 +793,11 @@
         var filtered = products.filter(matchFilters);
         var labels = { slug: ui('colSlug'), name: ui('colName'), category: ui('colCategory'), tag: ui('colTag'), price: ui('colPrice'), position: ui('colPosition'), image: ui('colImage') };
         if (productView === 'table') {
-          if (colPanel) { colPanel.style.display = 'block'; renderColPanel(); }
+          if (colPanel) { colPanel.style.display = 'flex'; renderColPanel(); }
           var keys = colKeys().filter(function (k) { return colConfig[k]; });
           var head = '<th style="width:28px"><input type="checkbox" class="row-check" id="checkAll" onchange="toggleAllRows(this)"></th>';
-          head += keys.map(function (k) { return '<th>' + (labels[k] || k) + '</th>'; }).join('');
-          head += '<th>' + ui('edit') + '</th>';
+          head += keys.map(function (k) { return '<th data-col="' + k + '">' + (labels[k] || k) + '<span class="th-resizer"></span></th>'; }).join('');
+          head += '<th data-col="actions" style="width:74px">' + ui('edit') + '</th>';
           if (filtered.length === 0) {
             list.className = 'product-table-wrap';
             list.innerHTML = '<div style="padding:24px;color:#888;">' + ui('noMatch') + '</div>';
@@ -773,11 +806,11 @@
           }
           var rows = filtered.map(function (p) {
             var cells = keys.map(function (k) {
-              if (k === 'slug') return p.slug;
-              if (k === 'name') return (p.name_en || '') + ' / ' + (p.name_zh || '');
-              if (k === 'category') return (p.category_en || '') + (p.category_en && p.category_zh ? ' / ' : '') + (p.category_zh || '');
-              if (k === 'tag') return (p.tag_en || '') + (p.tag_en && p.tag_zh ? ' / ' : '') + (p.tag_zh || '');
-              if (k === 'price') return p.price || '';
+              if (k === 'slug') return esc(p.slug);
+              if (k === 'name') return esc(tableLang === 'zh' ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || ''));
+              if (k === 'category') return esc(tableLang === 'zh' ? (p.category_zh || p.category_en || '') : (p.category_en || p.category_zh || ''));
+              if (k === 'tag') return esc(tableLang === 'zh' ? (p.tag_zh || p.tag_en || '') : (p.tag_en || p.tag_zh || ''));
+              if (k === 'price') return esc(p.price || '');
               if (k === 'position') return p.position;
               if (k === 'image') {
                 return p.image_url
@@ -785,11 +818,11 @@
                   : '<img class="timg" src="' + placeholder + '">';
               }
               return '';
-            }).map(function (x) { return '<td>' + x + '</td>'; }).join('');
+            }).map(function (x) { return '<td>' + x + '<span class="td-resizer"></span></td>'; }).join('');
             var editBtn = '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>';
             var delBtn = '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>';
-            return '<tr><td><input type="checkbox" class="row-check" value="' + p.slug + '" onchange="updateBatchInfo()"></td>' +
-              cells + '<td class="t-actions">' + editBtn + ' ' + delBtn + '</td></tr>';
+            return '<tr><td><input type="checkbox" class="row-check" value="' + p.slug + '" onchange="updateBatchInfo()"><span class="td-resizer"></span></td>' +
+              cells + '<td class="t-actions">' + editBtn + delBtn + '</td></tr>';
           }).join('');
           list.className = 'product-table-wrap';
           list.innerHTML = '<table class="product-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table>';
@@ -834,6 +867,69 @@
           }).join('');
         }
         updateBatchInfo();
+      }
+
+      // ====== Column / row drag-resize (event delegation, survives re-render) ======
+      function initTableResize() {
+        document.addEventListener('mousedown', function (e) {
+          var r = e.target && e.target.closest ? e.target.closest('.th-resizer') : null;
+          if (!r) return;
+          e.preventDefault();
+          var th = r.parentNode;
+          var table = th.closest('table');
+          if (!table) return;
+          var index = Array.prototype.indexOf.call(th.parentNode.children, th);
+          var startX = e.clientX;
+          var startW = th.getBoundingClientRect().width;
+          r.classList.add('dragging');
+          function move(ev) {
+            var w = Math.max(48, startW + ev.clientX - startX);
+            table.style.tableLayout = 'fixed';
+            var col = table.querySelectorAll('colgroup col')[index];
+            if (col) { col.style.width = w + 'px'; }
+            else {
+              var cg = table.querySelector('colgroup');
+              if (!cg) {
+                cg = document.createElement('colgroup');
+                var n = (table.rows[0] ? table.rows[0].cells.length : 0);
+                for (var i = 0; i < n; i++) cg.appendChild(document.createElement('col'));
+                table.insertBefore(cg, table.firstChild);
+              }
+              table.querySelectorAll('colgroup col')[index].style.width = w + 'px';
+            }
+          }
+          function up() {
+            r.classList.remove('dragging');
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+          }
+          document.addEventListener('mousemove', move);
+          document.addEventListener('mouseup', up);
+        });
+      }
+      function initRowResize() {
+        document.addEventListener('mousedown', function (e) {
+          var r = e.target && e.target.closest ? e.target.closest('.td-resizer') : null;
+          if (!r) return;
+          e.preventDefault();
+          var tr = r.closest('tr');
+          if (!tr) return;
+          var startY = e.clientY;
+          var startH = tr.getBoundingClientRect().height;
+          r.classList.add('dragging');
+          function move(ev) {
+            var h = Math.max(32, startH + ev.clientY - startY);
+            tr.style.height = h + 'px';
+            Array.prototype.forEach.call(tr.cells, function (td) { td.style.height = h + 'px'; });
+          }
+          function up() {
+            r.classList.remove('dragging');
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+          }
+          document.addEventListener('mousemove', move);
+          document.addEventListener('mouseup', up);
+        });
       }
 
       function openModal(product) {
