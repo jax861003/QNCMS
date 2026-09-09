@@ -94,17 +94,22 @@
       .pg-actions { display: flex; gap: 8px; }
       .table-tools { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
       .table-tools input, .table-tools select { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .9rem; background: var(--bg); color: var(--ink); }
-      .table-tools input { width: 260px; max-width: 100%; }
-      .col-panel { display: flex; gap: 14px; flex-wrap: wrap; padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 16px; }
+      .table-tools input { width: 220px; max-width: 100%; }
+      .batch-info { font-size: .85rem; color: var(--ink-soft); }
+      .view-toggle { display: inline-flex; gap: 4px; margin-left: auto; }
+      .col-panel { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 14px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; margin-top: 14px; }
       .col-panel label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; cursor: pointer; }
       .product-table-wrap { overflow-x: auto; }
       .product-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-      .product-table th, .product-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+      .product-table th, .product-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
       .product-table th { font-weight: 700; color: var(--ink-soft); background: var(--bg-soft); white-space: nowrap; }
       .product-table tr:hover td { background: var(--bg-soft); }
-      .product-table .timg { width: 56px; height: 40px; object-fit: cover; border-radius: 6px; }
+      .product-table .timg { width: 48px; height: 30px; object-fit: cover; border-radius: 5px; }
       .product-table .row-check { width: 16px; height: 16px; }
       .product-table .t-actions { white-space: nowrap; }
+      .product-item .row-check { width: 16px; height: 16px; flex: none; }
+      .pg-thumb { position: relative; }
+      .pg-thumb .row-check { position: absolute; top: 8px; left: 8px; z-index: 2; width: 16px; height: 16px; background: #fff; border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
       @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
   </head>
@@ -153,21 +158,20 @@
           <!-- Products -->
           <div class="card" id="panelProducts">
             <h2 data-i18n="tabProducts">Products</h2>
-            <button class="btn btn-primary btn-sm" onclick="openModal()" style="margin-bottom:16px" data-i18n="addProduct">+ Add Product</button>
-            <div class="view-toggle">
-              <button class="view-btn active" id="viewListBtn" onclick="setProductView('list')" data-i18n="viewList">List</button>
-              <button class="view-btn" id="viewGridBtn" onclick="setProductView('grid')" data-i18n="viewGrid">Grid</button>
-              <button class="view-btn" id="viewTableBtn" onclick="setProductView('table')" data-i18n="viewTable">Table</button>
-              <button class="view-btn" id="colSettingsBtn" onclick="toggleColPanel()" data-i18n="columns">Columns</button>
-            </div>
-            <div class="table-tools" id="tableTools" style="display:none">
+            <div class="table-tools" id="tableTools">
+              <button class="btn btn-primary btn-sm" onclick="openModal()" data-i18n="addProduct">+ Add Product</button>
               <input type="search" id="tableSearch" data-i18n-ph="searchPlaceholder" placeholder="Search name or slug..." />
               <select id="tableCategory"></select>
-              <span id="batchInfo" style="font-size:.85rem;color:var(--ink-soft);margin-left:auto"></span>
+              <span id="batchInfo" class="batch-info"></span>
               <button class="btn btn-sm btn-danger" id="batchDeleteBtn" onclick="batchDelete()" data-i18n="batchDelete">Delete Selected</button>
+              <span class="view-toggle">
+                <button class="view-btn active" id="viewListBtn" onclick="setProductView('list')" data-i18n="viewList">List</button>
+                <button class="view-btn" id="viewGridBtn" onclick="setProductView('grid')" data-i18n="viewGrid">Grid</button>
+                <button class="view-btn" id="viewTableBtn" onclick="setProductView('table')" data-i18n="viewTable">Table</button>
+              </span>
             </div>
-            <div class="col-panel" id="colPanel" style="display:none"></div>
             <div class="product-list" id="productList">Loading...</div>
+            <div class="col-panel" id="colPanel" style="display:none"></div>
           </div>
 
           <!-- Settings -->
@@ -647,7 +651,6 @@
         if (lb) lb.classList.toggle('active', v === 'list');
         if (gb) gb.classList.toggle('active', v === 'grid');
         if (tb) tb.classList.toggle('active', v === 'table');
-        document.getElementById('colPanel').style.display = 'none';
         if (window._currentProducts) renderProducts(window._currentProducts);
       }
 
@@ -753,19 +756,19 @@
         var list = document.getElementById('productList');
         if (!list) return;
         var placeholder = '/images/products/placeholder.svg';
+        var colPanel = document.getElementById('colPanel');
+        var filtered = products.filter(matchFilters);
+        var labels = { slug: ui('colSlug'), name: ui('colName'), category: ui('colCategory'), tag: ui('colTag'), price: ui('colPrice'), position: ui('colPosition'), image: ui('colImage') };
         if (productView === 'table') {
-          document.getElementById('tableTools').style.display = 'flex';
-          var filtered = products.filter(matchFilters);
+          if (colPanel) { colPanel.style.display = 'block'; renderColPanel(); }
           var keys = colKeys().filter(function (k) { return colConfig[k]; });
           var head = '<th style="width:28px"><input type="checkbox" class="row-check" id="checkAll" onchange="toggleAllRows(this)"></th>';
-          head += keys.map(function (k) {
-            var labels = { slug: ui('colSlug'), name: ui('colName'), category: ui('colCategory'), tag: ui('colTag'), price: ui('colPrice'), position: ui('colPosition'), image: ui('colImage') };
-            return '<th>' + (labels[k] || k) + '</th>';
-          }).join('');
+          head += keys.map(function (k) { return '<th>' + (labels[k] || k) + '</th>'; }).join('');
           head += '<th>' + ui('edit') + '</th>';
           if (filtered.length === 0) {
             list.className = 'product-table-wrap';
             list.innerHTML = '<div style="padding:24px;color:#888;">' + ui('noMatch') + '</div>';
+            updateBatchInfo();
             return;
           }
           var rows = filtered.map(function (p) {
@@ -795,21 +798,29 @@
           updateBatchInfo();
           return;
         }
-        document.getElementById('tableTools').style.display = 'none';
-        var cards = products.map(function (p) {
+        if (colPanel) colPanel.style.display = 'none';
+        if (filtered.length === 0) {
+          list.className = 'product-list';
+          list.innerHTML = '<div style="padding:24px;color:#888;">' + ui('noMatch') + '</div>';
+          updateBatchInfo();
+          return;
+        }
+        var cards = filtered.map(function (p) {
           var img = p.image_url
             ? '<img src="' + p.image_url + '" alt="' + (p.name_en || '') + '" onerror="this.src=\'' + placeholder + '\'">'
             : '<img src="' + placeholder + '" alt="' + (p.name_en || '') + '">';
+          var check = '<input type="checkbox" class="row-check" value="' + p.slug + '" onchange="updateBatchInfo()">';
           var editBtn = '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>';
           var delBtn = '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>';
           var priceTag = p.price ? '<div style="color:var(--brand);font-weight:700;">' + p.price + '</div>' : '';
           var catTag = p.category_en || p.category_zh ? '<div style="font-size:.8rem;color:var(--ink-soft);">' + (p.category_en || p.category_zh) + '</div>' : '';
-          return { img: img, editBtn: editBtn, delBtn: delBtn, name: (p.name_en || '') + ' / ' + (p.name_zh || ''), short: p.short_en || '', priceTag: priceTag, catTag: catTag };
+          return { img: img, check: check, editBtn: editBtn, delBtn: delBtn, name: (p.name_en || '') + ' / ' + (p.name_zh || ''), short: p.short_en || '', priceTag: priceTag, catTag: catTag };
         });
         if (productView === 'grid') {
           list.className = 'products-admin-grid';
           list.innerHTML = cards.map(function (p) {
-            return '<div class="pg-card">' + p.img +
+            return '<div class="pg-card">' +
+              '<div class="pg-thumb">' + p.img + p.check + '</div>' +
               '<div class="pg-body"><h4>' + p.name + '</h4>' + p.catTag + p.priceTag +
               '<p>' + p.short + '</p>' +
               '<div class="pg-actions">' + p.editBtn + p.delBtn + '</div></div></div>';
@@ -817,11 +828,12 @@
         } else {
           list.className = 'product-list';
           list.innerHTML = cards.map(function (p) {
-            return '<div class="product-item">' + p.img +
+            return '<div class="product-item">' + p.check + p.img +
               '<div class="product-info"><h3>' + p.name + '</h3>' + p.catTag + p.priceTag +
               '<p>' + p.short + '</p></div>' + p.editBtn + p.delBtn + '</div>';
           }).join('');
         }
+        updateBatchInfo();
       }
 
       function openModal(product) {
