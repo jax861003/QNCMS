@@ -105,10 +105,9 @@
   // ---- Site settings (public /api/settings) ------------------------------
   // Applies admin-configured site title, favicon, logo, about and contact
   // info at runtime, so a content change needs no rebuild/redeploy.
-  function applySiteSettings() {
-    fetch('/api/settings', { headers: { Accept: 'application/json' } })
-      .then(function (r) { return r.ok ? r.json() : {}; })
-      .then(function (s) {
+  // Cache-first: a cached copy is applied instantly on reload (no flash of
+  // default content), then the network copy refreshes it silently.
+  function renderSettings(s) {
         if (!s || typeof s !== 'object') return;
         var locale = currentLocale();
         var title = s['site_title_' + locale] || s.site_title_en;
@@ -161,27 +160,32 @@
           var fc = document.querySelector('[data-footer-copy]');
           if (fc) fc.textContent = fc.textContent.replace(/©\s*\d{4}\s*[^.]*/, '© ' + new Date().getFullYear() + ' ' + title);
         }
-      })
-      .catch(function () { /* keep the statically rendered content */ });
   }
-  applySiteSettings();
+  function loadSettings() {
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem('qncms_settings_cache') || 'null'); } catch (e) { /* ignore */ }
+    if (cached && typeof cached === 'object' && !Array.isArray(cached)) renderSettings(cached);
+    fetch('/api/settings', { headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (s) {
+        if (!s || typeof s !== 'object' || Array.isArray(s)) return;
+        renderSettings(s);
+        try { localStorage.setItem('qncms_settings_cache', JSON.stringify(s)); } catch (e) { /* ignore */ }
+      })
+      .catch(function () { /* keep cached / statically rendered content */ });
+  }
+  loadSettings();
 
   // Footer product links follow the live product list (admin-managed)
-  function applyFooterProducts() {
+  function renderFooterProducts(list) {
     var ul = document.querySelector('[data-footer-products]');
     if (!ul) return;
+    if (!Array.isArray(list) || list.length === 0) return;
     var locale = currentLocale();
-    fetch('/api/products?locale=' + locale)
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (list) {
-        if (!Array.isArray(list) || list.length === 0) return;
-        ul.innerHTML = list.slice(0, 4).map(function (p) {
-          return '<li><a href="/' + locale + '/products/' + p.slug + '/">' + (p.name || p.slug) + '</a></li>';
-        }).join('');
-      })
-      .catch(function () { /* keep static */ });
+    ul.innerHTML = list.slice(0, 4).map(function (p) {
+      return '<li><a href="/' + locale + '/products/' + p.slug + '/">' + (p.name || p.slug) + '</a></li>';
+    }).join('');
   }
-  applyFooterProducts();
 
   // ---- Product detail modal (for admin-added products) -------------------
   var productModal = null;
@@ -251,18 +255,15 @@
   // the admin appear on the homepage / product list without a redeploy.
   // Cards for slugs that also have a static detail page keep their link;
   // newly added products open a detail modal instead.
-  function applyProducts() {
+  function renderGrid(list) {
     var grid = document.querySelector('[data-product-grid]');
     if (!grid) return;
+    if (!Array.isArray(list) || list.length === 0) return; // keep static content
     var locale = currentLocale();
     var staticSlugs = {};
     grid.querySelectorAll('[data-slug]').forEach(function (el) {
       staticSlugs[el.getAttribute('data-slug')] = true;
     });
-    fetch('/api/products?locale=' + locale)
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (list) {
-        if (!Array.isArray(list) || list.length === 0) return; // keep static content
         var learn = locale === 'zh' ? '了解更多' : 'Learn more';
         var placeholder = '/images/products/placeholder.svg';
         grid.innerHTML = list.map(function (p) {
@@ -294,10 +295,27 @@
         } else {
           els.forEach(function (el) { el.classList.add('in'); });
         }
-      })
-      .catch(function () { /* keep static */ });
   }
-  applyProducts();
+  function loadProducts() {
+    var locale = currentLocale();
+    var key = 'qncms_products_cache_' + locale;
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { /* ignore */ }
+    if (cached && Array.isArray(cached) && cached.length) {
+      renderGrid(cached);
+      renderFooterProducts(cached);
+    }
+    fetch('/api/products?locale=' + locale)
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (list) {
+        if (!Array.isArray(list) || list.length === 0) return; // keep cached / static content
+        renderGrid(list);
+        renderFooterProducts(list);
+        try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* ignore */ }
+      })
+      .catch(function () { /* keep cached / static */ });
+  }
+  loadProducts();
 
   // ---- Product filters: category tabs + search (home & list pages) ----
   function setupProductFilters(grid) {
