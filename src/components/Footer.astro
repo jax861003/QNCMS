@@ -1,5 +1,5 @@
 ---
-import { t, localeNames, locales, localeUrl, type Locale } from '@/lib/i18n';
+import { t, type Locale } from '@/lib/i18n';
 
 interface Props {
   locale: Locale;
@@ -20,17 +20,6 @@ const year = new Date().getFullYear();
           </span>
           <span data-footer-brand>{t(locale, 'brand')}</span>
         </a>
-        <p>{t(locale, 'footer.tagline')}</p>
-      </div>
-
-      <div class="footer-col">
-        <h4>{t(locale, 'footer.colProducts')}</h4>
-        <ul data-footer-products>
-          <li><a href={`/${locale}/products/ingest/`}>Ingest</a></li>
-          <li><a href={`/${locale}/products/orchestrate/`}>Orchestrate</a></li>
-          <li><a href={`/${locale}/products/analytics/`}>Analytics</a></li>
-          <li><a href={`/${locale}/products/observability/`}>Observe</a></li>
-        </ul>
       </div>
 
       <div class="footer-col">
@@ -40,24 +29,17 @@ const year = new Date().getFullYear();
           <li><a href={`/${locale}/contact/`}>{t(locale, 'nav.contact')}</a></li>
         </ul>
       </div>
-
     </div>
 
     <div class="footer-bottom">
       <span data-footer-copy>© {year} {t(locale, 'brand')}. {t(locale, 'footer.rights')}</span>
-      <span class="footer-lang">
-        <label class="lang-select-wrap" aria-label="Language / 语言">
-          <span class="sr-only">Language / 语言</span>
-          <select class="lang-select" aria-label="Language / 语言" onchange="location.href = this.value;">
-            {locales.map((l) => (
-              <option value={localeUrl(Astro.url.pathname, l)} selected={l === locale}>{localeNames[l]}</option>
-            ))}
-          </select>
-        </label>
-      </span>
-      <span>
-        <a href="#" data-footer-github style="display:none;margin-right:18px">GitHub</a>
-        <a href="#" data-footer-twitter style="display:none">Twitter / X</a>
+      <span class="footer-social">
+        <a href="#" data-footer-github style="display:none" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
+        </a>
+        <a href="#" data-footer-twitter style="display:none" aria-label="Twitter / X">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M18.9 1.2h3.7l-8.1 9.3L24 22.8h-7.5l-5.9-7.7-6.7 7.7H.2l8.7-9.9L0 1.2h7.7l5.3 7 6-7zm-1.3 19.4h2L6.5 3.3h-2.2l13.3 17.3z"/></svg>
+        </a>
       </span>
     </div>
   </div>

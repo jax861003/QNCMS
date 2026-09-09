@@ -6,21 +6,14 @@
     "products": "产品",
     "about": "关于我们",
     "contact": "联系我们",
-    "cta": "立即咨询"
+    "cta": "联系我们"
   },
   "hero": {
-    "badge": "企业级 · 云原生",
     "titleLine1": "让基础设施",
     "titleLine2": "随你的雄心一同扩展。",
     "subtitle": "NovaGrid 为现代数据团队提供云原生平台，集统一的数据接入、编排与分析于一体——为可靠性而生，让复杂被优雅化解。",
     "primaryCta": "探索产品",
-    "secondaryCta": "预约演示",
-    "stat1Value": "99.99%",
-    "stat1Label": "SLA 可用性",
-    "stat2Value": "120亿+",
-    "stat2Label": "日处理事件",
-    "stat3Value": "40+",
-    "stat3Label": "覆盖国家"
+    "secondaryCta": "联系我们"
   },
   "products": {
     "eyebrow": "产品",
@@ -64,12 +57,12 @@
     "infoEmail": "hello@novagrid.io",
     "infoPhone": "+1 (415) 555-0132",
     "infoAddress": "500 Market Street, Suite 2100, San Francisco, CA 94105",
-  "infoQQ": "—",
-  "infoWechat": "—"
+    "infoQQ": "—",
+    "infoWechat": "—",
+    "lblQq": "QQ",
+    "lblWechat": "微信"
   },
   "footer": {
-    "tagline": "为数据驱动型企业打造的云原生基础设施。",
-    "colProducts": "产品",
     "colCompany": "公司",
     "rights": "版权所有。"
   }

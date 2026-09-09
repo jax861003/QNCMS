@@ -6,21 +6,14 @@
     "products": "Products",
     "about": "About",
     "contact": "Contact",
-    "cta": "Get in touch"
+    "cta": "Contact us"
   },
   "hero": {
-    "badge": "Enterprise-grade · Cloud-native",
     "titleLine1": "Infra that scales",
     "titleLine2": "with your ambition.",
     "subtitle": "NovaGrid delivers a cloud-native platform for modern data teams. Unified ingestion, orchestration, and analytics — engineered for reliability and built to be loved.",
     "primaryCta": "Explore products",
-    "secondaryCta": "Book a demo",
-    "stat1Value": "99.99%",
-    "stat1Label": "SLA uptime",
-    "stat2Value": "12B+",
-    "stat2Label": "Events / day",
-    "stat3Value": "40+",
-    "stat3Label": "Countries served"
+    "secondaryCta": "Contact us"
   },
   "products": {
     "eyebrow": "Products",
@@ -65,11 +58,11 @@
     "infoPhone": "+1 (415) 555-0132",
     "infoAddress": "500 Market Street, Suite 2100, San Francisco, CA 94105",
   "infoQQ": "—",
-  "infoWechat": "—"
+  "infoWechat": "—",
+  "lblQq": "QQ",
+  "lblWechat": "WeChat"
   },
   "footer": {
-    "tagline": "Cloud-native infrastructure for the data-driven enterprise.",
-    "colProducts": "Products",
     "colCompany": "Company",
     "rights": "All rights reserved."
   }

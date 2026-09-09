@@ -169,12 +169,15 @@
           else tw.style.display = 'none';
         }
 
-        // Footer brand + copyright
+        // Footer brand + copyright (custom copyright from settings wins)
         if (title) {
           var fb = document.querySelector('[data-footer-brand]');
           if (fb) fb.textContent = title;
           var fc = document.querySelector('[data-footer-copy]');
-          if (fc) fc.textContent = fc.textContent.replace(/©\s*\d{4}\s*[^.]*/, '© ' + new Date().getFullYear() + ' ' + title);
+          if (fc) {
+            if (s.footer_copyright) fc.textContent = s.footer_copyright;
+            else fc.textContent = fc.textContent.replace(/©\s*\d{4}\s*[^.]*/, '© ' + new Date().getFullYear() + ' ' + title);
+          }
         }
   }
   function loadSettings() {
@@ -191,17 +194,6 @@
       .catch(function () { /* keep cached / statically rendered content */ });
   }
   loadSettings();
-
-  // Footer product links follow the live product list (admin-managed)
-  function renderFooterProducts(list) {
-    var ul = document.querySelector('[data-footer-products]');
-    if (!ul) return;
-    if (!Array.isArray(list) || list.length === 0) return;
-    var locale = currentLocale();
-    ul.innerHTML = list.slice(0, 4).map(function (p) {
-      return '<li><a href="/' + locale + '/products/' + p.slug + '/">' + (p.name || p.slug) + '</a></li>';
-    }).join('');
-  }
 
   // ---- Product detail modal (for admin-added products) -------------------
   var productModal = null;
@@ -224,7 +216,8 @@
       '.pmodal-buy{display:inline-block;margin:6px 0 0;padding:12px 26px;border-radius:10px;background:var(--brand,#2563eb);color:#fff;font-weight:700;text-decoration:none;}' +
       'html[data-theme="dark"] .pmodal-card{background:#141b30;color:#e7eaf4;}' +
       'html[data-theme="dark"] .pmodal-close{background:#232c47;color:#e7eaf4;}' +
-      'html[data-theme="dark"] .pmodal-short{color:#a7b0c5;}';
+      'html[data-theme="dark"] .pmodal-short{color:#a7b0c5;}' +
+      '@media(max-width:640px){.pmodal{padding:10px}.pmodal-card{padding:22px;border-radius:14px;max-height:92vh}.pmodal-card h2{font-size:1.4rem}.pmodal-price{font-size:1.4rem}}';
     document.head.appendChild(productModalStyle);
   }
   function closeProductModal() {
@@ -319,19 +312,36 @@
     try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { /* ignore */ }
     if (cached && Array.isArray(cached) && cached.length) {
       renderGrid(cached);
-      renderFooterProducts(cached);
     }
     fetch('/api/products?locale=' + locale)
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (list) {
         if (!Array.isArray(list) || list.length === 0) return; // keep cached / static content
         renderGrid(list);
-        renderFooterProducts(list);
         try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* ignore */ }
       })
       .catch(function () { /* keep cached / static */ });
   }
   loadProducts();
+
+  // ---- Floating scroll buttons (back to top / to bottom) ----------------
+  var fab = document.createElement('div');
+  fab.className = 'scroll-fab';
+  fab.innerHTML =
+    '<button type="button" data-scroll-top aria-label="Back to top" title="Back to top">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>' +
+    '<button type="button" data-scroll-bottom aria-label="Go to bottom" title="Go to bottom">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></button>';
+  document.body.appendChild(fab);
+  fab.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!t) return;
+    if (t.hasAttribute('data-scroll-top')) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (t.hasAttribute('data-scroll-bottom')) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  });
 
   // ---- Product filters: category tabs + search (home & list pages) ----
   function setupProductFilters(grid) {

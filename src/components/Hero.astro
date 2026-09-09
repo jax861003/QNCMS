@@ -5,22 +5,12 @@ interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-
-const stats = [
-  { v: t(locale, 'hero.stat1Value'), l: t(locale, 'hero.stat1Label') },
-  { v: t(locale, 'hero.stat2Value'), l: t(locale, 'hero.stat2Label') },
-  { v: t(locale, 'hero.stat3Value'), l: t(locale, 'hero.stat3Label') },
-];
 ---
 
 <section class="hero">
   <div class="container">
     <div class="hero-grid">
       <div>
-        <span class="hero-badge">
-          <span class="dot" aria-hidden="true"></span>
-          {t(locale, 'hero.badge')}
-        </span>
         <h1 class="hero-title">
           <span data-hero-line1>{t(locale, 'hero.titleLine1')}</span><br />
           <span class="grad" data-hero-line2>{t(locale, 'hero.titleLine2')}</span>
@@ -39,15 +29,6 @@ const stats = [
           <img src="/images/hero-dashboard.png" alt="NovaGrid control dashboard" width="900" height="675" fetchpriority="high" data-hero-img />
         </div>
       </div>
-    </div>
-
-    <div class="stats">
-      {stats.map((s, i) => (
-        <div class="stat" data-reveal>
-          <div class="num">{s.v}</div>
-          <div class="label">{s.l}</div>
-        </div>
-      ))}
     </div>
   </div>
 </section>

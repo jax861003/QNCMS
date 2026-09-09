@@ -35,8 +35,9 @@ const learnMore = locale === 'zh' ? '了解更多' : 'Learn more';
 )}
 
 <style>
-.products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
-@media (max-width: 960px) { .products-grid { grid-template-columns: 1fr; } }
+.products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+@media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .products-grid { grid-template-columns: 1fr; } }
 .product-card { position: relative; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease); }
 .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
 .product-thumb { position: relative; overflow: hidden; background: var(--bg-muted); }
