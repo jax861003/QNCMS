@@ -10,9 +10,9 @@ const learnMore = locale === 'zh' ? '了解更多' : 'Learn more';
 ---
 
 {products.length > 0 ? (
-  <div class="products-grid">
+  <div class="products-grid" data-product-grid>
     {products.map((p) => (
-      <a class="product-card" href={`/${locale}/products/${p.slug}/`} data-reveal>
+      <a class="product-card" href={`/${locale}/products/${p.slug}/`} data-slug={p.slug} data-reveal>
         <div class="product-thumb">
           <img src={p.image_url} alt={p.name} loading="lazy" width="640" height="400" />
           {p.tag && <span class="product-tag">{p.tag}</span>}

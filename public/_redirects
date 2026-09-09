@@ -2,3 +2,8 @@
 # /api/* is handled by Pages Functions and takes priority over this.
 # Unmatched paths are served with /404.html automatically by Cloudflare Pages.
 /admin  /admin/  301
+# Dynamic product deep links (products added in the admin have no static
+# detail page yet): render the product list page, whose JS opens the detail
+# modal for the requested slug. Built static pages still take priority.
+/en/products/*  /en/products/  200
+/zh/products/*  /zh/products/  200

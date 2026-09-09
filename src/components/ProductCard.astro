@@ -11,7 +11,7 @@ interface Props {
 const { product, locale, learnMore } = Astro.props;
 ---
 
-<a class="product-card" href={`/${locale}/products/${product.slug}/`} data-reveal>
+<a class="product-card" href={`/${locale}/products/${product.slug}/`} data-slug={product.slug} data-reveal>
   <div class="product-thumb">
     <img src={product.image} alt={product.name} loading="lazy" width="640" height="400" />
     <span class="product-tag">{product.tag}</span>

@@ -9,8 +9,10 @@
 ## 特性
 
 - 🌐 **多语言**：内置 `en` / `zh`（URL 前缀 `/en/...` `/zh/...`），右上角**下拉菜单**切换；后台管理界面也支持**中英文一键切换**；新增语言只需改一处配置 + 复制页面目录（见下方「添加新语言」）
-- 🛒 **产品管理后台**：`/admin` 登录后增删改产品，写入 D1 实时生效（API 层），无需重新部署
-- ⚙️ **站点设置后台**：`/admin` 的「站点设置」页可修改**网页标题、Logo、Favicon、关于我们、联系方式**，保存后前台**实时应用**（客户端读取 `/api/settings`），无需重新部署
+- 🛒 **产品管理后台**：`/admin` 登录后增删改产品，写入 D1 实时生效；后台支持**列表 / 缩略图**两种视图切换
+- 🚀 **产品前台实时更新**：后台新增的产品**无需重新部署**即出现在首页与产品列表页（客户端读取 `/api/products` 动态渲染），点击以**详情弹层**查看；示例产品仍保留独立详情页（SEO）
+- ⚙️ **站点设置后台**：`/admin` 的「站点设置」页可修改**网页标题、主页站点名称、Logo、Favicon、关于我们、联系方式**，保存后前台**实时应用**（客户端读取 `/api/settings`），无需重新部署
+- 🖼️ **产品图可选**：图片链接为空时自动使用内置默认图 `/images/products/placeholder.svg`
 - 🔌 **前后端分离**：`functions/` 提供 REST API；前台页面构建时使用内置示例数据（SEO 友好），站点永不空白
 - 🗄️ **D1 自动建表**：数据库绑定后首次请求自动创建 `products` / `settings` 表，**无需手动执行迁移**
 - 🔑 **灵活的登录凭证**：支持明文密码（`ADMIN_PASSWORD`，推荐）或 SHA-256 哈希（`ADMIN_PASSWORD_HASH`），见「环境变量」
@@ -104,10 +106,15 @@ node -e "console.log(require('crypto').createHash('sha256').update('your_passwor
 - 登录：`ADMIN_USERNAME` + 密码（`ADMIN_PASSWORD` 或对应 `ADMIN_PASSWORD_HASH` 的明文）
 - 界面语言：右上角 **EN / 中文** 按钮一键切换后台界面语言，选择会记忆在浏览器中
 - 功能：
-  - **产品管理**：新增 / 编辑 / 删除产品（双语字段、排序、图片 URL），保存即写入 D1
-  - **站点设置**：修改网页标题（双语）、Logo、Favicon、关于我们（双语）、联系方式，保存后前台实时生效
+  - **产品管理**：新增 / 编辑 / 删除产品（双语字段、排序、图片 URL），支持**列表 / 缩略图**视图切换（右上角 List / Grid 按钮，选择会记忆）；图片链接**可留空**，留空自动使用默认图
+  - **站点设置**：修改网页标题（双语）、主页站点名称、Logo、Favicon、关于我们（双语）、联系方式，保存后前台实时生效
 
 > 提示：如果后台提示「Failed to load products」，多半是浏览器里残留了旧的登录凭据，刷新页面重新登录即可（登录凭据失效时会自动跳回登录页）。
+
+### 前台产品展示说明
+
+- 首页与产品列表页的产品网格**优先读取 `/api/products`**（后台写入 D1 的数据实时显示）；API 无数据时回退为构建时的示例产品。
+- 示例产品（有静态详情页）点击后进入独立详情页；**后台新增的产品**点击后打开**详情弹层**（内容来自 API）。新增产品的分享链接 `/en/products/<slug>/` 会自动打开详情弹层。
 
 ### 产品字段
 
@@ -118,7 +125,7 @@ node -e "console.log(require('crypto').createHash('sha256').update('your_passwor
 | `short_en` / `short_zh` | ✓ | 简短描述（列表页显示） |
 | `description_en` / `description_zh` | 可选 | 详细描述（详情页显示） |
 | `highlights_en` / `highlights_zh` | 可选 | JSON 数组，如 `["快速", "稳定"]` |
-| `image_url` | ✓ | 产品图片外链地址（建议 800×600px） |
+| `image_url` | 可选 | 产品图片外链地址；留空自动使用默认图 `/images/products/placeholder.svg` |
 | `position` | 可选 | 排序权重，越小越靠前 |
 
 ---
@@ -170,10 +177,10 @@ QNCMS/
 │       └── zh/                 # 中文页面（同结构）
 ├── public/
 │   ├── images/                 # 静态资源（产品示例图、hero 图）
-│   ├── scripts/site.js         # 客户端脚本（暗黑模式切换等）
+│   ├── scripts/site.js         # 客户端脚本（主题切换/设置应用/产品动态渲染/详情弹层）
 │   ├── favicon.svg
 │   ├── robots.txt
-│   └── _redirects              # Pages 重定向规则（/admin → /admin/）
+│   └── _redirects              # Pages 重定向（/admin → /admin/、动态产品直链回退）
 ├── wrangler.migrations/        # DDL 参考（现已由运行时自动建表替代）
 ├── astro.config.mjs            # Astro 配置（site 域名在此修改）
 └── package.json
@@ -222,6 +229,17 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 4. 如需产品/站点文案也支持该语言，在后台产品编辑中补充 `*_ru` 字段（API 已按 locale 参数透传）。
 
 > 语言下拉菜单会自动读取 `localeNames` 渲染新选项，无需改组件。
+
+### 页面模板功能（规划预留）
+
+后续计划为前台页面（首页 / 产品 / 关于 / 联系等）提供**后台可视化的页面模板选择**。当前代码已为此预留好扩展点，届时只需增量开发，无需重构：
+
+1. **数据层**：站点设置使用通用 key/value 存储（`settings` 表），任何"页面模板选择 / 区块开关 / 自定义字段"都可直接以新 key 读写，无需改表结构；`/api/settings` 读写接口已是通用实现。
+2. **组件层**：前台每个页面由独立区块组件（`Hero` / `ProductsSection` / `AboutSection` / `ContactSection` 等）拼装，模板化时只需在 `src/pages/<locale>/` 下按模板组合组件，或新增 `pages` 表存"页面 slug → 模板 ID + 字段 JSON"。
+3. **展示层**：`site.js` 已实现"运行时读取 settings/API 数据并动态渲染"的机制（标题、Logo、关于、联系方式、产品网格），页面模板的字段同样可经此通道下发。
+4. **后台层**：`/admin` 的 Settings 页签为通用表单结构，新增字段只需在表单与保存逻辑中加一行。
+
+> 规划方向：新增 `pages` 表（slug、template_id、locale 字段 JSON）+ 后台「页面」页签 + 前台动态渲染入口。需要时按此方案扩展即可。
 
 ---
 

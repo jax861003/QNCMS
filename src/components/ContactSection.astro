@@ -11,9 +11,9 @@ const info = [
     label: t(locale, 'contact.infoTitle'),
     icon: 'mail',
     items: [
-      { lbl: 'Email', val: t(locale, 'contact.infoEmail') },
-      { lbl: 'Phone', val: t(locale, 'contact.infoPhone') },
-      { lbl: 'Office', val: t(locale, 'contact.infoAddress') },
+      { lbl: 'Email', attr: { 'data-contact-email': '' }, val: t(locale, 'contact.infoEmail') },
+      { lbl: 'Phone', attr: { 'data-contact-phone': '' }, val: t(locale, 'contact.infoPhone') },
+      { lbl: 'Office', attr: {}, val: t(locale, 'contact.infoAddress') },
     ],
   },
 ];
@@ -47,7 +47,7 @@ const info = [
                   </span>
                   <div>
                     <div class="lbl">{it.lbl}</div>
-                    <div class="val" data-contact-{it.lbl === 'Email' ? 'email' : it.lbl === 'Phone' ? 'phone' : ''}>{it.val}</div>
+                    <div class="val" {...it.attr}>{it.val}</div>
                   </div>
                 </li>
               ))}

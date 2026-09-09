@@ -18,7 +18,7 @@ const learnMore = t(locale, 'products.learnMore');
       <h2 style="font-size: clamp(2rem,4vw,3rem);">{t(locale, 'products.title')}</h2>
       <p style="max-width:52ch;">{t(locale, 'products.subtitle')}</p>
     </div>
-    <div class="products-grid">
+    <div class="products-grid" data-product-grid>
       {products.map((p) => <ProductCard product={p} locale={locale} learnMore={learnMore} />)}
     </div>
   </div>

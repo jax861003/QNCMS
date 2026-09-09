@@ -69,7 +69,7 @@ export async function onRequestPost(context) {
     description_zh: body.description_zh || '',
     highlights_en: JSON.stringify(Array.isArray(body.highlights_en) ? body.highlights_en : []),
     highlights_zh: JSON.stringify(Array.isArray(body.highlights_zh) ? body.highlights_zh : []),
-    image_url: body.image_url || '',
+    image_url: body.image_url || '/images/products/placeholder.svg',
     position: Number(body.position) || 0,
   };
 

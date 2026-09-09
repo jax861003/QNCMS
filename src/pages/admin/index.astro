@@ -82,6 +82,16 @@
       .status { font-size: .85rem; margin-top: 12px; }
       .status.ok { color: #16a34a; }
       .status.err { color: #dc2626; }
+      .view-toggle { display: inline-flex; gap: 4px; margin-bottom: 16px; }
+      .view-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg-soft); color: var(--ink-soft); font-weight: 600; cursor: pointer; font-size: .85rem; }
+      .view-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+      .products-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+      .pg-card { background: var(--bg-soft); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+      .pg-card img { width: 100%; height: 140px; object-fit: cover; display: block; }
+      .pg-body { padding: 14px; }
+      .pg-body h4 { font-size: .95rem; margin-bottom: 4px; }
+      .pg-body p { font-size: .8rem; color: var(--ink-soft); margin-bottom: 10px; }
+      .pg-actions { display: flex; gap: 8px; }
       @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
   </head>
@@ -131,6 +141,10 @@
           <div class="card" id="panelProducts">
             <h2 data-i18n="tabProducts">Products</h2>
             <button class="btn btn-primary btn-sm" onclick="openModal()" style="margin-bottom:16px" data-i18n="addProduct">+ Add Product</button>
+            <div class="view-toggle">
+              <button class="view-btn active" id="viewListBtn" onclick="setProductView('list')" data-i18n="viewList">List</button>
+              <button class="view-btn" id="viewGridBtn" onclick="setProductView('grid')" data-i18n="viewGrid">Grid</button>
+            </div>
             <div class="product-list" id="productList">Loading...</div>
           </div>
 
@@ -260,8 +274,9 @@
             </div>
           </div>
           <div class="form-group">
-            <label data-i18n="imageUrl">Image URL * (external link)</label>
-            <input type="url" id="image_url" required placeholder="https://example.com/image.png" />
+            <label data-i18n="imageUrl">Image URL (external link)</label>
+            <input type="url" id="image_url" placeholder="https://example.com/image.png" />
+            <div class="hint" data-i18n="imgHint">Leave empty to use the default product image</div>
           </div>
           <div class="form-group">
             <label data-i18n="position">Position (sort, lower first)</label>
@@ -290,7 +305,9 @@
           tagEn: 'Tag (EN)', tagZh: 'Tag (ZH)', shortEn: 'Short Description (EN)', shortZh: 'Short Description (ZH)',
           descEn: 'Description (EN)', descZh: 'Description (ZH)',
           hlEn: 'Highlights (EN, JSON array)', hlZh: 'Highlights (ZH, JSON array)',
-          imageUrl: 'Image URL * (external link)', position: 'Position (sort, lower first)',
+          imageUrl: 'Image URL (external link)', position: 'Position (sort, lower first)',
+          imgHint: 'Leave empty to use the default product image',
+          viewList: 'List', viewGrid: 'Grid',
           save: 'Save', cancel: 'Cancel', edit: 'Edit', delete: 'Delete',
           settingsSub: 'Site title, logo, favicon, about and contact info (applied to the public site without redeploy)',
           siteTitleEn: 'Site Title (EN)', siteTitleZh: 'Site Title (ZH)',
@@ -314,7 +331,9 @@
           tagEn: '标签（英文）', tagZh: '标签（中文）', shortEn: '简介（英文）', shortZh: '简介（中文）',
           descEn: '详细描述（英文）', descZh: '详细描述（中文）',
           hlEn: '亮点（英文，JSON 数组）', hlZh: '亮点（中文，JSON 数组）',
-          imageUrl: '图片 URL *（外链）', position: '排序（数字越小越靠前）',
+          imageUrl: '图片 URL（外链）', position: '排序（数字越小越靠前）',
+          imgHint: '留空将使用默认产品图片',
+          viewList: '列表', viewGrid: '缩略图',
           save: '保存', cancel: '取消', edit: '编辑', delete: '删除',
           settingsSub: '站点标题、Logo、Favicon、关于我们和联系方式（保存后前台实时生效，无需重新部署）',
           siteTitleEn: '站点标题（英文）', siteTitleZh: '站点标题（中文）',
@@ -464,22 +483,58 @@
           var products = await resp.json();
           if (!Array.isArray(products)) throw new Error('bad response');
           if (products.length === 0) {
+            list.className = 'product-list';
             list.innerHTML = '<div style="color:#888;padding:16px;">' + ui('noProducts') + '</div>';
             return;
           }
-          list.innerHTML = products.map(function (p) {
-            var img = p.image_url
-              ? '<img src="' + p.image_url + '" alt="' + (p.name_en || '') + '" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 60%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2260%22/><text x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22>No Image</text></svg>\'">'
-              : '';
-            return '<div class="product-item">' + img +
-              '<div class="product-info"><h3>' + (p.name_en || '') + ' / ' + (p.name_zh || '') + '</h3>' +
-              '<p>' + (p.short_en || '') + '</p></div>' +
-              '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>' +
-              '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>' +
-              '</div>';
-          }).join('');
+          renderProducts(products);
         } catch (err) {
           list.innerHTML = '<div style="color:#dc2626;padding:16px;">' + ui('failedLoad') + '</div>';
+        }
+      }
+
+      // ====== Product view toggle (list / grid) ======
+      var productView = 'list';
+      try { var pv = localStorage.getItem('admin_product_view'); if (pv === 'list' || pv === 'grid') productView = pv; } catch (e) { /* ignore */ }
+
+      function setProductView(v) {
+        productView = v;
+        try { localStorage.setItem('admin_product_view', v); } catch (e) { /* ignore */ }
+        var lb = document.getElementById('viewListBtn');
+        var gb = document.getElementById('viewGridBtn');
+        if (lb) lb.classList.toggle('active', v === 'list');
+        if (gb) gb.classList.toggle('active', v === 'grid');
+        if (window._currentProducts) renderProducts(window._currentProducts);
+      }
+
+      function renderProducts(products) {
+        window._currentProducts = products;
+        var list = document.getElementById('productList');
+        if (!list) return;
+        var placeholder = '/images/products/placeholder.svg';
+        var cards = products.map(function (p) {
+          var img = p.image_url
+            ? '<img src="' + p.image_url + '" alt="' + (p.name_en || '') + '" onerror="this.src=\'' + placeholder + '\'">'
+            : '<img src="' + placeholder + '" alt="' + (p.name_en || '') + '">';
+          var editBtn = '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>';
+          var delBtn = '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>';
+          return { img: img, editBtn: editBtn, delBtn: delBtn, name: (p.name_en || '') + ' / ' + (p.name_zh || ''), short: p.short_en || '' };
+        });
+        if (productView === 'grid') {
+          list.className = 'products-admin-grid';
+          list.innerHTML = cards.map(function (p) {
+            return '<div class="pg-card">' + p.img +
+              '<div class="pg-body"><h4>' + p.name + '</h4>' +
+              '<p>' + p.short + '</p>' +
+              '<div class="pg-actions">' + p.editBtn + p.delBtn + '</div></div></div>';
+          }).join('');
+        } else {
+          list.className = 'product-list';
+          list.innerHTML = cards.map(function (p) {
+            return '<div class="product-item">' + p.img +
+              '<div class="product-info"><h3>' + p.name + '</h3>' +
+              '<p>' + p.short + '</p></div>' + p.editBtn + p.delBtn + '</div>';
+          }).join('');
         }
       }
 
@@ -549,7 +604,7 @@
           description_zh: document.getElementById('description_zh').value,
           highlights_en: document.getElementById('highlights_en').value || '[]',
           highlights_zh: document.getElementById('highlights_zh').value || '[]',
-          image_url: document.getElementById('image_url').value
+          image_url: document.getElementById('image_url').value.trim() || '/images/products/placeholder.svg'
         };
         try {
           var resp = await fetch('/api/products', {
@@ -659,6 +714,7 @@
       window.closeModal = closeModal;
       window.editProduct = editProduct;
       window.deleteProduct = deleteProduct;
+      window.setProductView = setProductView;
     </script>
   </body>
 </html>
