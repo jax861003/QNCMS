@@ -268,16 +268,16 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 
 ### 模板（配色方案）开发规范
 
-后台「设置 → 模板」可选择整站配色方案。模板的**本质是一组 CSS 变量**（只改颜色、不改布局），与暗黑模式正交（模板 × 浅/深色可任意组合）。
+后台顶部菜单「模板（Templates）」页签可选择整站配色方案。模板的**本质是一组 CSS 变量**（只改颜色、不改布局），与暗黑模式正交（模板 × 浅/深色可任意组合）。**当前四套均为配色模板；后续规划布局格式不同的页面级模板**（见文末预留说明），新增布局模板时只需扩展后台「模板」页的模板类型。
 
 **现有模板**：
 
-| 模板名（value） | 显示名 | 主色 | 次色 | 渐变 |
+| 模板名（value） | 显示名（中文） | 主色 | 次色 | 渐变 |
 |---|---|---|---|---|
-| `default` | 默认（蓝紫） | #2563eb | #7c3aed | 蓝 → 紫 |
-| `ocean` | 海洋（青蓝） | #0e7490 | #2563eb | 青 → 蓝 |
-| `forest` | 森林（绿色） | #059669 | #0d9488 | 绿 → 青 |
-| `sunset` | 落日（橙粉） | #ea580c | #db2777 | 橙 → 粉 |
+| `default` | 官方模板-蓝紫色 | #2563eb | #7c3aed | 蓝 → 紫 |
+| `ocean` | 官方模板-青色 | #0e7490 | #2563eb | 青 → 蓝 |
+| `forest` | 官方模板-绿色 | #059669 | #0d9488 | 绿 → 青 |
+| `sunset` | 官方模板-橙色 | #ea580c | #db2777 | 橙 → 粉 |
 
 **新增一个模板（三步）**：
 
@@ -290,7 +290,7 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
      --accent: #fb7185;
    }
    ```
-2. **注册到后台**：在 `src/pages/admin/index.astro` 模板下拉框加 `<option value="rose" data-i18n="themeRose">Rose (Pink-Red)</option>`，并在 EN / ZH 字典各加显示名（`themeRose: 'Rose (Pink-Red)'` / `themeRose: '玫瑰（粉红）'`）。
+2. **注册到后台**：在 `src/pages/admin/index.astro` 的 `TEMPLATES` 数组中加一条记录 `{ id: 'rose', grad: 'linear-gradient(135deg,#f43f5e 0%,#d946ef 100%)', nameKey: 'tplRose' }`（`grad` 为卡片预览渐变），并在 EN / ZH 字典各加显示名（`tplRose: 'Official Template - Rose (Pink-Red)'` / `tplRose: '官方模板-玫红色'`）。
 3. **生效方式**：后台保存后，前台 `site.js` 将 `<html data-variant="rose">` 写入根元素，CSS 变量自动切换，无需重新部署。
 
 **可覆盖的变量清单**：

@@ -127,6 +127,57 @@
       .pg-thumb { position: relative; }
       .pg-thumb .row-check { position: absolute; top: 8px; left: 8px; z-index: 2; width: 16px; height: 16px; background: #fff; border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
       @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+          /* Language menu */
+      .lang-menu { position: relative; display: inline-flex; }
+      .lang-toggle {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px; border-radius: 50%;
+        border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
+        cursor: pointer; transition: all .25s ease;
+      }
+      .lang-toggle:hover { border-color: var(--brand); color: var(--brand); }
+      .lang-toggle svg { width: 18px; height: 18px; }
+      .lang-pop {
+        position: absolute; right: 0; top: calc(100% + 10px);
+        min-width: 158px; background: var(--card); border: 1px solid var(--line);
+        border-radius: 12px; box-shadow: 0 12px 30px -12px rgba(11,16,32,.25); padding: 6px; z-index: 400;
+        display: grid; gap: 2px;
+      }
+      .lang-pop[hidden] { display: none; }
+      .lang-opt {
+        display: flex; align-items: center; gap: 9px; padding: 9px 12px;
+        border-radius: 8px; font-weight: 600; font-size: .92rem; color: var(--ink);
+        transition: background .2s ease;
+      }
+      .lang-opt:hover { background: var(--bg-soft); }
+      .lang-opt.active { color: var(--brand); }
+      .lang-opt .flag { font-size: 1.1rem; line-height: 1; }
+
+      /* Template cards */
+      .template-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .template-card {
+        border: 2px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--card);
+        transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+      }
+      .template-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -12px rgba(11,16,32,.18); }
+      .template-card.active { border-color: var(--brand); }
+      .tpl-preview { height: 74px; }
+      .tpl-body { padding: 14px 16px 16px; display: grid; gap: 10px; }
+      .tpl-name { font-weight: 700; color: var(--ink); font-size: .95rem; }
+      .tpl-badge {
+        justify-self: start;
+        padding: 4px 12px; border-radius: 999px;
+        background: var(--brand); color: #fff; font-size: .78rem; font-weight: 700;
+      }
+      .template-card .btn { justify-self: start; }
     </style>
   </head>
   <body>
@@ -162,11 +213,19 @@
           <div class="header-actions">
             <div class="tabs">
               <button class="tab-btn active" id="tabProductsBtn" onclick="switchTab('products')" data-i18n="tabProducts">Products</button>
+              <button class="tab-btn" id="tabTemplatesBtn" onclick="switchTab('templates')" data-i18n="tabTemplates">Templates</button>
               <button class="tab-btn" id="tabMessagesBtn" onclick="switchTab('messages')" data-i18n="tabMessages">Messages</button>
               <button class="tab-btn" id="tabSettingsBtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
             </div>
-            <button class="btn btn-sm btn-ghost" onclick="setUiLang('en')" data-lang-btn="en">EN</button>
-            <button class="btn btn-sm btn-ghost" onclick="setUiLang('zh')" data-lang-btn="zh">中文</button>
+            <div class="lang-menu">
+              <button class="lang-toggle" type="button" aria-label="Language / 语言" onclick="toggleLangMenu(event)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+              </button>
+              <div class="lang-pop" id="langPop" hidden>
+                <a class="lang-opt" data-lang-btn="en" href="javascript:void(0)" onclick="setUiLang('en'); hideLangMenu(event)"><span class="flag" aria-hidden="true">🇬🇧</span>English</a>
+                <a class="lang-opt" data-lang-btn="zh" href="javascript:void(0)" onclick="setUiLang('zh'); hideLangMenu(event)"><span class="flag" aria-hidden="true">🇨🇳</span>中文</a>
+              </div>
+            </div>
             <button class="btn btn-sm btn-ghost" id="themeToggle" type="button" aria-label="Toggle dark mode">🌙</button>
             <button class="btn btn-sm btn-ghost" onclick="logout()" data-i18n="logout">Logout</button>
           </div>
@@ -329,16 +388,6 @@
                   <input type="text" id="contact_wechat" />
                 </div>
               </div>
-              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secTemplate">Template (Color Scheme)</h3>
-              <div class="form-group">
-                <label data-i18n="themeName">Template</label>
-                <select id="theme_name" onchange="document.documentElement.setAttribute('data-variant', this.value)">
-                  <option value="default" data-i18n="themeDefault">Default (Blue-Violet)</option>
-                  <option value="ocean" data-i18n="themeOcean">Ocean (Cyan-Blue)</option>
-                  <option value="forest" data-i18n="themeForest">Forest (Green)</option>
-                  <option value="sunset" data-i18n="themeSunset">Sunset (Orange-Pink)</option>
-                </select>
-              </div>
               <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secFooter">Footer</h3>
               <div class="form-grid">
                 <div class="form-group">
@@ -359,6 +408,13 @@
                 <div class="status" id="settingsStatus"></div>
               </div>
             </form>
+          </div>
+
+          <!-- Templates -->
+          <div class="card" id="panelTemplates" style="display:none">
+            <h2 data-i18n="tabTemplates">Templates</h2>
+            <p class="sub" data-i18n="templatesSub">Color-scheme templates for the public site. Layout templates will be supported later.</p>
+            <div class="template-grid" id="templateGrid"></div>
           </div>
 
           <!-- Messages -->
@@ -494,8 +550,9 @@
           secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
           productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
           secFooter: 'Footer', footerGithub: 'GitHub URL (footer)', footerTwitter: 'Twitter / X URL (footer)', footerCopyright: 'Copyright Text (footer)',
-          secTemplate: 'Template (Color Scheme)', themeName: 'Template',
-          themeDefault: 'Default (Blue-Violet)', themeOcean: 'Ocean (Cyan-Blue)', themeForest: 'Forest (Green)', themeSunset: 'Sunset (Orange-Pink)',
+          tabTemplates: 'Templates', templatesSub: 'Color-scheme templates for the public site. Layout templates will be supported later.',
+          tplDefault: 'Official Template - Blue-Violet', tplOcean: 'Official Template - Cyan', tplForest: 'Official Template - Green', tplSunset: 'Official Template - Orange',
+          tplApplied: 'In use', tplApply: 'Apply',
           contactQq: 'QQ', contactWechat: 'WeChat',
           tabMessages: 'Messages', messagesSub: 'Messages submitted through the public contact form.',
           msgName: 'Name', msgEmail: 'Email', msgPhone: 'Phone', msgCompany: 'Company', msgContent: 'Message', msgTime: 'Time', msgActions: 'Actions',
@@ -542,8 +599,9 @@
           secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
           productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
           secFooter: '页脚', footerGithub: 'GitHub 链接（页脚）', footerTwitter: 'Twitter / X 链接（页脚）', footerCopyright: '版权文字（页脚）',
-          secTemplate: '模板（配色方案）', themeName: '模板',
-          themeDefault: '默认（蓝紫）', themeOcean: '海洋（青蓝）', themeForest: '森林（绿色）', themeSunset: '落日（橙粉）',
+          tabTemplates: '模板', templatesSub: '前台站点的配色模板。布局模板将在后续版本支持。',
+          tplDefault: '官方模板-蓝紫色', tplOcean: '官方模板-青色', tplForest: '官方模板-绿色', tplSunset: '官方模板-橙色',
+          tplApplied: '使用中', tplApply: '应用',
           contactQq: 'QQ', contactWechat: '微信',
           tabMessages: '留言管理', messagesSub: '前台联系表单提交的留言。',
           msgName: '姓名', msgEmail: '邮箱', msgPhone: '电话', msgCompany: '公司', msgContent: '留言内容', msgTime: '时间', msgActions: '操作',
@@ -591,6 +649,16 @@
         try { localStorage.setItem('admin_lang', l); } catch (e) { /* ignore */ }
         applyUi();
         refreshDynamicTexts();
+      }
+      function toggleLangMenu(e) {
+        if (e) e.stopPropagation();
+        var pop = document.getElementById('langPop');
+        if (pop) pop.hidden = !pop.hidden;
+      }
+      function hideLangMenu(e) {
+        if (e) e.stopPropagation();
+        var pop = document.getElementById('langPop');
+        if (pop) pop.hidden = true;
       }
       function refreshDynamicTexts() {
         var mt = document.getElementById('modalTitle');
@@ -679,20 +747,26 @@
         var p = document.getElementById('panelProducts');
         var s = document.getElementById('panelSettings');
         var m = document.getElementById('panelMessages');
+        var t = document.getElementById('panelTemplates');
         var pb = document.getElementById('tabProductsBtn');
         var sb = document.getElementById('tabSettingsBtn');
         var mb = document.getElementById('tabMessagesBtn');
+        var tb = document.getElementById('tabTemplatesBtn');
+        function hideAll() {
+          [p, s, m, t].forEach(function (el) { if (el) el.style.display = 'none'; });
+          [pb, sb, mb, tb].forEach(function (el) { if (el) el.classList.remove('active'); });
+        }
         if (name === 'settings') {
-          p.style.display = 'none'; m.style.display = 'none'; s.style.display = 'block';
-          pb.classList.remove('active'); mb.classList.remove('active'); sb.classList.add('active');
+          hideAll(); s.style.display = 'block'; sb.classList.add('active');
           loadSettings();
         } else if (name === 'messages') {
-          p.style.display = 'none'; s.style.display = 'none'; m.style.display = 'block';
-          pb.classList.remove('active'); sb.classList.remove('active'); mb.classList.add('active');
+          hideAll(); m.style.display = 'block'; mb.classList.add('active');
           loadMessages();
+        } else if (name === 'templates') {
+          hideAll(); t.style.display = 'block'; tb.classList.add('active');
+          loadTemplates();
         } else {
-          s.style.display = 'none'; m.style.display = 'none'; p.style.display = 'block';
-          sb.classList.remove('active'); mb.classList.remove('active'); pb.classList.add('active');
+          hideAll(); p.style.display = 'block'; pb.classList.add('active');
           loadProducts();
         }
       }
@@ -1139,8 +1213,7 @@
             if (el && s[key] !== undefined && s[key] !== null) el.value = s[key];
           });
         } catch (err) { /* keep empty */ }
-        // apply selected template (color scheme) preview on the admin page
-        if (s && s.theme_name) document.documentElement.setAttribute('data-variant', s.theme_name);
+        // template (color scheme) is managed in the Templates tab
       }
 
       document.getElementById('settingsForm').addEventListener('submit', async function (e) {
@@ -1172,8 +1245,7 @@
           contact_wechat: document.getElementById('contact_wechat').value,
           footer_github: document.getElementById('footer_github').value,
           footer_twitter: document.getElementById('footer_twitter').value,
-          footer_copyright: document.getElementById('footer_copyright').value,
-          theme_name: document.getElementById('theme_name').value
+          footer_copyright: document.getElementById('footer_copyright').value
         };
         var statusEl = document.getElementById('settingsStatus');
         statusEl.className = 'status';
@@ -1259,6 +1331,57 @@
         } catch (err) { alert('Network error'); }
       }
 
+      // ====== Templates (color schemes) ======
+      var TEMPLATES = [
+        { id: 'default', grad: 'linear-gradient(135deg,#2563eb,#7c3aed)', nameKey: 'tplDefault' },
+        { id: 'ocean', grad: 'linear-gradient(135deg,#06b6d4,#2563eb)', nameKey: 'tplOcean' },
+        { id: 'forest', grad: 'linear-gradient(135deg,#10b981,#0d9488)', nameKey: 'tplForest' },
+        { id: 'sunset', grad: 'linear-gradient(135deg,#f97316,#db2777)', nameKey: 'tplSunset' }
+      ];
+      var currentTemplate = 'default';
+
+      async function loadTemplates() {
+        var grid = document.getElementById('templateGrid');
+        if (!grid) return;
+        try {
+          var resp = await fetch('/api/settings', { headers: { Accept: 'application/json' } });
+          var s = await resp.json();
+          if (s && s.theme_name) currentTemplate = s.theme_name;
+        } catch (e) { /* keep default */ }
+        document.documentElement.setAttribute('data-variant', currentTemplate);
+        renderTemplates();
+      }
+      function renderTemplates() {
+        var grid = document.getElementById('templateGrid');
+        if (!grid) return;
+        grid.innerHTML = TEMPLATES.map(function (t) {
+          var active = t.id === currentTemplate;
+          return '<div class="template-card' + (active ? ' active' : '') + '" data-tpl="' + t.id + '">' +
+            '<div class="tpl-preview" style="background:' + t.grad + '"></div>' +
+            '<div class="tpl-body">' +
+            '<div class="tpl-name">' + ui(t.nameKey) + '</div>' +
+            (active
+              ? '<span class="tpl-badge">' + ui('tplApplied') + '</span>'
+              : '<button class="btn btn-sm btn-primary" onclick="applyTemplate(\'' + t.id + '\')">' + ui('tplApply') + '</button>') +
+            '</div></div>';
+        }).join('');
+      }
+      async function applyTemplate(id) {
+        try {
+          var resp = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ theme_name: id })
+          });
+          var data = await resp.json();
+          if (resp.status === 401) { sessionExpired(); return; }
+          if (!data.ok) { alert(ui('saveFailed') + (data.message || '')); return; }
+          currentTemplate = id;
+          document.documentElement.setAttribute('data-variant', id);
+          renderTemplates();
+        } catch (err) { alert('Network error'); }
+      }
+
       // ====== Boot ======
       applyUi();
       if (token) {
@@ -1283,6 +1406,10 @@
       window.batchDelete = batchDelete;
       window.onTableFilter = onTableFilter;
       window.deleteMessage = deleteMessage;
+      document.addEventListener('click', function (e) {
+        var pop = document.getElementById('langPop');
+        if (pop && !pop.hidden && !pop.contains(e.target) && !(e.target && e.target.closest && e.target.closest('.lang-menu'))) pop.hidden = true;
+      });
     </script>
   </body>
 </html>

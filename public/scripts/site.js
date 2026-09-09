@@ -55,6 +55,29 @@
     }
   }
 
+  // Language menu (globe icon + flag popover)
+  var langToggle = document.querySelector('[data-lang-toggle]');
+  var langPop = document.querySelector('[data-lang-pop]');
+  if (langToggle && langPop) {
+    function showLang(show) {
+      langPop.hidden = !show;
+      langToggle.setAttribute('aria-expanded', show ? 'true' : 'false');
+    }
+    langToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      showLang(langPop.hidden);
+    });
+    langToggle.addEventListener('mouseenter', function () { showLang(true); });
+    langPop.addEventListener('mouseleave', function () { showLang(false); });
+    langToggle.addEventListener('mouseleave', function () {
+      setTimeout(function () { if (!langPop.matches(':hover')) showLang(false); }, 150);
+    });
+    document.addEventListener('click', function (e) {
+      if (langPop.hidden) return;
+      if (e.target !== langToggle && !langPop.contains(e.target)) showLang(false);
+    });
+  }
+
   // Contact form -> Cloudflare Pages Function
   var form = document.querySelector('[data-contact-form]');
   if (form) {

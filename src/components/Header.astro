@@ -44,14 +44,19 @@ const section = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
         </svg>
       </button>
 
-      <label class="lang-select-wrap" aria-label="Language / 语言">
-        <span class="sr-only">Language / 语言</span>
-        <select class="lang-select" aria-label="Language / 语言" onchange="location.href = this.value;">
+      <div class="lang-menu">
+        <button class="lang-toggle" data-lang-toggle type="button" aria-label="Language / 语言" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+        </button>
+        <div class="lang-pop" data-lang-pop hidden>
           {locales.map((l) => (
-            <option value={localeUrl(Astro.url.pathname, l)} selected={l === locale}>{localeNames[l]}</option>
+            <a class={'lang-opt' + (l === locale ? ' active' : '')} href={localeUrl(Astro.url.pathname, l)}>
+              <span class="flag" aria-hidden="true">{l === 'en' ? '🇬🇧' : l === 'zh' ? '🇨🇳' : '🌐'}</span>
+              {localeNames[l]}
+            </a>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
 
       <button class="nav-toggle" data-nav-toggle aria-label="Toggle menu" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
