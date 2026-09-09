@@ -188,6 +188,15 @@ section {
   width: 16px;
   height: 16px;
 }
+.btn-outline {
+  background: transparent;
+  color: var(--brand);
+  border: 1.5px solid var(--brand);
+}
+.btn-outline:hover {
+  background: var(--brand);
+  color: #fff;
+}
 .btn-primary {
   background: var(--brand-grad);
   color: #fff;

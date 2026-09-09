@@ -30,7 +30,7 @@ const section = seg[1] || 'index';
       <a href={`/${locale}/`} aria-current={section === 'index' ? 'page' : undefined}>{t(locale, 'nav.home')}</a>
       <a href={`/${locale}/products/`} aria-current={section.startsWith('products') ? 'page' : undefined}>{t(locale, 'nav.products')}</a>
       <a href={`/${locale}/about/`} aria-current={section === 'about' ? 'page' : undefined}>{t(locale, 'nav.about')}</a>
-      <a class="btn btn-primary" href={`/${locale}/contact/`}>{t(locale, 'nav.cta')}</a>
+      <a class="btn btn-outline" href={`/${locale}/contact/`}>{t(locale, 'nav.cta')}</a>
     </nav>
 
     <div class="header-actions">

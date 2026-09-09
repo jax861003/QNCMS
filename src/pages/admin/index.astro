@@ -197,8 +197,15 @@
       <!-- ============ LOGIN ============ -->
       <div class="login-screen" id="loginScreen">
         <div class="login-lang">
-          <button class="btn btn-sm btn-ghost" onclick="setUiLang('en')" data-lang-btn="en">EN</button>
-          <button class="btn btn-sm btn-ghost" onclick="setUiLang('zh')" data-lang-btn="zh">中文</button>
+          <div class="lang-menu">
+            <button class="lang-toggle" type="button" aria-label="Language / 语言" onclick="toggleLangMenu(event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+            </button>
+            <div class="lang-pop" id="langPopLogin" hidden>
+              <a class="lang-opt" data-lang-btn="en" href="javascript:void(0)" onclick="setUiLang('en'); hideLangMenu(event)"><span class="lang-abbr" aria-hidden="true">EN</span>English</a>
+              <a class="lang-opt" data-lang-btn="zh" href="javascript:void(0)" onclick="setUiLang('zh'); hideLangMenu(event)"><span class="lang-abbr" aria-hidden="true">中</span>中文</a>
+            </div>
+          </div>
         </div>
         <div class="login-box">
           <h1 data-i18n="loginTitle">Admin Login</h1>
@@ -664,12 +671,14 @@
       }
       function toggleLangMenu(e) {
         if (e) e.stopPropagation();
-        var pop = document.getElementById('langPop');
+        var menu = e && e.target.closest ? e.target.closest('.lang-menu') : null;
+        var pop = menu ? menu.querySelector('.lang-pop') : null;
         if (pop) pop.hidden = !pop.hidden;
       }
       function hideLangMenu(e) {
         if (e) e.stopPropagation();
-        var pop = document.getElementById('langPop');
+        var menu = e && e.target.closest ? e.target.closest('.lang-menu') : null;
+        var pop = menu ? menu.querySelector('.lang-pop') : null;
         if (pop) pop.hidden = true;
       }
       function refreshDynamicTexts() {
@@ -1396,6 +1405,19 @@
 
       // ====== Boot ======
       applyUi();
+      // apply the saved color-scheme template to the admin UI immediately
+      (function () {
+        try {
+          fetch('/api/settings', { headers: { Accept: 'application/json' } })
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .then(function (s) {
+              var v = (s && s.theme_name) || 'default';
+              currentTemplate = v;
+              document.documentElement.setAttribute('data-variant', v);
+            })
+            .catch(function () { /* keep default */ });
+        } catch (e) { /* ignore */ }
+      })();
       if (token) {
         showAdmin();
       } else {
@@ -1419,8 +1441,9 @@
       window.onTableFilter = onTableFilter;
       window.deleteMessage = deleteMessage;
       document.addEventListener('click', function (e) {
-        var pop = document.getElementById('langPop');
-        if (pop && !pop.hidden && !pop.contains(e.target) && !(e.target && e.target.closest && e.target.closest('.lang-menu'))) pop.hidden = true;
+        document.querySelectorAll('.lang-pop').forEach(function (pop) {
+          if (!pop.hidden && !pop.contains(e.target) && !(e.target && e.target.closest && e.target.closest('.lang-menu'))) pop.hidden = true;
+        });
       });
     </script>
   </body>
