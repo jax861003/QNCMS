@@ -15,7 +15,7 @@ git push -u origin main
 
 1. Cloudflare Dashboard → **Workers & Pages → Create → Pages → Connect to Git**
 2. 选择仓库与分支（`main`）
-3. 构建配置：
+3. 构建配置（在 Dashboard 填写；**仓库内不要提交 `wrangler.toml`**，否则 Cloudflare 会接管绑定管理，Dashboard 将无法增删 D1 绑定）：
    - 框架预设：**Astro**
    - 构建命令：`npm run build`
    - 输出目录：`dist`
@@ -33,6 +33,7 @@ git push -u origin main
 | `ADMIN_PASSWORD` | 推荐（明文） | `your-password` |
 | `ADMIN_PASSWORD_HASH` | 二选一 | 密码 SHA-256 小写 hex，或任意明文 |
 | `JWT_SECRET` | ✓ | 随机字符串，如 `x9Kp2mQv8sTz...` |
+| `DB_BINDING_NAME` | 条件 | D1 绑定变量名，默认 `DB`；绑定名不同时填写 |
 
 改完环境变量需**重新部署**一次（Create deployment）。
 
@@ -40,10 +41,10 @@ git push -u origin main
 
 项目 **Settings → Bindings → Add binding → D1 database**：
 
-- Variable name：**`DB`**（必须与代码一致，不可改名）
-- D1 database：选择已创建的数据库
+- Variable name：**任意**，如 `DB` 或 `qncms_db`（代码通过 `DB_BINDING_NAME` 读取实际变量名，默认 `DB`）
+- D1 database：选择已创建的数据库（如 `qncms`）
 
-绑定后 **Create deployment** 重新部署。
+若变量名不是 `DB`，在环境变量中添加 `DB_BINDING_NAME = <变量名>`。绑定后 **Create deployment** 重新部署。
 
 > 数据表（`products` / `settings`）会在首次请求 API 时自动创建，无需手动迁移。
 > 如需手动建表（可选）：
@@ -72,7 +73,8 @@ npx wrangler pages dev dist \
 
 | 现象 | 原因 / 解决 |
 |------|-------------|
-| 部署日志 `D1 binding 'DB' references database ... not found` | `wrangler.toml` 中配置了 D1 绑定但构建环境无法解析。模板已移除该配置；请在 Dashboard 绑定，不要写进 `wrangler.toml` |
+| 部署日志 `D1 binding 'DB' references database ... not found` | 某处配置引用了不存在的数据库。确认 Dashboard Bindings 中绑定的数据库真实存在（变量名任意，配合 `DB_BINDING_NAME`） |
+| Dashboard 提示「绑定由 wrangler.toml 管理」，无法增删 | 仓库中存在 `wrangler.toml`。模板已删除该文件；若你的仓库里有，删除并重新部署 |
 | 后台登录 `Network error` | Functions 未部署成功，查看部署日志；确认构建无报错且 `functions/` 目录存在 |
 | 后台登录 `Invalid credentials` | 环境变量问题：用户名/密码不匹配，或 `ADMIN_PASSWORD_HASH` 格式不对（见 README） |
-| 后台提示 `Database not available` | D1 绑定缺失或变量名不是 `DB`，重新绑定并部署 |
+| 后台提示 `Database not available` | D1 绑定缺失；若绑定变量名不是 `DB`，设置 `DB_BINDING_NAME = <变量名>` 后重新部署 |

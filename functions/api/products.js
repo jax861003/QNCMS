@@ -1,13 +1,13 @@
 // /api/products - GET: public product list (D1 or inline fallback)
 // POST: create/update product (auth required, writes to D1)
-import { requireAuth, getEnv, ensureTables } from '../_utils.js';
+import { requireAuth, getEnv, getDB, ensureTables } from '../_utils.js';
 
 export async function onRequestGet(context) {
   const url = new URL(context.request.url);
   const locale = url.searchParams.get('locale') || 'en';
   const slug = url.searchParams.get('slug');
   const env = getEnv(context);
-  const db = env.DB;
+  const db = getDB(env);
 
   // Try D1 first (production), fallback to inline data
   if (db && typeof db.prepare === 'function') {
@@ -52,7 +52,7 @@ export async function onRequestPost(context) {
     return Response.json({ ok: false, message: 'Missing slug' }, { status: 400 });
   }
 
-  const db = getEnv(context).DB;
+  const db = getDB(getEnv(context));
   if (!db || typeof db.prepare !== 'function') {
     return Response.json({ ok: false, message: 'Database not available' }, { status: 503 });
   }

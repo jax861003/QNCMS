@@ -1,7 +1,7 @@
 // POST /api/products/create - create/update a product (auth required)
 // NOTE: primary upsert endpoint is POST /api/products (functions/api/products.js).
 // This route is kept as an alias for the admin UI.
-import { requireAuth, getEnv, ensureTables } from '../../_utils.js';
+import { requireAuth, getEnv, getDB, ensureTables } from '../../_utils.js';
 
 export async function onRequestPost(context) {
   const auth = await requireAuth(context);
@@ -12,7 +12,7 @@ export async function onRequestPost(context) {
     return Response.json({ ok: false, message: 'Missing slug' }, { status: 400 });
   }
 
-  const db = getEnv(context).DB;
+  const db = getDB(getEnv(context));
   if (!db || typeof db.prepare !== 'function') {
     return Response.json({ ok: false, message: 'Database not available' }, { status: 503 });
   }

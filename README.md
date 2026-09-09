@@ -60,15 +60,16 @@ npx wrangler pages dev dist \
    git push -u origin main
    ```
 2. Cloudflare Dashboard → **Workers & Pages → Create → Pages → Connect to Git**，选择该仓库，分支 `main`。
-3. 构建配置（模板已内置，无需改动 `wrangler.toml`）：
+3. 构建配置（**在 Dashboard 中填写**，仓库内**不要**提交 `wrangler.toml`——只要存在该文件，Cloudflare 就会把项目绑定切换为"由 wrangler.toml 管理"，导致 Dashboard 无法添加/删除 D1 绑定）：
    - 框架预设：**Astro**
    - 构建命令：`npm run build`
    - 输出目录：`dist`
 4. 点击 **Save and Deploy**。部署成功后 Cloudflare 分配公网域名 `https://<project-name>.pages.dev`。
 5. **部署完成后**，在项目 **Settings → Environment variables** 添加环境变量（见下表）。
-6. 在项目 **Settings → Bindings → Add binding → D1 database** 添加数据库绑定：
-   - Variable name（变量名）：**`DB`**（代码固定读取 `env.DB`，不可改名）
+6. 在项目 **Settings → Bindings → Add binding → D1 database** 添加数据库绑定（此时绑定界面可正常编辑）：
+   - Variable name（变量名）：**任意**，如 `DB` 或 `qncms_db`（代码通过 `DB_BINDING_NAME` 环境变量读取实际绑定名，默认 `DB`）
    - D1 database：选择你已创建的数据库（如 `qncms`）
+   - 若变量名不是 `DB`，在环境变量中添加 `DB_BINDING_NAME = <变量名>`
    - 添加后点 **Create deployment** 重新部署一次，让绑定生效。
 7. 完成。数据表会在首次请求 API 时**自动创建**，无需任何迁移命令。
 
@@ -84,6 +85,7 @@ npx wrangler pages dev dist \
 | `ADMIN_PASSWORD` | 推荐 | **明文密码**（最简单，方便记忆）。设置了它，登录直接用该值 |
 | `ADMIN_PASSWORD_HASH` | 二选一 | 密码的 SHA-256 小写十六进制（64 字符）。若填的是**其他任意值**，也会被直接当作明文密码比对 |
 | `JWT_SECRET` | ✓ | 会话签名密钥，任意随机字符串即可 |
+| `DB_BINDING_NAME` | 条件 | D1 绑定的**变量名**。默认 `DB`；若你在 Bindings 中把变量名取成了别的（如 `qncms_db`），这里填那个名字 |
 
 > 凭证优先级：`ADMIN_PASSWORD`（明文）→ `ADMIN_PASSWORD_HASH`（64 位 hex 按哈希比对，否则按明文比对）。
 
@@ -165,7 +167,6 @@ QNCMS/
 │   ├── favicon.svg
 │   ├── robots.txt
 │   └── _redirects              # Pages 重定向规则（/admin → /admin/）
-├── wrangler.toml               # 仅构建配置（无 D1 绑定、无 secrets）
 ├── wrangler.migrations/        # DDL 参考（现已由运行时自动建表替代）
 ├── astro.config.mjs            # Astro 配置（site 域名在此修改）
 └── package.json
@@ -251,7 +252,11 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 
 ### Q: 后台提示「Database not available」？
 
-D1 绑定未生效。到项目 **Settings → Bindings** 确认存在变量名为 **`DB`** 的 D1 绑定，绑定后重新部署。
+D1 绑定未生效。到项目 **Settings → Bindings** 确认已绑定真实数据库；若绑定变量名不是 `DB`，需在环境变量中设置 `DB_BINDING_NAME = <变量名>`；确认后重新部署。
+
+### Q: Dashboard 提示「绑定由 wrangler.toml 管理」，无法添加/删除绑定？
+
+仓库中存在 `wrangler.toml` 会导致 Cloudflare 接管绑定管理。删除仓库中的 `wrangler.toml` 并重新部署即可恢复 Dashboard 手动管理（模板已移除该文件；构建配置在 Dashboard 中填写：`npm run build` / `dist`）。
 
 ### Q: 后台产品列表为空 / 提示执行迁移？
 

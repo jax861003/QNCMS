@@ -1,11 +1,11 @@
 // /api/settings - GET/POST site settings (auth required)
-import { requireAuth, getEnv, ensureTables } from '../_utils.js';
+import { requireAuth, getEnv, getDB, ensureTables } from '../_utils.js';
 
 export async function onRequestGet(context) {
   const auth = await requireAuth(context);
   if (!auth.ok) return Response.json(auth.body, { status: auth.status });
 
-  const db = getEnv(context).DB;
+  const db = getDB(getEnv(context));
   if (!db || typeof db.prepare !== 'function') return Response.json({});
 
   try {
@@ -31,7 +31,7 @@ export async function onRequestPost(context) {
     return Response.json({ ok: false, message: 'Invalid body' }, { status: 400 });
   }
 
-  const db = getEnv(context).DB;
+  const db = getDB(getEnv(context));
   if (db && typeof db.prepare === 'function') {
     await ensureTables(db);
     for (const [key, value] of Object.entries(body)) {

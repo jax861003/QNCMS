@@ -70,6 +70,23 @@ export function getEnv(context) {
 }
 
 /**
+ * Resolve the D1 database binding from env.
+ * The binding name is NOT hard-coded: set `DB_BINDING_NAME` (an environment
+ * variable) to whatever variable name you used for the D1 binding in the
+ * dashboard. Falls back to "DB", then to any of the common names.
+ */
+export function getDB(env) {
+  env = env || {};
+  const names = [env.DB_BINDING_NAME, 'DB', 'D1', 'DATABASE']
+    .map((n) => (n || '').trim())
+    .filter(Boolean);
+  for (const name of names) {
+    if (env[name] && typeof env[name].prepare === 'function') return env[name];
+  }
+  return env.DB || null;
+}
+
+/**
  * Require authentication for a Pages Function context.
  * Returns { ok: true } or { ok: false, status, body } for a quick error response.
  */

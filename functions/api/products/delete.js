@@ -1,5 +1,5 @@
 // DELETE /api/products/delete?slug=<slug> - delete a product (auth required)
-import { requireAuth, getEnv, ensureTables } from '../../_utils.js';
+import { requireAuth, getEnv, getDB, ensureTables } from '../../_utils.js';
 
 export async function onRequestDelete(context) {
   const auth = await requireAuth(context);
@@ -8,7 +8,7 @@ export async function onRequestDelete(context) {
   const slug = new URL(context.request.url).searchParams.get('slug');
   if (!slug) return Response.json({ ok: false, message: 'Missing slug' }, { status: 400 });
 
-  const db = getEnv(context).DB;
+  const db = getDB(getEnv(context));
   if (!db || typeof db.prepare !== 'function') {
     return Response.json({ ok: false, message: 'Database not available' }, { status: 503 });
   }

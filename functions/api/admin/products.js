@@ -1,11 +1,11 @@
 // /api/admin/products - GET: full bilingual fields for admin editing (auth required)
-import { requireAuth, getEnv, ensureTables } from '../../_utils.js';
+import { requireAuth, getEnv, getDB, ensureTables } from '../../_utils.js';
 
 export async function onRequestGet(context) {
   const auth = await requireAuth(context);
   if (!auth.ok) return Response.json(auth.body, { status: auth.status });
 
-  const db = getEnv(context).DB;
+  const db = getDB(getEnv(context));
   if (!db || typeof db.prepare !== 'function') {
     // No D1 bound - return empty so admin shows "no products"
     return Response.json([]);
