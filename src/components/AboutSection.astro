@@ -18,8 +18,8 @@ const values = [
     <div class="about-grid">
       <div class="about-body">
         <span class="eyebrow">{t(locale, 'about.eyebrow')}</span>
-        <h2 style="font-size: clamp(1.9rem,3.4vw,2.6rem); margin:16px 0 20px;">{t(locale, 'about.title')}</h2>
-        <p>{t(locale, 'about.body')}</p>
+        <h2 data-about-title style="font-size: clamp(1.9rem,3.4vw,2.6rem); margin:16px 0 20px;">{t(locale, 'about.title')}</h2>
+        <p data-about-body>{t(locale, 'about.body')}</p>
       </div>
       <div class="about-values">
         {values.map((v) => (

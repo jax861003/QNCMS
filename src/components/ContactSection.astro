@@ -47,7 +47,7 @@ const info = [
                   </span>
                   <div>
                     <div class="lbl">{it.lbl}</div>
-                    <div class="val">{it.val}</div>
+                    <div class="val" data-contact-{it.lbl === 'Email' ? 'email' : it.lbl === 'Phone' ? 'phone' : ''}>{it.val}</div>
                   </div>
                 </li>
               ))}

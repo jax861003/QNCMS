@@ -1,10 +1,9 @@
-// /api/settings - GET/POST site settings (auth required)
+// /api/settings - GET (public, for front-end) / POST (auth required, for admin)
 import { requireAuth, getEnv, getDB, ensureTables } from '../_utils.js';
 
+// Public: front-end pages read site settings (title / logo / favicon / about
+// / contact) at runtime to apply them without a rebuild.
 export async function onRequestGet(context) {
-  const auth = await requireAuth(context);
-  if (!auth.ok) return Response.json(auth.body, { status: auth.status });
-
   const db = getDB(getEnv(context));
   if (!db || typeof db.prepare !== 'function') return Response.json({});
 
@@ -22,6 +21,7 @@ export async function onRequestGet(context) {
   }
 }
 
+// Auth required: admin saves settings.
 export async function onRequestPost(context) {
   const auth = await requireAuth(context);
   if (!auth.ok) return Response.json(auth.body, { status: auth.status });

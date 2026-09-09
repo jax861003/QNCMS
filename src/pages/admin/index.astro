@@ -1,19 +1,11 @@
 ---
-import { fetchProducts } from '@/lib/api';
-import type { Locale } from '@/lib/i18n';
-
-interface Props {
-  locale: Locale;
-}
-const { locale } = Astro.props;
 ---
-
 <!doctype html>
-<html lang={locale === 'zh' ? 'zh-Hans' : 'en'}>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin — NovaGrid</title>
+    <title>Admin — QNCMS</title>
     <script>
       (function () {
         try {
@@ -40,26 +32,32 @@ const { locale } = Astro.props;
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-soft); color: var(--ink); transition: background .3s, color .3s; }
       .login-screen, .app { min-height: 100vh; }
-      .login-screen { display: flex; align-items: center; justify-content: center; }
+      .login-screen { display: flex; align-items: center; justify-content: center; position: relative; }
+      .login-lang { position: absolute; top: 20px; right: 24px; display: flex; gap: 8px; }
       .login-box { background: var(--card); padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(11,16,32,.1); width: 100%; max-width: 360px; border: 1px solid var(--line); }
       html[data-theme="dark"] .login-box { box-shadow: 0 10px 40px rgba(0,0,0,.5); }
       .login-box h1 { font-size: 1.5rem; margin-bottom: 8px; }
       .login-box p { color: var(--ink-soft); margin-bottom: 24px; font-size: .9rem; }
       .field { margin-bottom: 16px; }
       .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
-      .field input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--ink); }
-      .field input:focus { outline: none; border-color: var(--brand); }
+      .field input, .field textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--ink); }
+      .field textarea { min-height: 90px; resize: vertical; }
+      .field input:focus, .field textarea:focus { outline: none; border-color: var(--brand); }
       .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: .95rem; transition: all .2s; }
       .btn-primary { background: var(--brand); color: #fff; }
       .btn-primary:hover { filter: brightness(1.08); }
       .error { color: #dc2626; font-size: .85rem; margin-top: 8px; }
       .app { display: flex; flex-direction: column; }
-      .header { background: var(--card); border-bottom: 1px solid var(--line); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
-      .header h1 { font-size: 1.25rem; }
-      .header-actions { display: flex; gap: 8px; align-items: center; }
+      .header { background: var(--card); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .header h1 { font-size: 1.2rem; }
+      .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .tabs { display: flex; gap: 4px; }
+      .tab-btn { padding: 8px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-soft); color: var(--ink-soft); font-weight: 600; cursor: pointer; font-size: .9rem; }
+      .tab-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
       .main { flex: 1; padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
       .card { background: var(--card); border-radius: 16px; border: 1px solid var(--line); padding: 24px; margin-bottom: 24px; }
       .card h2 { font-size: 1.1rem; margin-bottom: 16px; }
+      .card .sub { color: var(--ink-soft); font-size: .9rem; margin-bottom: 20px; }
       .product-list { display: grid; gap: 16px; }
       .product-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-soft); border-radius: 12px; align-items: center; }
       .product-item img { width: 80px; height: 60px; object-fit: cover; border-radius: 8px; }
@@ -70,188 +68,344 @@ const { locale } = Astro.props;
       .btn-danger { background: #dc2626; color: #fff; }
       .btn-success { background: #16a34a; color: #fff; }
       .btn-ghost { background: var(--bg-soft); color: var(--ink); border: 1px solid var(--line); }
+      .hint { color: var(--ink-soft); font-size: .8rem; margin-top: 4px; }
       .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; z-index: 100; }
       .modal.active { display: flex; }
-      .modal-content { background: var(--card); padding: 32px; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+      .modal-content { background: var(--card); padding: 32px; border-radius: 16px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; }
       .modal-content h2 { margin-bottom: 24px; }
       .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
       .form-group { margin-bottom: 16px; }
       .form-group label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
       .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .95rem; background: var(--bg); color: var(--ink); }
-      .form-group textarea { min-height: 100px; resize: vertical; }
-      .actions { display: flex; gap: 12px; margin-top: 24px; }
+      .form-group textarea { min-height: 80px; resize: vertical; }
+      .actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
+      .status { font-size: .85rem; margin-top: 12px; }
+      .status.ok { color: #16a34a; }
+      .status.err { color: #dc2626; }
       @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
   </head>
   <body>
     <div id="app">
+      <!-- ============ LOGIN ============ -->
       <div class="login-screen" id="loginScreen">
+        <div class="login-lang">
+          <button class="btn btn-sm btn-ghost" onclick="setUiLang('en')" data-lang-btn="en">EN</button>
+          <button class="btn btn-sm btn-ghost" onclick="setUiLang('zh')" data-lang-btn="zh">中文</button>
+        </div>
         <div class="login-box">
-          <h1>Admin Login</h1>
-          <p>Enter your credentials to manage the site</p>
+          <h1 data-i18n="loginTitle">Admin Login</h1>
+          <p data-i18n="loginSub">Enter your credentials to manage the site</p>
           <form id="loginForm">
             <div class="field">
-              <label>Username</label>
+              <label data-i18n="username">Username</label>
               <input type="text" id="username" required autocomplete="username" />
             </div>
             <div class="field">
-              <label>Password</label>
+              <label data-i18n="password">Password</label>
               <input type="password" id="password" required autocomplete="current-password" />
             </div>
             <div id="loginError" class="error"></div>
-            <button type="submit" class="btn btn-primary" style="width:100%">Sign In</button>
+            <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="signIn">Sign In</button>
           </form>
         </div>
       </div>
-      
+
+      <!-- ============ ADMIN APP ============ -->
       <div class="app" id="adminApp" style="display:none">
         <header class="header">
-          <h1>NovaGrid Admin</h1>
+          <h1 data-i18n="adminTitle">Site Admin</h1>
           <div class="header-actions">
-            <button class="btn btn-sm btn-ghost" id="themeToggle" type="button" aria-label="Toggle dark mode / 切换深色模式">🌙</button>
-            <button class="btn btn-sm btn-ghost" onclick="logout()">Logout</button>
+            <div class="tabs">
+              <button class="tab-btn active" id="tabProductsBtn" onclick="switchTab('products')" data-i18n="tabProducts">Products</button>
+              <button class="tab-btn" id="tabSettingsBtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="setUiLang('en')" data-lang-btn="en">EN</button>
+            <button class="btn btn-sm btn-ghost" onclick="setUiLang('zh')" data-lang-btn="zh">中文</button>
+            <button class="btn btn-sm btn-ghost" id="themeToggle" type="button" aria-label="Toggle dark mode">🌙</button>
+            <button class="btn btn-sm btn-ghost" onclick="logout()" data-i18n="logout">Logout</button>
           </div>
         </header>
         <main class="main">
-          <div class="card">
-            <h2>Products</h2>
-            <button class="btn btn-primary btn-sm" onclick="openModal()" style="margin-bottom:16px">+ Add Product</button>
+          <!-- Products -->
+          <div class="card" id="panelProducts">
+            <h2 data-i18n="tabProducts">Products</h2>
+            <button class="btn btn-primary btn-sm" onclick="openModal()" style="margin-bottom:16px" data-i18n="addProduct">+ Add Product</button>
             <div class="product-list" id="productList">Loading...</div>
+          </div>
+
+          <!-- Settings -->
+          <div class="card" id="panelSettings" style="display:none">
+            <h2 data-i18n="tabSettings">Site Settings</h2>
+            <p class="sub" data-i18n="settingsSub">Site title, logo, favicon, about and contact info (applied to the public site without redeploy)</p>
+            <form id="settingsForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="siteTitleEn">Site Title (EN)</label>
+                  <input type="text" id="site_title_en" placeholder="NovaGrid" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="siteTitleZh">Site Title (ZH)</label>
+                  <input type="text" id="site_title_zh" placeholder="新星网格" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="logoUrl">Logo URL (optional, replaces text logo)</label>
+                  <input type="url" id="logo_url" placeholder="https://example.com/logo.png" />
+                  <div class="hint" data-i18n="logoUrlHint">Leave empty to keep the default text logo</div>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="faviconUrl">Favicon URL (optional)</label>
+                  <input type="url" id="favicon_url" placeholder="https://example.com/favicon.ico" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="aboutTitleEn">About Title (EN)</label>
+                  <input type="text" id="about_title_en" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="aboutTitleZh">About Title (ZH)</label>
+                  <input type="text" id="about_title_zh" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="aboutBodyEn">About Body (EN)</label>
+                  <textarea id="about_body_en"></textarea>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="aboutBodyZh">About Body (ZH)</label>
+                  <textarea id="about_body_zh"></textarea>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label data-i18n="contactEmail">Contact Email</label>
+                  <input type="email" id="contact_email" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="contactPhone">Contact Phone</label>
+                  <input type="text" id="contact_phone" />
+                </div>
+              </div>
+              <div class="actions">
+                <button type="submit" class="btn btn-success" data-i18n="saveSettings">Save Settings</button>
+                <div class="status" id="settingsStatus"></div>
+              </div>
+            </form>
           </div>
         </main>
       </div>
     </div>
 
+    <!-- ============ PRODUCT MODAL ============ -->
     <div class="modal" id="productModal">
       <div class="modal-content">
         <h2 id="modalTitle">Add Product</h2>
         <form id="productForm">
           <div class="form-group">
-            <label>Slug * (URL 标识，英文小写)</label>
+            <label data-i18n="slugLabel">Slug * (URL identifier, lowercase)</label>
             <input type="text" id="slug" required placeholder="nova-ingest" />
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Name (EN) *</label>
+              <label data-i18n="nameEn">Name (EN) *</label>
               <input type="text" id="name_en" required />
             </div>
             <div class="form-group">
-              <label>Name (ZH) *</label>
+              <label data-i18n="nameZh">Name (ZH) *</label>
               <input type="text" id="name_zh" required />
             </div>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Tag (EN)</label>
+              <label data-i18n="tagEn">Tag (EN)</label>
               <input type="text" id="tag_en" placeholder="Streaming" />
             </div>
             <div class="form-group">
-              <label>Tag (ZH)</label>
+              <label data-i18n="tagZh">Tag (ZH)</label>
               <input type="text" id="tag_zh" placeholder="数据接入" />
             </div>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Short Description (EN)</label>
+              <label data-i18n="shortEn">Short Description (EN)</label>
               <textarea id="short_en"></textarea>
             </div>
             <div class="form-group">
-              <label>Short Description (ZH)</label>
+              <label data-i18n="shortZh">Short Description (ZH)</label>
               <textarea id="short_zh"></textarea>
             </div>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Description (EN)</label>
+              <label data-i18n="descEn">Description (EN)</label>
               <textarea id="description_en"></textarea>
             </div>
             <div class="form-group">
-              <label>Description (ZH)</label>
+              <label data-i18n="descZh">Description (ZH)</label>
               <textarea id="description_zh"></textarea>
             </div>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Highlights (EN, JSON 数组)</label>
+              <label data-i18n="hlEn">Highlights (EN, JSON array)</label>
               <input type="text" id="highlights_en" placeholder='["Fast", "Stable"]' />
             </div>
             <div class="form-group">
-              <label>Highlights (ZH, JSON 数组)</label>
+              <label data-i18n="hlZh">Highlights (ZH, JSON array)</label>
               <input type="text" id="highlights_zh" placeholder='["快速", "稳定"]' />
             </div>
           </div>
           <div class="form-group">
-            <label>Image URL * (图片外链)</label>
+            <label data-i18n="imageUrl">Image URL * (external link)</label>
             <input type="url" id="image_url" required placeholder="https://example.com/image.png" />
           </div>
           <div class="form-group">
-            <label>Position (排序，数字越小越靠前)</label>
+            <label data-i18n="position">Position (sort, lower first)</label>
             <input type="number" id="position" value="0" />
           </div>
           <div class="actions">
-            <button type="submit" class="btn btn-success">Save</button>
-            <button type="button" class="btn" onclick="closeModal()" style="background:var(--line)">Cancel</button>
+            <button type="submit" class="btn btn-success" data-i18n="save">Save</button>
+            <button type="button" class="btn" onclick="closeModal()" style="background:var(--line)" data-i18n="cancel">Cancel</button>
           </div>
         </form>
       </div>
     </div>
 
     <script>
-      let token = localStorage.getItem('admin_token');
-      const app = document.getElementById('app');
-      const loginScreen = document.getElementById('loginScreen');
-      const adminApp = document.getElementById('adminApp');
+      // ====== UI dictionary (EN / ZH) ======
+      var UI = {
+        en: {
+          loginTitle: 'Admin Login', loginSub: 'Enter your credentials to manage the site',
+          username: 'Username', password: 'Password', signIn: 'Sign In',
+          adminTitle: 'Site Admin', tabProducts: 'Products', tabSettings: 'Settings', logout: 'Logout',
+          addProduct: '+ Add Product',
+          loading: 'Loading...', noProducts: 'No products in database yet. Use "+ Add Product" to create one.',
+          failedLoad: 'Failed to load products', sessionExpired: 'Session expired, please sign in again.',
+          addProductTitle: 'Add Product', editProductTitle: 'Edit Product',
+          slugLabel: 'Slug * (URL identifier, lowercase)', nameEn: 'Name (EN) *', nameZh: 'Name (ZH) *',
+          tagEn: 'Tag (EN)', tagZh: 'Tag (ZH)', shortEn: 'Short Description (EN)', shortZh: 'Short Description (ZH)',
+          descEn: 'Description (EN)', descZh: 'Description (ZH)',
+          hlEn: 'Highlights (EN, JSON array)', hlZh: 'Highlights (ZH, JSON array)',
+          imageUrl: 'Image URL * (external link)', position: 'Position (sort, lower first)',
+          save: 'Save', cancel: 'Cancel', edit: 'Edit', delete: 'Delete',
+          settingsSub: 'Site title, logo, favicon, about and contact info (applied to the public site without redeploy)',
+          siteTitleEn: 'Site Title (EN)', siteTitleZh: 'Site Title (ZH)',
+          logoUrl: 'Logo URL (optional, replaces text logo)', logoUrlHint: 'Leave empty to keep the default text logo',
+          faviconUrl: 'Favicon URL (optional)', aboutTitleEn: 'About Title (EN)', aboutTitleZh: 'About Title (ZH)',
+          aboutBodyEn: 'About Body (EN)', aboutBodyZh: 'About Body (ZH)',
+          contactEmail: 'Contact Email', contactPhone: 'Contact Phone',
+          saveSettings: 'Save Settings', saved: 'Settings saved. Refresh the public site to see changes.',
+          saveFailed: 'Save failed: ', deleteConfirm: 'Delete product',
+          deleteFailed: 'Delete failed: ', loginFailed: 'Login failed',
+        },
+        zh: {
+          loginTitle: '管理员登录', loginSub: '请输入凭据以管理站点',
+          username: '用户名', password: '密码', signIn: '登录',
+          adminTitle: '站点管理', tabProducts: '产品管理', tabSettings: '站点设置', logout: '退出登录',
+          addProduct: '+ 新增产品',
+          loading: '加载中...', noProducts: '数据库中暂无产品。点击"+ 新增产品"创建。',
+          failedLoad: '产品加载失败', sessionExpired: '登录已过期，请重新登录。',
+          addProductTitle: '新增产品', editProductTitle: '编辑产品',
+          slugLabel: 'Slug *（URL 标识，英文小写）', nameEn: '名称（英文）*', nameZh: '名称（中文）*',
+          tagEn: '标签（英文）', tagZh: '标签（中文）', shortEn: '简介（英文）', shortZh: '简介（中文）',
+          descEn: '详细描述（英文）', descZh: '详细描述（中文）',
+          hlEn: '亮点（英文，JSON 数组）', hlZh: '亮点（中文，JSON 数组）',
+          imageUrl: '图片 URL *（外链）', position: '排序（数字越小越靠前）',
+          save: '保存', cancel: '取消', edit: '编辑', delete: '删除',
+          settingsSub: '站点标题、Logo、Favicon、关于我们和联系方式（保存后前台实时生效，无需重新部署）',
+          siteTitleEn: '站点标题（英文）', siteTitleZh: '站点标题（中文）',
+          logoUrl: 'Logo 图片 URL（可选，替换文字 Logo）', logoUrlHint: '留空则使用默认文字 Logo',
+          faviconUrl: 'Favicon URL（可选）', aboutTitleEn: '关于我们标题（英文）', aboutTitleZh: '关于我们标题（中文）',
+          aboutBodyEn: '关于我们内容（英文）', aboutBodyZh: '关于我们内容（中文）',
+          contactEmail: '联系邮箱', contactPhone: '联系电话',
+          saveSettings: '保存设置', saved: '设置已保存，刷新前台即可生效。',
+          saveFailed: '保存失败：', deleteConfirm: '删除产品',
+          deleteFailed: '删除失败：', loginFailed: '登录失败',
+        }
+      };
+
+      var curLang = 'en';
+      try {
+        var savedLang = localStorage.getItem('admin_lang');
+        if (savedLang === 'en' || savedLang === 'zh') curLang = savedLang;
+      } catch (e) { /* ignore */ }
+
+      function ui(key) { return (UI[curLang] && UI[curLang][key]) || UI.en[key] || key; }
+
+      function applyUi() {
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n');
+          if (key && UI.en[key]) el.textContent = ui(key);
+        });
+        document.querySelectorAll('[data-lang-btn]').forEach(function (b) {
+          b.classList.toggle('active', b.getAttribute('data-lang-btn') === curLang);
+        });
+        document.documentElement.lang = curLang === 'zh' ? 'zh-Hans' : 'en';
+      }
+      function setUiLang(l) {
+        curLang = l;
+        try { localStorage.setItem('admin_lang', l); } catch (e) { /* ignore */ }
+        applyUi();
+        refreshDynamicTexts();
+      }
+      function refreshDynamicTexts() {
+        var mt = document.getElementById('modalTitle');
+        if (mt) mt.textContent = ui(modalProduct ? 'editProductTitle' : 'addProductTitle');
+      }
+
+      // ====== State ======
+      var token = null;
+      try { token = localStorage.getItem('admin_token'); } catch (e) { /* ignore */ }
+      var modalProduct = null;
+      var app = document.getElementById('app');
+      var loginScreen = document.getElementById('loginScreen');
+      var adminApp = document.getElementById('adminApp');
 
       // Theme toggle
-      const themeToggle = document.getElementById('themeToggle');
+      var themeToggle = document.getElementById('themeToggle');
       function currentTheme() {
         try {
-          const s = localStorage.getItem('theme');
+          var s = localStorage.getItem('theme');
           if (s === 'light' || s === 'dark') return s;
         } catch (e) { /* ignore */ }
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       function syncThemeIcon() {
-        if (!themeToggle) return;
-        themeToggle.textContent = currentTheme() === 'dark' ? '☀️' : '🌙';
+        if (themeToggle) themeToggle.textContent = currentTheme() === 'dark' ? '☀️' : '🌙';
       }
       if (themeToggle) {
         syncThemeIcon();
-        themeToggle.addEventListener('click', () => {
-          const next = currentTheme() === 'dark' ? 'light' : 'dark';
+        themeToggle.addEventListener('click', function () {
+          var next = currentTheme() === 'dark' ? 'light' : 'dark';
           document.documentElement.dataset.theme = next;
           try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
           syncThemeIcon();
         });
       }
 
-      // Check session
-      if (token) {
-        showAdmin();
-      } else {
-        loginScreen.style.display = 'flex';
-      }
-
-      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      // ====== Auth ======
+      document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorEl = document.getElementById('loginError');
-
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        var errorEl = document.getElementById('loginError');
         try {
-          const resp = await fetch('/api/auth', {
+          var resp = await fetch('/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ username: username, password: password })
           });
-          const data = await resp.json();
-          
+          var data = await resp.json();
           if (data.ok) {
             token = data.token;
-            localStorage.setItem('admin_token', token);
+            try { localStorage.setItem('admin_token', token); } catch (err) { /* ignore */ }
             showAdmin();
           } else {
-            errorEl.textContent = data.message || 'Login failed';
+            errorEl.textContent = data.message || ui('loginFailed');
           }
         } catch (err) {
           errorEl.textContent = 'Network error';
@@ -261,66 +415,93 @@ const { locale } = Astro.props;
       function showAdmin() {
         loginScreen.style.display = 'none';
         adminApp.style.display = 'flex';
-        loadProducts();
+        applyUi();
+        switchTab('products');
       }
 
       function logout() {
         token = null;
-        localStorage.removeItem('admin_token');
+        modalProduct = null;
+        try { localStorage.removeItem('admin_token'); } catch (e) { /* ignore */ }
         loginScreen.style.display = 'flex';
         adminApp.style.display = 'none';
+        applyUi();
       }
 
-      async function loadProducts() {
-        const list = document.getElementById('productList');
-        list.innerHTML = 'Loading...';
+      function sessionExpired() {
+        logout();
+        var el = document.getElementById('loginError');
+        if (el) el.textContent = ui('sessionExpired');
+      }
 
-        try {
-          const resp = await fetch('/api/admin/products', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const products = await resp.json();
-          
-          if (!products || products.length === 0) {
-            list.innerHTML = '<div style="color:#888;padding:16px;">No products in database. Use "+ Add Product" to create one. (提示：请执行 D1 迁移脚本创建表)</div>';
-            return;
-          }
-          
-          list.innerHTML = products.map(p => `
-            <div class="product-item">
-              <img src="${p.image_url}" alt="${p.name_en}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 60%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2260%22/><text x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22>No Image</text></svg>'">
-              <div class="product-info">
-                <h3>${p.name_en} / ${p.name_zh}</h3>
-                <p>${p.short_en}</p>
-              </div>
-              <button class="btn btn-sm" onclick='editProduct(${JSON.stringify(p)})'>Edit</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.slug}')">Delete</button>
-            </div>
-          `).join('');
-        } catch (err) {
-          list.innerHTML = 'Failed to load products';
+      // ====== Tabs ======
+      function switchTab(name) {
+        var p = document.getElementById('panelProducts');
+        var s = document.getElementById('panelSettings');
+        var pb = document.getElementById('tabProductsBtn');
+        var sb = document.getElementById('tabSettingsBtn');
+        if (name === 'settings') {
+          p.style.display = 'none'; s.style.display = 'block';
+          pb.classList.remove('active'); sb.classList.add('active');
+          loadSettings();
+        } else {
+          s.style.display = 'none'; p.style.display = 'block';
+          sb.classList.remove('active'); pb.classList.add('active');
+          loadProducts();
         }
       }
 
-      function openModal(product = null) {
-        document.getElementById('productModal').classList.add('active');
-        document.getElementById('modalTitle').textContent = product ? 'Edit Product' : 'Add Product';
-        document.getElementById('slug').disabled = !!product;
+      // ====== Products ======
+      async function loadProducts() {
+        if (!token) return;
+        var list = document.getElementById('productList');
+        list.innerHTML = ui('loading');
+        try {
+          var resp = await fetch('/api/admin/products', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (resp.status === 401) { sessionExpired(); return; }
+          var products = await resp.json();
+          if (!Array.isArray(products)) throw new Error('bad response');
+          if (products.length === 0) {
+            list.innerHTML = '<div style="color:#888;padding:16px;">' + ui('noProducts') + '</div>';
+            return;
+          }
+          list.innerHTML = products.map(function (p) {
+            var img = p.image_url
+              ? '<img src="' + p.image_url + '" alt="' + (p.name_en || '') + '" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 60%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2260%22/><text x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22>No Image</text></svg>\'">'
+              : '';
+            return '<div class="product-item">' + img +
+              '<div class="product-info"><h3>' + (p.name_en || '') + ' / ' + (p.name_zh || '') + '</h3>' +
+              '<p>' + (p.short_en || '') + '</p></div>' +
+              '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>' +
+              '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>' +
+              '</div>';
+          }).join('');
+        } catch (err) {
+          list.innerHTML = '<div style="color:#dc2626;padding:16px;">' + ui('failedLoad') + '</div>';
+        }
+      }
 
-        if (product) {
-          document.getElementById('slug').value = product.slug;
-          document.getElementById('position').value = product.position || 0;
-          document.getElementById('name_en').value = product.name_en || '';
-          document.getElementById('name_zh').value = product.name_zh || '';
-          document.getElementById('tag_en').value = product.tag_en || '';
-          document.getElementById('tag_zh').value = product.tag_zh || '';
-          document.getElementById('short_en').value = product.short_en || '';
-          document.getElementById('short_zh').value = product.short_zh || '';
-          document.getElementById('description_en').value = product.description_en || '';
-          document.getElementById('description_zh').value = product.description_zh || '';
-          document.getElementById('highlights_en').value = product.highlights_en || '[]';
-          document.getElementById('highlights_zh').value = product.highlights_zh || '[]';
-          document.getElementById('image_url').value = product.image_url || '';
+      function openModal(product) {
+        modalProduct = product || null;
+        document.getElementById('productModal').classList.add('active');
+        document.getElementById('modalTitle').textContent = ui(modalProduct ? 'editProductTitle' : 'addProductTitle');
+        document.getElementById('slug').disabled = !!modalProduct;
+        if (modalProduct) {
+          document.getElementById('slug').value = modalProduct.slug || '';
+          document.getElementById('position').value = modalProduct.position || 0;
+          document.getElementById('name_en').value = modalProduct.name_en || '';
+          document.getElementById('name_zh').value = modalProduct.name_zh || '';
+          document.getElementById('tag_en').value = modalProduct.tag_en || '';
+          document.getElementById('tag_zh').value = modalProduct.tag_zh || '';
+          document.getElementById('short_en').value = modalProduct.short_en || '';
+          document.getElementById('short_zh').value = modalProduct.short_zh || '';
+          document.getElementById('description_en').value = modalProduct.description_en || '';
+          document.getElementById('description_zh').value = modalProduct.description_zh || '';
+          document.getElementById('highlights_en').value = modalProduct.highlights_en || '[]';
+          document.getElementById('highlights_zh').value = modalProduct.highlights_zh || '[]';
+          document.getElementById('image_url').value = modalProduct.image_url || '';
         } else {
           document.getElementById('productForm').reset();
           document.getElementById('position').value = '0';
@@ -329,23 +510,22 @@ const { locale } = Astro.props;
 
       function closeModal() {
         document.getElementById('productModal').classList.remove('active');
+        modalProduct = null;
       }
 
-      function editProduct(product) {
-        openModal(product);
-      }
+      function editProduct(product) { openModal(product); }
 
       async function deleteProduct(slug) {
-        if (!confirm(`Delete product "${slug}"? 确认删除？`)) return;
-
+        if (!confirm(ui('deleteConfirm') + ' "' + slug + '"?')) return;
         try {
-          const resp = await fetch(`/api/products/delete?slug=${encodeURIComponent(slug)}`, {
+          var resp = await fetch('/api/products/delete?slug=' + encodeURIComponent(slug), {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': 'Bearer ' + token }
           });
-          const data = await resp.json();
+          if (resp.status === 401) { sessionExpired(); return; }
+          var data = await resp.json();
           if (!data.ok) {
-            alert('Delete failed: ' + (data.message || 'unknown error'));
+            alert(ui('deleteFailed') + (data.message || 'unknown error'));
             return;
           }
           loadProducts();
@@ -354,10 +534,9 @@ const { locale } = Astro.props;
         }
       }
 
-      document.getElementById('productForm').addEventListener('submit', async (e) => {
+      document.getElementById('productForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-
-        const data = {
+        var data = {
           slug: document.getElementById('slug').value.trim(),
           position: parseInt(document.getElementById('position').value, 10) || 0,
           name_en: document.getElementById('name_en').value,
@@ -370,22 +549,22 @@ const { locale } = Astro.props;
           description_zh: document.getElementById('description_zh').value,
           highlights_en: document.getElementById('highlights_en').value || '[]',
           highlights_zh: document.getElementById('highlights_zh').value || '[]',
-          image_url: document.getElementById('image_url').value,
+          image_url: document.getElementById('image_url').value
         };
-
         try {
-          const resp = await fetch('/api/products', {
+          var resp = await fetch('/api/products', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+              'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(data)
           });
-          const result = await resp.json();
+          if (resp.status === 401) { sessionExpired(); return; }
+          var result = await resp.json();
           if (!result.ok) {
-            alert('Save failed: ' + (result.message || 'unknown error') +
-              (result.message === 'Database not available' ? '（请确认 D1 数据库已绑定并执行过迁移脚本）' : ''));
+            alert(ui('saveFailed') + (result.message || 'unknown error') +
+              (result.message === 'Database not available' ? '（请确认 D1 数据库已绑定）' : ''));
             return;
           }
           closeModal();
@@ -395,10 +574,91 @@ const { locale } = Astro.props;
         }
       });
 
-      // Close modal on outside click
-      document.getElementById('productModal').addEventListener('click', (e) => {
+      // ====== Settings ======
+      async function loadSettings() {
+        if (!token) return;
+        try {
+          var resp = await fetch('/api/settings', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (resp.status === 401) { sessionExpired(); return; }
+          var s = await resp.json();
+          if (!s || typeof s !== 'object') return;
+          var map = {
+            site_title_en: 'site_title_en', site_title_zh: 'site_title_zh',
+            logo_url: 'logo_url', favicon_url: 'favicon_url',
+            about_title_en: 'about_title_en', about_title_zh: 'about_title_zh',
+            about_body_en: 'about_body_en', about_body_zh: 'about_body_zh',
+            contact_email: 'contact_email', contact_phone: 'contact_phone'
+          };
+          Object.keys(map).forEach(function (key) {
+            var el = document.getElementById(map[key]);
+            if (el && s[key] !== undefined && s[key] !== null) el.value = s[key];
+          });
+        } catch (err) { /* keep empty */ }
+      }
+
+      document.getElementById('settingsForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var data = {
+          site_title_en: document.getElementById('site_title_en').value,
+          site_title_zh: document.getElementById('site_title_zh').value,
+          logo_url: document.getElementById('logo_url').value,
+          favicon_url: document.getElementById('favicon_url').value,
+          about_title_en: document.getElementById('about_title_en').value,
+          about_title_zh: document.getElementById('about_title_zh').value,
+          about_body_en: document.getElementById('about_body_en').value,
+          about_body_zh: document.getElementById('about_body_zh').value,
+          contact_email: document.getElementById('contact_email').value,
+          contact_phone: document.getElementById('contact_phone').value
+        };
+        var statusEl = document.getElementById('settingsStatus');
+        statusEl.className = 'status';
+        statusEl.textContent = '';
+        try {
+          var resp = await fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+          });
+          if (resp.status === 401) { sessionExpired(); return; }
+          var result = await resp.json();
+          if (result.ok) {
+            statusEl.className = 'status ok';
+            statusEl.textContent = ui('saved');
+          } else {
+            statusEl.className = 'status err';
+            statusEl.textContent = ui('saveFailed') + (result.message || '');
+          }
+        } catch (err) {
+          statusEl.className = 'status err';
+          statusEl.textContent = 'Network error';
+        }
+      });
+
+      document.getElementById('productModal').addEventListener('click', function (e) {
         if (e.target.id === 'productModal') closeModal();
       });
+
+      // ====== Boot ======
+      applyUi();
+      if (token) {
+        showAdmin();
+      } else {
+        loginScreen.style.display = 'flex';
+      }
+
+      // Expose handlers used by inline onclick attributes
+      window.setUiLang = setUiLang;
+      window.switchTab = switchTab;
+      window.logout = logout;
+      window.openModal = openModal;
+      window.closeModal = closeModal;
+      window.editProduct = editProduct;
+      window.deleteProduct = deleteProduct;
     </script>
   </body>
 </html>

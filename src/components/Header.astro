@@ -22,7 +22,7 @@ const section = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
           <path d="M4 16 V8 M9 16 V4 M14 16 V7 M19 16 V10" />
         </svg>
       </span>
-      <span>{t(locale, 'brand')}</span>
+      <span data-site-logo>{t(locale, 'brand')}</span>
     </a>
 
     <nav class="main-nav" data-nav aria-label="Primary">

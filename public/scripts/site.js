@@ -97,4 +97,43 @@
   } else {
     revealEls.forEach(function (el) { el.classList.add('in'); });
   }
+
+  // ---- Site settings (public /api/settings) ------------------------------
+  // Applies admin-configured site title, favicon, logo, about and contact
+  // info at runtime, so a content change needs no rebuild/redeploy.
+  function applySiteSettings() {
+    fetch('/api/settings', { headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (s) {
+        if (!s || typeof s !== 'object') return;
+        var locale = /^\/zh\//.test(window.location.pathname) ? 'zh' : 'en';
+        var title = s['site_title_' + locale] || s.site_title_en;
+        if (title) document.title = title;
+
+        if (s.favicon_url) {
+          var icon = document.querySelector('link[rel="icon"]');
+          if (icon) icon.href = s.favicon_url;
+        }
+
+        if (s.logo_url) {
+          var logoLink = document.querySelector('a.logo');
+          if (logoLink) {
+            var img = document.createElement('img');
+            img.src = s.logo_url;
+            img.alt = title || '';
+            img.style.cssText = 'height:30px;width:auto;display:block;';
+            logoLink.innerHTML = '';
+            logoLink.appendChild(img);
+          }
+        }
+
+        var at = s['about_title_' + locale], ab = s['about_body_' + locale];
+        if (at) { var atEl = document.querySelector('[data-about-title]'); if (atEl) atEl.textContent = at; }
+        if (ab) { var abEl = document.querySelector('[data-about-body]'); if (abEl) abEl.textContent = ab; }
+        if (s.contact_email) { var ceEl = document.querySelector('[data-contact-email]'); if (ceEl) ceEl.textContent = s.contact_email; }
+        if (s.contact_phone) { var cpEl = document.querySelector('[data-contact-phone]'); if (cpEl) cpEl.textContent = s.contact_phone; }
+      })
+      .catch(function () { /* keep the statically rendered content */ });
+  }
+  applySiteSettings();
 })();

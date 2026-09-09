@@ -36,3 +36,6 @@ Thumbs.db
 
 # Wrangler state
 .wrangler/
+
+# Wrangler local vars (local-only test credentials)
+.dev.vars

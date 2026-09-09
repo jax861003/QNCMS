@@ -8,12 +8,13 @@
 
 ## 特性
 
-- 🌐 **多语言**：内置 `en` / `zh`（URL 前缀 `/en/...` `/zh/...`），右上角**下拉菜单**切换；新增语言只需改一处配置 + 复制页面目录（见下方「添加新语言」）
-- 🛒 **产品管理后台**：`/admin` 登录后增删改产品，写入 D1 实时生效，无需重新部署
-- 🔌 **前后端分离**：`functions/` 提供 REST API，静态页面通过 API 读取数据；无 D1 绑定或表为空时自动回退到内置示例数据，站点永不空白
+- 🌐 **多语言**：内置 `en` / `zh`（URL 前缀 `/en/...` `/zh/...`），右上角**下拉菜单**切换；后台管理界面也支持**中英文一键切换**；新增语言只需改一处配置 + 复制页面目录（见下方「添加新语言」）
+- 🛒 **产品管理后台**：`/admin` 登录后增删改产品，写入 D1 实时生效（API 层），无需重新部署
+- ⚙️ **站点设置后台**：`/admin` 的「站点设置」页可修改**网页标题、Logo、Favicon、关于我们、联系方式**，保存后前台**实时应用**（客户端读取 `/api/settings`），无需重新部署
+- 🔌 **前后端分离**：`functions/` 提供 REST API；前台页面构建时使用内置示例数据（SEO 友好），站点永不空白
 - 🗄️ **D1 自动建表**：数据库绑定后首次请求自动创建 `products` / `settings` 表，**无需手动执行迁移**
 - 🔑 **灵活的登录凭证**：支持明文密码（`ADMIN_PASSWORD`，推荐）或 SHA-256 哈希（`ADMIN_PASSWORD_HASH`），见「环境变量」
-- 🌙 **暗黑模式**：右上角一键切换，`localStorage` 记忆选择，跟随系统偏好作为默认值
+- 🌙 **暗黑模式**：前台与后台均支持一键切换，`localStorage` 记忆选择，跟随系统偏好作为默认值
 - 🖼️ **外链产品图**：图片使用 URL，无需对象存储，零额外费用
 - ⚡ **Cloudflare CDN**：全球边缘节点、自动 HTTPS，Git 推送即部署
 - 📱 **响应式**：全设备适配，移动端汉堡菜单
@@ -101,7 +102,12 @@ node -e "console.log(require('crypto').createHash('sha256').update('your_passwor
 
 - 访问：`https://<your-project>.pages.dev/admin/`
 - 登录：`ADMIN_USERNAME` + 密码（`ADMIN_PASSWORD` 或对应 `ADMIN_PASSWORD_HASH` 的明文）
-- 功能：新增 / 编辑 / 删除产品（双语字段、排序、图片 URL），保存即写入 D1
+- 界面语言：右上角 **EN / 中文** 按钮一键切换后台界面语言，选择会记忆在浏览器中
+- 功能：
+  - **产品管理**：新增 / 编辑 / 删除产品（双语字段、排序、图片 URL），保存即写入 D1
+  - **站点设置**：修改网页标题（双语）、Logo、Favicon、关于我们（双语）、联系方式，保存后前台实时生效
+
+> 提示：如果后台提示「Failed to load products」，多半是浏览器里残留了旧的登录凭据，刷新页面重新登录即可（登录凭据失效时会自动跳回登录页）。
 
 ### 产品字段
 
@@ -133,7 +139,8 @@ QNCMS/
 │       │   └── delete.js       # DELETE /api/products/delete?slug=（需认证）
 │       ├── admin/
 │       │   └── products.js     # GET /api/admin/products 双语完整数据（需认证）
-│       ├── settings.js         # GET/POST /api/settings 站点设置（需认证）
+│       ├── settings.js         # GET /api/settings 站点设置（公开，前台读取）
+│       │                       # POST /api/settings 保存设置（需认证）
 │       └── contact.js          # POST /api/contact 联系表单
 ├── src/
 │   ├── i18n/
@@ -229,7 +236,7 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 | POST | `/api/products/create` | Bearer token | 新增产品（别名） |
 | DELETE | `/api/products/delete?slug=x` | Bearer token | 删除产品 |
 | GET | `/api/admin/products` | Bearer token | 双语完整字段（后台编辑用） |
-| GET/POST | `/api/settings` | Bearer token | 站点设置读写 |
+| GET/POST | `/api/settings` | GET 公开 / POST 需认证 | 站点设置读取（前台用）/ 保存（后台用） |
 | POST | `/api/contact` | 否 | 联系表单 |
 
 > 认证方式：请求头 `Authorization: Bearer <token>`（后台登录后自动附带）。
