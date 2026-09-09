@@ -57,6 +57,12 @@ function esc(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+function splitTagsHtml(t) {
+  var list = String(t || '').split(/[,，、;；|]/).map(function (s) { return s.trim(); }).filter(Boolean);
+  if (!list.length) return '';
+  return '<div class="d-tags">' + list.map(function (tg) { return '<span class="d-tag">' + esc(tg) + '</span>'; }).join('') + '</div>';
+}
+
 function shellHtml(p, locale, settings) {
   const L = locale === 'zh' ? {
     back: '返回产品列表', overview: '产品概述', highlights: '核心亮点',
@@ -136,7 +142,7 @@ function shellHtml(p, locale, settings) {
   '.section{min-height:calc(100vh - 68px)}.detail-wrap{max-width:1040px;margin:0 auto;padding:44px 24px 80px}' +
   '.d-back{display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);text-decoration:none;font-weight:600;margin-bottom:28px;transition:color .2s}.d-back:hover{color:var(--brand)}' +
   '.d-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center;margin-bottom:44px}@media(max-width:760px){.d-hero{grid-template-columns:1fr}.main-nav .nav-cta{display:none}}' +
-  '.d-tag{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--bg-muted);color:var(--brand);font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:12px;margin-bottom:14px}' +
+  '.d-tag{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--bg-muted);color:var(--brand);font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}' +  '.d-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;margin-bottom:14px}' +  '.overview-block{grid-column:1/-1;background:var(--bg-muted);border:1px solid var(--line);border-radius:14px;padding:30px 32px}' +  '.overview-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}' +  '.overview-head h3{font-size:1.25rem;margin:0;padding-left:12px;border-left:4px solid var(--brand)}' +  '.overview-head::after{content:"";flex:1;height:1px;background:var(--line)}' +  '.overview-block .md{color:var(--ink-soft);line-height:1.75}' +
   '.md h1,.md h2,.md h3{margin:18px 0 8px;font-size:1.15rem}.md h1{font-size:1.35rem}.md h2{font-size:1.25rem}.md p{margin:0 0 12px}.md ul,.md ol{margin:0 0 12px;padding-left:22px}.md li{margin-bottom:6px}.md a{color:var(--brand);text-decoration:underline}.md pre{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;margin:0 0 12px}.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}.md pre code{border:none;padding:0;background:transparent}' +
   '.d-hero h1{font-size:clamp(1.9rem,3.4vw,2.7rem);margin:0 0 14px;line-height:1.15}' +
   '.d-lead{color:var(--ink-soft);font-size:1.08rem;margin:0 0 18px;line-height:1.6}' +
@@ -196,7 +202,7 @@ function shellHtml(p, locale, settings) {
   '<a class="d-back" href="/' + locale + '/products/">← ' + L.back + '</a>' +
   '<div class="d-hero"><div>' +
   '<h1>' + esc(p.name) + '</h1>' +
-  (p.tag ? '<span class="d-tag">' + esc(p.tag) + '</span>' : '') +
+  splitTagsHtml(p.tag) +
   '<p class="d-lead">' + esc(p.short || '') + '</p>' +
   '<div class="detail-meta">' + category + price + '</div>' +
   (p.buy_url
@@ -204,7 +210,7 @@ function shellHtml(p, locale, settings) {
     : '<a class="d-buy" href="/' + locale + '/contact/">' + L.contact + '</a>') +
   '</div>' + img + '</div>' +
   '<div class="d-blocks">' +
-  (desc ? '<div class="detail-block"><h3>' + L.overview + '</h3><div class="md">' + renderMd(desc) + '</div></div>' : '') +
+  (desc ? '<div class="overview-block"><div class="overview-head"><h3>' + L.overview + '</h3></div><div class="md">' + renderMd(desc) + '</div></div>' : '') +
   features +
   '</div></div></main>' +
 

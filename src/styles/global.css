@@ -549,10 +549,18 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 .product-card:hover .product-thumb img {
   transform: scale(1.05);
 }
-.product-tag {
+.product-tags {
   position: absolute;
   top: 14px;
   left: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: calc(100% - 28px);
+  z-index: 1;
+}
+.product-tag {
+  display: inline-block;
   padding: 5px 12px;
   border-radius: 999px;
   background: var(--tag-bg);
@@ -634,6 +642,41 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 }
 .detail-block p {
   color: var(--ink-soft);
+}
+/* Overview gets its own header bar, visually separated from the body text */
+.overview-block {
+  grid-column: 1 / -1;
+  background: var(--bg-muted);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 30px 32px;
+}
+.overview-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.overview-head h3 {
+  font-size: 1.25rem;
+  margin: 0;
+  padding-left: 12px;
+  border-left: 4px solid var(--brand);
+  letter-spacing: -0.01em;
+}
+.overview-head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.overview-block .md {
+  color: var(--ink-soft);
+  line-height: 1.75;
+}
+@media (max-width: 760px) {
+  .overview-block { padding: 24px 20px; }
+  .detail-blocks { grid-template-columns: 1fr; }
 }
 .feature-list {
   display: grid;

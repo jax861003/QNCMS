@@ -9,16 +9,20 @@ interface Props {
   learnMore: string;
 }
 const { product, locale, learnMore } = Astro.props;
+const tags = String(product.tag || '').split(/[,，、;；|]/).map((s) => s.trim()).filter(Boolean);
 ---
 
 <a class="product-card" href={`/${locale}/products/${product.slug}/`} data-slug={product.slug} data-reveal>
   <div class="product-thumb">
     <img src={product.image} alt={product.name} loading="lazy" width="640" height="400" />
-    <span class="product-tag">{product.tag}</span>
+    {tags.length > 0 && (
+      <div class="product-tags">
+        {tags.map((tg) => <span class="product-tag">{tg}</span>)}
+      </div>
+    )}
   </div>
   <div class="product-body">
     <h3>{product.name}</h3>
-    {product.price ? <span style="color:var(--brand);font-weight:700;font-size:1rem;">{product.price}</span> : ''}
     <p>{product.short}</p>
     <span class="product-link">
       {learnMore}

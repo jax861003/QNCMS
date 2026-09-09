@@ -15,7 +15,13 @@ const learnMore = locale === 'zh' ? '了解更多' : 'Learn more';
       <a class="product-card" href={`/${locale}/products/${p.slug}/`} data-slug={p.slug} data-reveal>
         <div class="product-thumb">
           <img src={p.image_url} alt={p.name} loading="lazy" width="640" height="400" />
-          {p.tag && <span class="product-tag">{p.tag}</span>}
+          {String(p.tag || '').split(/[,，、;；|]/).map((s) => s.trim()).filter(Boolean).length > 0 && (
+            <div class="product-tags">
+              {String(p.tag || '').split(/[,，、;；|]/).map((s) => s.trim()).filter(Boolean).map((tg) => (
+                <span class="product-tag">{tg}</span>
+              ))}
+            </div>
+          )}
         </div>
         <div class="product-body">
           <h3>{p.name}</h3>
@@ -43,7 +49,8 @@ const learnMore = locale === 'zh' ? '了解更多' : 'Learn more';
 .product-thumb { position: relative; overflow: hidden; background: var(--bg-muted); }
 .product-thumb img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform .6s var(--ease); }
 .product-card:hover .product-thumb img { transform: scale(1.05); }
-.product-tag { position: absolute; top: 14px; left: 14px; padding: 5px 12px; border-radius: 999px; background: #ffffffeb; backdrop-filter: blur(6px); font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); }
+.product-tags { position: absolute; top: 14px; left: 14px; display: flex; flex-wrap: wrap; gap: 6px; max-width: calc(100% - 28px); z-index: 1; }
+.product-tag { display: inline-block; padding: 5px 12px; border-radius: 999px; background: #ffffffeb; backdrop-filter: blur(6px); font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); }
 .product-body { padding: 26px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .product-body h3 { font-size: 1.3rem; }
 .product-body p { color: var(--ink-soft); font-size: .98rem; flex: 1; }

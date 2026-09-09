@@ -21,7 +21,11 @@ const product = getProduct(slug, locale)!;
     <div class="detail-hero">
       <div>
         <h1>{product.name}</h1>
-        {product.tag ? <span class="product-tag" style="position:static; display:inline-block; margin-top:12px; margin-bottom:16px;">{product.tag}</span> : ''}
+        {(() => { const tags = String(product.tag || '').split(/[,，、;；|]/).map((s) => s.trim()).filter(Boolean); return tags.length > 0 ? (
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;margin-bottom:16px">
+            {tags.map((tg) => <span class="product-tag" style="position:static;display:inline-block">{tg}</span>)}
+          </div>
+        ) : ''; })()}
         <p class="lead">{product.short}</p>
         {product.price ? <div style="font-size:1.6rem;font-weight:800;color:var(--brand);margin-bottom:18px;">{product.price}</div> : ''}
 
@@ -35,8 +39,10 @@ const product = getProduct(slug, locale)!;
     </div>
 
     <div class="detail-blocks">
-      <div class="detail-block">
-        <h3>{t(locale, 'productDetail.overview')}</h3>
+      <div class="overview-block">
+        <div class="overview-head">
+          <h3>{t(locale, 'productDetail.overview')}</h3>
+        </div>
         <div class="md" set:html={renderMd(product.description)} />
       </div>
       <div class="detail-block">

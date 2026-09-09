@@ -337,14 +337,14 @@
           var cat = locale === 'zh' ? (p.category_zh || p.category_en || '') : (p.category_en || p.category_zh || '');
           var tag = locale === 'zh' ? (p.tag_zh || p.tag_en || '') : (p.tag_en || p.tag_zh || '');
           var short = locale === 'zh' ? (p.short_zh || p.short_en || '') : (p.short_en || p.short_zh || '');
-          var tagHtml = tag ? '<span class="product-tag">' + tag + '</span>' : '';
+          var tagList = String(tag || '').split(/[,，、;；|]/).map(function (s) { return s.trim(); }).filter(Boolean);
+          var tagHtml = tagList.length ? '<div class="product-tags">' + tagList.map(function (tg) { return '<span class="product-tag">' + tg + '</span>'; }).join('') + '</div>' : '';
           var img = p.image_url
             ? '<img src="' + p.image_url + '" alt="' + name + '" loading="lazy" width="640" height="400" onerror="this.src=\'' + placeholder + '\'" />'
             : '<img src="' + placeholder + '" alt="' + name + '" loading="lazy" width="640" height="400" />';
           return '<a class="product-card' + (isStatic ? '' : ' is-dynamic') + '" href="' + href + '" data-slug="' + p.slug + '" data-cat="' + cat + '" data-name="' + name.toLowerCase() + '" data-reveal>' +
             '<div class="product-thumb">' + img + tagHtml + '</div>' +
             '<div class="product-body"><h3>' + name + '</h3>' +
-            (p.price ? '<span style="color:var(--brand);font-weight:700;font-size:1rem;">' + p.price + '</span>' : '') +
             '<p>' + short + '</p>' +
             '<span class="product-link">' + learn +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>';

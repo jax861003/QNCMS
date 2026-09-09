@@ -131,7 +131,7 @@ import { locales, localeNames } from '@/lib/i18n';
             box.innerHTML =
               '<a class="fb-back" href="/' + locale + '/products/">← ' + L.back + '</a>' +
               '<div class="fb-hero">' +
-                '<div><span class="fb-tag">' + (p.tag || '') + '</span>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:6px">' + String(p.tag || '').split(/[,，、;；|]/).map(function (s) { return s.trim(); }).filter(Boolean).map(function (tg) { return '<span class="fb-tag">' + tg + '</span>'; }).join('') + '</div>' +
                 '<h1>' + (p.name || '') + '</h1>' +
                 '<p class="fb-lead">' + (p.short || '') + '</p>' +
                 price +
