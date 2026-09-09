@@ -178,6 +178,18 @@
         background: var(--brand); color: #fff; font-size: .78rem; font-weight: 700;
       }
       .template-card .btn { justify-self: start; }
+          .lang-abbr {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 24px; height: 22px; padding: 0 5px;
+        border-radius: 6px; background: var(--bg-soft);
+        color: var(--brand); font-size: .7rem; font-weight: 800; letter-spacing: .04em;
+      }
+      .lang-opt.active .lang-abbr { background: var(--brand); color: #fff; }
+
+      /* Template (color scheme) overrides — admin UI preview follows the applied template */
+      html[data-variant="ocean"] { --brand: #0e7490; --brand-grad: linear-gradient(135deg,#06b6d4,#2563eb); }
+      html[data-variant="forest"] { --brand: #059669; --brand-grad: linear-gradient(135deg,#10b981,#0d9488); }
+      html[data-variant="sunset"] { --brand: #ea580c; --brand-grad: linear-gradient(135deg,#f97316,#db2777); }
     </style>
   </head>
   <body>
@@ -222,8 +234,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
               </button>
               <div class="lang-pop" id="langPop" hidden>
-                <a class="lang-opt" data-lang-btn="en" href="javascript:void(0)" onclick="setUiLang('en'); hideLangMenu(event)"><span class="flag" aria-hidden="true">🇬🇧</span>English</a>
-                <a class="lang-opt" data-lang-btn="zh" href="javascript:void(0)" onclick="setUiLang('zh'); hideLangMenu(event)"><span class="flag" aria-hidden="true">🇨🇳</span>中文</a>
+                <a class="lang-opt" data-lang-btn="en" href="javascript:void(0)" onclick="setUiLang('en'); hideLangMenu(event)"><span class="lang-abbr" aria-hidden="true">EN</span>English</a>
+                <a class="lang-opt" data-lang-btn="zh" href="javascript:void(0)" onclick="setUiLang('zh'); hideLangMenu(event)"><span class="lang-abbr" aria-hidden="true">中</span>中文</a>
               </div>
             </div>
             <button class="btn btn-sm btn-ghost" id="themeToggle" type="button" aria-label="Toggle dark mode">🌙</button>

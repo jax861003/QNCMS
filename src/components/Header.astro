@@ -11,7 +11,8 @@ const linkFor = (key: string, current: string) => {
   // match top-level section
   return currentSlug === current ? 'page' : undefined;
 };
-const section = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
+const seg = Astro.url.pathname.split('/').filter(Boolean);
+const section = seg[1] || 'index';
 ---
 
 <header class="site-header" data-header>
@@ -29,7 +30,6 @@ const section = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
       <a href={`/${locale}/`} aria-current={section === 'index' ? 'page' : undefined}>{t(locale, 'nav.home')}</a>
       <a href={`/${locale}/products/`} aria-current={section.startsWith('products') ? 'page' : undefined}>{t(locale, 'nav.products')}</a>
       <a href={`/${locale}/about/`} aria-current={section === 'about' ? 'page' : undefined}>{t(locale, 'nav.about')}</a>
-      <a href={`/${locale}/contact/`} aria-current={section === 'contact' ? 'page' : undefined}>{t(locale, 'nav.contact')}</a>
       <a class="btn btn-primary" href={`/${locale}/contact/`}>{t(locale, 'nav.cta')}</a>
     </nav>
 
@@ -51,8 +51,8 @@ const section = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
         <div class="lang-pop" data-lang-pop hidden>
           {locales.map((l) => (
             <a class={'lang-opt' + (l === locale ? ' active' : '')} href={localeUrl(Astro.url.pathname, l)}>
-              <span class="flag" aria-hidden="true">{l === 'en' ? '🇬🇧' : l === 'zh' ? '🇨🇳' : '🌐'}</span>
-              {localeNames[l]}
+              <span class="lang-abbr" aria-hidden="true">{l === 'en' ? 'EN' : l === 'zh' ? '中' : l.toUpperCase()}</span>
+              <span>{l === 'en' ? 'English' : localeNames[l]}</span>
             </a>
           ))}
         </div>

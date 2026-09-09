@@ -220,69 +220,9 @@
   }
   loadSettings();
 
-  // ---- Product detail modal (for admin-added products) -------------------
-  var productModal = null;
-  var productModalStyle = null;
-  function ensureModalStyle() {
-    if (productModalStyle) return;
-    productModalStyle = document.createElement('style');
-    productModalStyle.textContent =
-      '.pmodal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}' +
-      '.pmodal-backdrop{position:absolute;inset:0;background:rgba(10,15,30,.66);backdrop-filter:blur(4px);}' +
-      '.pmodal-card{position:relative;background:var(--bg,#fff);color:var(--ink,#0b1020);max-width:760px;width:100%;max-height:86vh;overflow-y:auto;border-radius:18px;padding:36px;box-shadow:0 24px 80px rgba(0,0,0,.35);}' +
-      '.pmodal-close{position:absolute;top:14px;right:16px;border:none;background:var(--bg-muted,#eef0f6);color:var(--ink,#0b1020);width:36px;height:36px;border-radius:50%;font-size:22px;cursor:pointer;line-height:1;}' +
-      '.pmodal-img{width:100%;border-radius:12px;margin-bottom:18px;aspect-ratio:16/10;object-fit:cover;background:var(--bg-muted,#eef0f6);}' +
-      '.pmodal-tag{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--bg-muted,#eef0f6);color:var(--brand,#2563eb);font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;}' +
-      '.pmodal-card h2{font-size:1.8rem;margin-bottom:10px;}' +
-      '.pmodal-short{color:var(--ink-soft,#475069);margin-bottom:14px;font-size:1.05rem;}' +
-      '.pmodal-desc{line-height:1.75;margin-bottom:16px;}' +
-      '.pmodal-hl{margin:0;padding-left:22px;display:grid;gap:8px;}' +
-      '.pmodal-price{font-size:1.8rem;font-weight:800;color:var(--brand,#2563eb);margin-bottom:12px;}' +
-      '.pmodal-buy{display:inline-block;margin:6px 0 0;padding:12px 26px;border-radius:10px;background:var(--brand,#2563eb);color:#fff;font-weight:700;text-decoration:none;}' +
-      'html[data-theme="dark"] .pmodal-card{background:#141b30;color:#e7eaf4;}' +
-      'html[data-theme="dark"] .pmodal-close{background:#232c47;color:#e7eaf4;}' +
-      'html[data-theme="dark"] .pmodal-short{color:#a7b0c5;}' +
-      '@media(max-width:640px){.pmodal{padding:10px}.pmodal-card{padding:22px;border-radius:14px;max-height:92vh}.pmodal-card h2{font-size:1.4rem}.pmodal-price{font-size:1.4rem}}';
-    document.head.appendChild(productModalStyle);
-  }
-  function closeProductModal() {
-    if (productModal) { productModal.style.display = 'none'; document.body.style.overflow = ''; }
-  }
-  function showProductModal(p) {
-    ensureModalStyle();
-    if (!productModal) {
-      productModal = document.createElement('div');
-      productModal.className = 'pmodal';
-      document.body.appendChild(productModal);
-    }
-    var hl = (p.highlights || []).map(function (h) { return '<li>' + h + '</li>'; }).join('');
-    productModal.innerHTML =
-      '<div class="pmodal-backdrop"></div>' +
-      '<div class="pmodal-card" role="dialog" aria-modal="true">' +
-        '<button class="pmodal-close" aria-label="Close">&times;</button>' +
-        (p.image_url ? '<img class="pmodal-img" src="' + p.image_url + '" alt="' + (p.name || '') + '" onerror="this.src=\'/images/products/placeholder.svg\'" />' : '') +
-        (p.tag ? '<span class="pmodal-tag">' + p.tag + '</span>' : '') +
-        '<h2>' + (p.name || '') + '</h2>' +
-        (p.price ? '<div class="pmodal-price">' + p.price + '</div>' : '') +
-        (p.short ? '<p class="pmodal-short">' + p.short + '</p>' : '') +
-        (p.description ? '<p class="pmodal-desc">' + p.description + '</p>' : '') +
-        (hl ? '<ul class="pmodal-hl">' + hl + '</ul>' : '') +
-        (p.buy_url ? '<a class="pmodal-buy" href="' + p.buy_url + '" target="_blank" rel="noopener">' + (currentLocale() === 'zh' ? '立即购买' : 'Buy now') + '</a>' : '') +
-      '</div>';
-    productModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    productModal.querySelector('.pmodal-close').addEventListener('click', closeProductModal);
-    productModal.querySelector('.pmodal-backdrop').addEventListener('click', closeProductModal);
-    document.addEventListener('keydown', function onKey(e) {
-      if (e.key === 'Escape') { closeProductModal(); document.removeEventListener('keydown', onKey); }
-    });
-  }
-  function openProductModal(slug) {
-    fetch('/api/products?locale=' + currentLocale() + '&slug=' + encodeURIComponent(slug))
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (p) { if (p && !p.error) showProductModal(p); })
-      .catch(function () { /* ignore */ });
-  }
+  // Product cards always navigate to their own detail page
+  // (static pages for seeded products, client-side fallback on /404.html for
+  //  products added later in the admin).
 
   // ---- Dynamic product grid ----------------------------------------------
   // Re-renders [data-product-grid] from the public API so products added in
@@ -302,7 +242,7 @@
         var placeholder = '/images/products/placeholder.svg';
         grid.innerHTML = list.map(function (p) {
           var isStatic = !!staticSlugs[p.slug];
-          var href = isStatic ? '/' + locale + '/products/' + p.slug + '/' : '#';
+          var href = '/' + locale + '/products/' + p.slug + '/';
           var tag = p.tag ? '<span class="product-tag">' + p.tag + '</span>' : '';
           var img = p.image_url
             ? '<img src="' + p.image_url + '" alt="' + (p.name || '') + '" loading="lazy" width="640" height="400" onerror="this.src=\'' + placeholder + '\'" />'
@@ -409,28 +349,4 @@
       card.style.display = okCat && okText ? '' : 'none';
     });
   }
-
-  // Card click: dynamic products open the modal; static ones navigate normally
-  document.addEventListener('click', function (e) {
-    var card = e.target && e.target.closest ? e.target.closest('a.product-card') : null;
-    if (card && (card.classList.contains('is-dynamic') || card.getAttribute('href') === '#')) {
-      e.preventDefault();
-      openProductModal(card.getAttribute('data-slug'));
-    }
-  });
-
-  // Deep link to a newly added product: /en/products/<slug>/ -> open modal
-  (function handleDeepLink() {
-    var m = window.location.pathname.match(/^\/(en|zh)\/products\/([^/]+)\/?$/);
-    if (!m) return;
-    var grid = document.querySelector('[data-product-grid]');
-    var staticSlugs = {};
-    if (grid) {
-      grid.querySelectorAll('[data-slug]').forEach(function (el) {
-        staticSlugs[el.getAttribute('data-slug')] = true;
-      });
-    }
-    if (staticSlugs[m[2]]) return; // a static detail page exists for this slug
-    setTimeout(function () { openProductModal(m[2]); }, 350);
-  })();
 })();

@@ -278,7 +278,9 @@ section {
   background: var(--bg-soft);
 }
 .main-nav a[aria-current="page"] {
-  color: var(--brand);
+  color: #fff;
+  background: var(--brand);
+  box-shadow: 0 6px 16px -8px var(--brand);
 }
 .header-actions {
   display: flex;
@@ -1083,3 +1085,11 @@ html[data-variant="sunset"] {
 .lang-opt:hover { background: var(--bg-muted); }
 .lang-opt.active { color: var(--brand); }
 .lang-opt .flag { font-size: 1.1rem; line-height: 1; }
+
+.lang-abbr {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 22px; padding: 0 5px;
+  border-radius: 6px; background: var(--bg-muted);
+  color: var(--brand); font-size: .7rem; font-weight: 800; letter-spacing: .04em;
+}
+.lang-opt.active .lang-abbr { background: var(--brand); color: #fff; }

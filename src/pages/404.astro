@@ -1,6 +1,8 @@
 ---
-// Standalone 404 (used by Cloudflare Pages `/* /404.html 404` fallback).
+// Standalone 404 (used by Cloudflare Pages `404.html` fallback).
 // Kept locale-independent; links are generated from the shared locale list.
+// For `/en|zh/products/<slug>/` paths without a static page (products added
+// later in the admin), this page renders the full product detail client-side.
 import { locales, localeNames } from '@/lib/i18n';
 ---
 
@@ -51,10 +53,38 @@ import { locales, localeNames } from '@/lib/i18n';
       }
       .links a.ghost { background: #fff; color: #0b1020; border: 1px solid #e6e9f2; box-shadow: none; }
       html[data-theme="dark"] .links a.ghost { background: #141b30; color: #e7eaf4; border-color: #232c47; }
+
+      /* ---- client-side product detail fallback ---- */
+      #productFallback { display: none; width: 100%; max-width: 1040px; text-align: left; }
+      #productFallback.on { display: block; }
+      .fb-back { display: inline-flex; align-items: center; gap: 8px; color: #475069; text-decoration: none; font-weight: 600; margin-bottom: 28px; }
+      html[data-theme="dark"] .fb-back { color: #a7b0c5; }
+      .fb-hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; margin-bottom: 44px; }
+      @media (max-width: 760px) { .fb-hero { grid-template-columns: 1fr; } }
+      .fb-tag { display: inline-block; padding: 5px 12px; border-radius: 999px; background: #eef0f6; color: #2563eb; font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 14px; }
+      html[data-theme="dark"] .fb-tag { background: #1c2742; color: #93b4ff; }
+      .fb-hero h1 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); margin: 0 0 14px; line-height: 1.15; }
+      .fb-lead { color: #475069; font-size: 1.08rem; margin: 0 0 16px; line-height: 1.6; }
+      html[data-theme="dark"] .fb-lead { color: #a7b0c5; }
+      .fb-price { font-size: 1.7rem; font-weight: 800; color: #2563eb; margin-bottom: 20px; }
+      .fb-buy { display: inline-block; padding: 13px 26px; border-radius: 999px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #2563eb, #7c3aed); text-decoration: none; box-shadow: 0 10px 24px -10px rgba(37,99,235,.7); }
+      .fb-frame { border-radius: 16px; overflow: hidden; background: #eef0f6; }
+      html[data-theme="dark"] .fb-frame { background: #141b30; }
+      .fb-frame img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+      .fb-blocks { display: grid; gap: 26px; }
+      .fb-block { background: #f5f7fb; border: 1px solid #e6e9f2; border-radius: 14px; padding: 26px 28px; }
+      html[data-theme="dark"] .fb-block { background: #12182b; border-color: #232c47; }
+      .fb-block h3 { font-size: 1.05rem; margin: 0 0 12px; }
+      .fb-block p { margin: 0; color: #475069; line-height: 1.7; }
+      html[data-theme="dark"] .fb-block p { color: #a7b0c5; }
+      .fb-features { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+      .fb-features li { display: flex; gap: 10px; align-items: flex-start; color: #475069; line-height: 1.5; }
+      html[data-theme="dark"] .fb-features li { color: #a7b0c5; }
+      .fb-features .fb-ic { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #2563eb; color: #fff; font-size: .7rem; font-weight: 800; flex: none; margin-top: 2px; }
     </style>
   </head>
   <body>
-    <div class="wrap">
+    <div class="wrap" id="fb404">
       <div class="code">404</div>
       <h1>Page not found</h1>
       <p>The page you're looking for doesn't exist or has moved.</p>
@@ -62,5 +92,62 @@ import { locales, localeNames } from '@/lib/i18n';
         {locales.map((l, i) => <a class={i === 0 ? '' : 'ghost'} href={`/${l}/`}>{localeNames[l]}</a>)}
       </div>
     </div>
+
+    <div id="productFallback"></div>
+
+    <script>
+      (function () {
+        var m = window.location.pathname.match(/^\/(en|zh)\/products\/([^/]+)\/?$/);
+        if (!m) return;
+        var locale = m[1];
+        var slug = m[2];
+        var L = locale === 'zh' ? {
+          back: '返回产品列表', overview: '产品概述', highlights: '核心亮点', buy: '立即购买',
+          contact: '联系我们', notFound: '产品不存在', goBack: '返回产品列表',
+          priceHide: '价格请咨询' 
+        } : {
+          back: 'Back to products', overview: 'Overview', highlights: 'Highlights', buy: 'Buy now',
+          contact: 'Contact us', notFound: 'Product not found', goBack: 'Back to products'
+        };
+        fetch('/api/products?locale=' + locale + '&slug=' + encodeURIComponent(slug))
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (p) {
+            if (!p || p.error) return; // keep the 404 view
+            document.getElementById('fb404').style.display = 'none';
+            var box = document.getElementById('productFallback');
+            box.className = 'on';
+            var img = p.image_url
+              ? '<img src="' + p.image_url + '" alt="' + (p.name || '') + '" onerror="this.style.visibility=\'hidden\'" />'
+              : '';
+            var price = p.price ? '<div class="fb-price">' + p.price + '</div>' : '';
+            var features = '';
+            if (Array.isArray(p.highlights) && p.highlights.length) {
+              features = '<div class="fb-block"><h3>' + L.highlights + '</h3><ul class="fb-features">' +
+                p.highlights.map(function (h) {
+                  return '<li><span class="fb-ic">✓</span><span>' + h + '</span></li>';
+                }).join('') + '</ul></div>';
+            }
+            var desc = p.description || p.short || '';
+            box.innerHTML =
+              '<a class="fb-back" href="/' + locale + '/products/">← ' + L.back + '</a>' +
+              '<div class="fb-hero">' +
+                '<div><span class="fb-tag">' + (p.tag || '') + '</span>' +
+                '<h1>' + (p.name || '') + '</h1>' +
+                '<p class="fb-lead">' + (p.short || '') + '</p>' +
+                price +
+                (p.buy_url
+                  ? '<a class="fb-buy" href="' + p.buy_url + '" rel="noopener" target="_blank">' + L.buy + '</a>'
+                  : '<a class="fb-buy" href="/' + locale + '/contact/">' + L.contact + '</a>') +
+                '</div>' +
+                '<div class="fb-frame">' + img + '</div>' +
+              '</div>' +
+              '<div class="fb-blocks">' +
+                (desc ? '<div class="fb-block"><h3>' + L.overview + '</h3><p>' + desc + '</p></div>' : '') +
+                features +
+              '</div>';
+          })
+          .catch(function () { /* keep the 404 view */ });
+      })();
+    </script>
   </body>
 </html>

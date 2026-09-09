@@ -264,7 +264,7 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 3. 复制 `src/pages/zh/` 目录为 `src/pages/ru/`，把页面 frontmatter 中的 `locale = 'zh'` 改为 `locale = 'ru'`；
 4. 如需产品/站点文案也支持该语言，在后台产品编辑中补充 `*_ru` 字段（API 已按 locale 参数透传）。
 
-> 语言下拉菜单会自动读取 `localeNames` 渲染新选项，无需改组件。
+> 页首的**地球图标语言菜单**（前台与后台一致）会自动遍历 `locales` 渲染新选项：显示语言缩写徽标（EN / 中，其他语言自动用大写代码如 RU）+ 语言名，无需改组件。如需自定义某语言的缩写或显示名，改 `Header.astro` 的缩写映射或 `localeNames` 即可。
 
 ### 模板（配色方案）开发规范
 
@@ -291,7 +291,7 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
    }
    ```
 2. **注册到后台**：在 `src/pages/admin/index.astro` 的 `TEMPLATES` 数组中加一条记录 `{ id: 'rose', grad: 'linear-gradient(135deg,#f43f5e 0%,#d946ef 100%)', nameKey: 'tplRose' }`（`grad` 为卡片预览渐变），并在 EN / ZH 字典各加显示名（`tplRose: 'Official Template - Rose (Pink-Red)'` / `tplRose: '官方模板-玫红色'`）。
-3. **生效方式**：后台保存后，前台 `site.js` 将 `<html data-variant="rose">` 写入根元素，CSS 变量自动切换，无需重新部署。
+3. **生效方式**：后台「模板」页点击应用后，`site.js` 将 `<html data-variant="rose">` 写入根元素，前台 CSS 变量自动切换，无需重新部署。**后台管理界面自身也会跟随模板配色**（admin 样式内置了同一套 `html[data-variant]` 品牌色覆盖规则），方便预览整体效果。
 
 **可覆盖的变量清单**：
 
