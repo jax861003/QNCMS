@@ -82,3 +82,54 @@ export async function requireAuth(context) {
   }
   return { ok: true, status: 200 };
 }
+
+/**
+ * Idempotently create the D1 tables the CMS needs.
+ * Called automatically by the API handlers before the first query, so no
+ * manual migration is required after the D1 binding is added in the dashboard.
+ * Returns true when the database is usable.
+ */
+export async function ensureTables(db) {
+  if (!db || typeof db.prepare !== 'function') return false;
+  try {
+    // D1's exec() rejects multi-statement strings, so run each DDL via
+    // prepare().run() - CREATE TABLE IF NOT EXISTS is idempotent, so calling
+    // this on every request is safe and cheap.
+    await db
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS products (
+          id          TEXT PRIMARY KEY,
+          slug        TEXT UNIQUE NOT NULL,
+          tag_en      TEXT NOT NULL DEFAULT '',
+          tag_zh      TEXT NOT NULL DEFAULT '',
+          name_en     TEXT NOT NULL DEFAULT '',
+          name_zh     TEXT NOT NULL DEFAULT '',
+          short_en    TEXT NOT NULL DEFAULT '',
+          short_zh    TEXT NOT NULL DEFAULT '',
+          description_en TEXT NOT NULL DEFAULT '',
+          description_zh TEXT NOT NULL DEFAULT '',
+          highlights_en TEXT NOT NULL DEFAULT '[]',
+          highlights_zh TEXT NOT NULL DEFAULT '[]',
+          image_url   TEXT NOT NULL DEFAULT '',
+          position    INTEGER NOT NULL DEFAULT 0,
+          active      INTEGER NOT NULL DEFAULT 1,
+          created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+          updated_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+        )`
+      )
+      .run();
+    await db
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS settings (
+          key   TEXT PRIMARY KEY,
+          value TEXT NOT NULL DEFAULT '',
+          updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+        )`
+      )
+      .run();
+    return true;
+  } catch (e) {
+    console.error('ensureTables failed:', e);
+    return false;
+  }
+}

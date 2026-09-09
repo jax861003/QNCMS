@@ -1,5 +1,5 @@
 // /api/admin/products - GET: full bilingual fields for admin editing (auth required)
-import { requireAuth, getEnv } from '../../_utils.js';
+import { requireAuth, getEnv, ensureTables } from '../../_utils.js';
 
 export async function onRequestGet(context) {
   const auth = await requireAuth(context);
@@ -12,6 +12,7 @@ export async function onRequestGet(context) {
   }
 
   try {
+    await ensureTables(db);
     const result = await db
       .prepare('SELECT * FROM products ORDER BY position ASC')
       .all();

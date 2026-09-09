@@ -1,6 +1,6 @@
 // /api/products - GET: public product list (D1 or inline fallback)
 // POST: create/update product (auth required, writes to D1)
-import { requireAuth, getEnv } from '../_utils.js';
+import { requireAuth, getEnv, ensureTables } from '../_utils.js';
 
 export async function onRequestGet(context) {
   const url = new URL(context.request.url);
@@ -12,6 +12,7 @@ export async function onRequestGet(context) {
   // Try D1 first (production), fallback to inline data
   if (db && typeof db.prepare === 'function') {
     try {
+      await ensureTables(db);
       if (!slug) {
         const result = await db
           .prepare('SELECT * FROM products WHERE active = 1 ORDER BY position ASC')
@@ -55,6 +56,7 @@ export async function onRequestPost(context) {
   if (!db || typeof db.prepare !== 'function') {
     return Response.json({ ok: false, message: 'Database not available' }, { status: 503 });
   }
+  await ensureTables(db);
 
   const fields = {
     tag_en: body.tag_en || '',

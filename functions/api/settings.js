@@ -1,5 +1,5 @@
 // /api/settings - GET/POST site settings (auth required)
-import { requireAuth, getEnv } from '../_utils.js';
+import { requireAuth, getEnv, ensureTables } from '../_utils.js';
 
 export async function onRequestGet(context) {
   const auth = await requireAuth(context);
@@ -9,6 +9,7 @@ export async function onRequestGet(context) {
   if (!db || typeof db.prepare !== 'function') return Response.json({});
 
   try {
+    await ensureTables(db);
     const result = await db.prepare('SELECT * FROM settings').all();
     const settings = {};
     for (const row of result.results || []) {
@@ -32,6 +33,7 @@ export async function onRequestPost(context) {
 
   const db = getEnv(context).DB;
   if (db && typeof db.prepare === 'function') {
+    await ensureTables(db);
     for (const [key, value] of Object.entries(body)) {
       const strValue = typeof value === 'string' ? value : JSON.stringify(value);
       await db.prepare(

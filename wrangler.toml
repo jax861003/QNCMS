@@ -6,15 +6,16 @@ compatibility_date = "2024-11-01"
 # root) upload the built static assets AND the `functions/` directory.
 pages_build_output_dir = "dist"
 
-# D1 binding used by functions/api/*.js via `env.DB`.
-# IMPORTANT: keep database_id in sync with the real database; the binding
-# is also applied by Cloudflare Pages at build time when it reads this file.
-[[d1_databases]]
-binding = "DB"
-database_name = "qncms"
-database_id = "752be8a3-4ddf-44c8-a994-bf4cb32f454b"
+# D1 binding is intentionally NOT declared here. Cloudflare's build pipeline
+# resolves wrangler.toml D1 bindings while publishing the Functions worker,
+# and an unresolvable id fails the whole deployment. Instead, bind the D1
+# database in the Cloudflare Pages dashboard AFTER deployment:
+#   Pages project -> Settings -> Bindings -> Add binding -> D1 database
+#   Variable name: DB    (must be exactly "DB" - the functions read env.DB)
+#   Database: qncms
+# Once bound, the functions auto-create the tables on first request
+# (see functions/_utils.js ensureTables), so no manual migration is needed.
 
-# NOTE: No [vars] here on purpose. ADMIN_USERNAME / ADMIN_PASSWORD_HASH /
-# JWT_SECRET are secrets that must be set in the Cloudflare Pages dashboard
-# (Settings -> Environment variables) so that placeholder values committed to
-# git never override the real ones at build time.
+# Secrets (ADMIN_USERNAME / ADMIN_PASSWORD / ADMIN_PASSWORD_HASH / JWT_SECRET)
+# are also configured in the dashboard (Settings -> Environment variables),
+# never committed here.
