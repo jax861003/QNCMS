@@ -109,7 +109,12 @@
       .product-table tbody tr:nth-child(even) td { background: var(--bg-soft); }
       .product-table tbody tr:hover td { background: rgba(37,99,235,.07); }
       .product-table .timg { width: 44px; height: 28px; object-fit: cover; border-radius: 4px; display: block; }
-      .product-table .row-check { width: 16px; height: 16px; }
+      .product-table td.img-cell { padding: 0; }
+      .product-table td.img-cell .timg { display: block; width: auto; height: 100%; min-width: 52px; max-width: 160px; object-fit: cover; border-radius: 0; }
+      .product-table th.check-col, .product-table td.check-col { text-align: center; }
+      .product-table th.check-col { width: 56px; }
+      .check-title { display: block; font-size: .72rem; color: var(--ink-soft); margin-bottom: 4px; }
+      .product-table .row-check { width: 16px; height: 16px; margin: 0 auto; }
       .product-table .t-actions { white-space: nowrap; }
       .t-actions .btn-sm { display: flex; width: 100%; justify-content: center; margin: 0; }
       .t-actions { display: flex; flex-direction: column; gap: 4px; }
@@ -172,8 +177,8 @@
               <button class="btn btn-primary btn-sm" onclick="openModal()" data-i18n="addProduct">+ Add Product</button>
               <input type="search" id="tableSearch" data-i18n-ph="searchPlaceholder" placeholder="Search name or slug..." />
               <select id="tableCategory"></select>
-              <span id="batchInfo" class="batch-info"></span>
               <button class="btn btn-sm btn-danger" id="batchDeleteBtn" onclick="batchDelete()" data-i18n="batchDelete">Delete Selected</button>
+              <span id="batchInfo" class="batch-info"></span>
               <span class="view-toggle">
                 <button class="view-btn active" id="viewListBtn" onclick="setProductView('list')" data-i18n="viewList">List</button>
                 <button class="view-btn" id="viewGridBtn" onclick="setProductView('grid')" data-i18n="viewGrid">Grid</button>
@@ -441,7 +446,7 @@
           batchDelete: 'Delete Selected', batchDeleteConfirm: 'Delete selected products',
           colSlug: 'Slug', colName: 'Name', colCategory: 'Category', colTag: 'Tag',
           colPrice: 'Price', colPosition: 'Position', colImage: 'Image',
-          allCategories: 'All categories', noMatch: 'No products match the filter.', tableLangLabel: 'Display language:',
+          allCategories: 'All categories', noMatch: 'No products match the filter.', tableLangLabel: 'Display language:', select: 'Select', selectedLabel: '{n} selected',
           secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
           productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
           price: 'Price (optional)', buyUrl: 'Buy URL (optional)',
@@ -482,7 +487,7 @@
           batchDelete: '删除选中', batchDeleteConfirm: '确定删除选中的产品',
           colSlug: 'Slug', colName: '名称', colCategory: '分类', colTag: '标签',
           colPrice: '价格', colPosition: '排序', colImage: '图片',
-          allCategories: '全部分类', noMatch: '没有符合筛选条件的产品。', tableLangLabel: '显示语言：',
+          allCategories: '全部分类', noMatch: '没有符合筛选条件的产品。', tableLangLabel: '显示语言：', select: '选择', selectedLabel: '已选 {n} 项',
           secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
           productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
           price: '价格（可选）', buyUrl: '购买链接（可选）',
@@ -760,7 +765,10 @@
       }
       function updateBatchInfo() {
         var info = document.getElementById('batchInfo');
-        if (info) info.textContent = selectedSlugs().length ? selectedSlugs().length + ' selected' : '';
+        if (info) {
+          var n = selectedSlugs().length;
+          info.textContent = n ? ui('selectedLabel').replace('{n}', n) : '';
+        }
       }
       function toggleAllRows(cb) {
         document.querySelectorAll('.row-check').forEach(function (r) { r.checked = cb.checked; });
@@ -795,7 +803,7 @@
         if (productView === 'table') {
           if (colPanel) { colPanel.style.display = 'flex'; renderColPanel(); }
           var keys = colKeys().filter(function (k) { return colConfig[k]; });
-          var head = '<th style="width:28px"><input type="checkbox" class="row-check" id="checkAll" onchange="toggleAllRows(this)"></th>';
+          var head = '<th class="check-col"><span class="check-title">' + ui('select') + '</span><input type="checkbox" class="row-check" id="checkAll" onchange="toggleAllRows(this)"></th>';
           head += keys.map(function (k) { return '<th data-col="' + k + '">' + (labels[k] || k) + '<span class="th-resizer"></span></th>'; }).join('');
           head += '<th data-col="actions" style="width:74px">' + ui('edit') + '</th>';
           if (filtered.length === 0) {
@@ -818,10 +826,13 @@
                   : '<img class="timg" src="' + placeholder + '">';
               }
               return '';
-            }).map(function (x) { return '<td>' + x + '<span class="td-resizer"></span></td>'; }).join('');
+            }).map(function (x, idx) {
+              var cls = keys[idx] === 'image' ? ' class="img-cell"' : '';
+              return '<td' + cls + '>' + x + '<span class="td-resizer"></span></td>';
+            }).join('');
             var editBtn = '<button class="btn btn-sm" onclick="editProduct(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + ui('edit') + '</button>';
             var delBtn = '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.slug + '\')">' + ui('delete') + '</button>';
-            return '<tr><td><input type="checkbox" class="row-check" value="' + p.slug + '" onchange="updateBatchInfo()"><span class="td-resizer"></span></td>' +
+            return '<tr><td class="check-col"><input type="checkbox" class="row-check" value="' + p.slug + '" onchange="updateBatchInfo()"><span class="td-resizer"></span></td>' +
               cells + '<td class="t-actions">' + editBtn + delBtn + '</td></tr>';
           }).join('');
           list.className = 'product-table-wrap';
