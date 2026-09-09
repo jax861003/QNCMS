@@ -47,6 +47,8 @@
     "formNamePh": "请填写你的姓名",
     "formEmail": "工作邮箱",
     "formEmailPh": "you@company.com",
+    "formPhone": "电话（选填）",
+    "formPhonePh": "+86 138 0000 0000",
     "formMessage": "需要什么帮助？",
     "formMessagePh": "我们正在为 200 人的团队评估一套数据平台……",
     "submit": "发送信息",

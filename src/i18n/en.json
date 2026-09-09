@@ -47,6 +47,8 @@
     "formNamePh": "Ada Lovelace",
     "formEmail": "Work email",
     "formEmailPh": "you@company.com",
+    "formPhone": "Phone (optional)",
+    "formPhonePh": "+1 (415) 555-0132",
     "formMessage": "How can we help?",
     "formMessagePh": "We're evaluating a data platform for our team of 200…",
     "submit": "Send message",

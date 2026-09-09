@@ -329,6 +329,16 @@
                   <input type="text" id="contact_wechat" />
                 </div>
               </div>
+              <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secTemplate">Template (Color Scheme)</h3>
+              <div class="form-group">
+                <label data-i18n="themeName">Template</label>
+                <select id="theme_name" onchange="document.documentElement.setAttribute('data-variant', this.value)">
+                  <option value="default" data-i18n="themeDefault">Default (Blue-Violet)</option>
+                  <option value="ocean" data-i18n="themeOcean">Ocean (Cyan-Blue)</option>
+                  <option value="forest" data-i18n="themeForest">Forest (Green)</option>
+                  <option value="sunset" data-i18n="themeSunset">Sunset (Orange-Pink)</option>
+                </select>
+              </div>
               <h3 style="font-size:1rem;margin:24px 0 16px;color:var(--brand);" data-i18n="secFooter">Footer</h3>
               <div class="form-grid">
                 <div class="form-group">
@@ -484,6 +494,8 @@
           secProducts: 'Products Section', productsTitleEn: 'Products Section Title (EN)', productsTitleZh: 'Products Section Title (ZH)',
           productsSubtitleEn: 'Products Section Subtitle (EN)', productsSubtitleZh: 'Products Section Subtitle (ZH)',
           secFooter: 'Footer', footerGithub: 'GitHub URL (footer)', footerTwitter: 'Twitter / X URL (footer)', footerCopyright: 'Copyright Text (footer)',
+          secTemplate: 'Template (Color Scheme)', themeName: 'Template',
+          themeDefault: 'Default (Blue-Violet)', themeOcean: 'Ocean (Cyan-Blue)', themeForest: 'Forest (Green)', themeSunset: 'Sunset (Orange-Pink)',
           contactQq: 'QQ', contactWechat: 'WeChat',
           tabMessages: 'Messages', messagesSub: 'Messages submitted through the public contact form.',
           msgName: 'Name', msgEmail: 'Email', msgPhone: 'Phone', msgCompany: 'Company', msgContent: 'Message', msgTime: 'Time', msgActions: 'Actions',
@@ -530,6 +542,8 @@
           secProducts: '产品板块', productsTitleEn: '产品板块标题（英文）', productsTitleZh: '产品板块标题（中文）',
           productsSubtitleEn: '产品板块副标题（英文）', productsSubtitleZh: '产品板块副标题（中文）',
           secFooter: '页脚', footerGithub: 'GitHub 链接（页脚）', footerTwitter: 'Twitter / X 链接（页脚）', footerCopyright: '版权文字（页脚）',
+          secTemplate: '模板（配色方案）', themeName: '模板',
+          themeDefault: '默认（蓝紫）', themeOcean: '海洋（青蓝）', themeForest: '森林（绿色）', themeSunset: '落日（橙粉）',
           contactQq: 'QQ', contactWechat: '微信',
           tabMessages: '留言管理', messagesSub: '前台联系表单提交的留言。',
           msgName: '姓名', msgEmail: '邮箱', msgPhone: '电话', msgCompany: '公司', msgContent: '留言内容', msgTime: '时间', msgActions: '操作',
@@ -1117,13 +1131,16 @@
             products_subtitle_en: 'products_subtitle_en', products_subtitle_zh: 'products_subtitle_zh',
             contact_qq: 'contact_qq', contact_wechat: 'contact_wechat',
             footer_github: 'footer_github', footer_twitter: 'footer_twitter',
-            footer_copyright: 'footer_copyright'
+            footer_copyright: 'footer_copyright',
+            theme_name: 'theme_name'
           };
           Object.keys(map).forEach(function (key) {
             var el = document.getElementById(map[key]);
             if (el && s[key] !== undefined && s[key] !== null) el.value = s[key];
           });
         } catch (err) { /* keep empty */ }
+        // apply selected template (color scheme) preview on the admin page
+        if (s && s.theme_name) document.documentElement.setAttribute('data-variant', s.theme_name);
       }
 
       document.getElementById('settingsForm').addEventListener('submit', async function (e) {
@@ -1155,7 +1172,8 @@
           contact_wechat: document.getElementById('contact_wechat').value,
           footer_github: document.getElementById('footer_github').value,
           footer_twitter: document.getElementById('footer_twitter').value,
-          footer_copyright: document.getElementById('footer_copyright').value
+          footer_copyright: document.getElementById('footer_copyright').value,
+          theme_name: document.getElementById('theme_name').value
         };
         var statusEl = document.getElementById('settingsStatus');
         statusEl.className = 'status';
@@ -1212,8 +1230,8 @@
           return;
         }
         list.className = 'product-table-wrap';
-        var labels = { time: ui('msgTime'), name: ui('msgName'), email: ui('msgEmail'), phone: ui('msgPhone'), company: ui('msgCompany'), message: ui('msgContent'), actions: ui('msgActions') };
-        var head = ['time', 'name', 'email', 'phone', 'company', 'message', 'actions'].map(function (k) {
+        var labels = { time: ui('msgTime'), name: ui('msgName'), email: ui('msgEmail'), phone: ui('msgPhone'), message: ui('msgContent'), actions: ui('msgActions') };
+        var head = ['time', 'name', 'email', 'phone', 'message', 'actions'].map(function (k) {
           return '<th>' + (labels[k] || k) + '</th>';
         }).join('');
         var rows = msgs.map(function (m) {
@@ -1222,7 +1240,6 @@
             '<td>' + esc(m.name || '') + '</td>' +
             '<td>' + esc(m.email || '') + '</td>' +
             '<td>' + esc(m.phone || '') + '</td>' +
-            '<td>' + esc(m.company || '') + '</td>' +
             '<td class="msg-cell">' + esc(m.message || '') + '</td>' +
             '<td style="white-space:nowrap"><button class="btn btn-sm btn-danger" onclick="deleteMessage(\'' + m.id + '\')">' + ui('delete') + '</button></td></tr>';
         }).join('');

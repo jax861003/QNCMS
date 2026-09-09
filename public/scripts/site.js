@@ -110,6 +110,8 @@
   function renderSettings(s) {
         if (!s || typeof s !== 'object') return;
         var locale = currentLocale();
+        // Theme template (color scheme) selected in the admin
+        document.documentElement.setAttribute('data-variant', s.theme_name || 'default');
         var title = s['site_title_' + locale] || s.site_title_en;
         if (title) document.title = title;
 

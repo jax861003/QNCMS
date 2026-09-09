@@ -681,7 +681,15 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   gap: clamp(32px, 5vw, 56px);
-  align-items: start;
+  align-items: stretch;
+}
+.contact-info {
+  display: flex;
+  flex-direction: column;
+}
+.info-list {
+  flex: 1;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
 }
 .contact-info h3 {
   font-size: 1.3rem;
@@ -690,6 +698,10 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 .info-list {
   display: grid;
   gap: 16px;
+}
+.contact-info > .info-list {
+  flex: 1;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
 }
 .info-list li {
   display: flex;
@@ -793,11 +805,29 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
   transition: background 0.3s var(--ease);
 }
 .footer-grid {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 40px;
-  padding-bottom: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  padding-bottom: 26px;
   border-bottom: 1px solid var(--footer-line);
+}
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.footer-links a {
+  color: var(--footer-text-soft);
+  font-size: 0.95rem;
+  transition: color 0.2s var(--ease);
+}
+.footer-links a:hover {
+  color: #fff;
 }
 .footer-brand .logo {
   color: #fff;
@@ -977,7 +1007,8 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 }
 @media (max-width: 620px) {
   .footer-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: flex-start;
   }
   .footer-bottom {
     flex-direction: column;
@@ -1000,3 +1031,26 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 .cat-tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
 .product-search { padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: .92rem; width: 280px; max-width: 100%; }
 .product-search:focus { outline: none; border-color: var(--brand); }
+
+/* ---- Theme templates (admin-selectable color schemes) -------------------- */
+/* Each template only overrides brand colors; dark/light mode stays orthogonal.
+   To add a template: 1) add a rule below with html[data-variant="NAME"],
+   2) add an option in the admin Template select (see README). */
+html[data-variant="ocean"] {
+  --brand: #0e7490;
+  --brand-2: #2563eb;
+  --brand-grad: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+  --accent: #06b6d4;
+}
+html[data-variant="forest"] {
+  --brand: #059669;
+  --brand-2: #0d9488;
+  --brand-grad: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+  --accent: #34d399;
+}
+html[data-variant="sunset"] {
+  --brand: #ea580c;
+  --brand-2: #db2777;
+  --brand-grad: linear-gradient(135deg, #f97316 0%, #db2777 100%);
+  --accent: #f59e0b;
+}

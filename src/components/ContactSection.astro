@@ -79,6 +79,10 @@ const info = [
           <input id="cf-email" name="email" type="email" required autocomplete="email" placeholder={t(locale, 'contact.formEmailPh')} />
         </div>
         <div class="field">
+          <label for="cf-phone">{t(locale, 'contact.formPhone')}</label>
+          <input id="cf-phone" name="phone" type="tel" autocomplete="tel" placeholder={t(locale, 'contact.formPhonePh')} />
+        </div>
+        <div class="field">
           <label for="cf-message">{t(locale, 'contact.formMessage')}</label>
           <textarea id="cf-message" name="message" required placeholder={t(locale, 'contact.formMessagePh')}></textarea>
         </div>
