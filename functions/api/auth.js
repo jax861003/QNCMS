@@ -1,7 +1,20 @@
 // POST /api/auth - login, issues a signed token cookie
-import { verifyLogin, signToken, getEnv } from '../_utils.js';
+import { verifyLogin, signToken, getEnv, getDB, rateLimit } from '../_utils.js';
 
 export async function onRequestPost(context) {
+  const rl = await rateLimit(
+    getDB(getEnv(context)),
+    'auth',
+    context.request.headers.get('CF-Connecting-IP') || 'unknown',
+    10,
+    60
+  );
+  if (!rl.ok) {
+    return Response.json(
+      { ok: false, message: 'Too many attempts, please try again later' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+    );
+  }
   const body = await context.request.json().catch(() => null);
   const { username, password } = body || {};
 

@@ -180,7 +180,6 @@ QNCMS/
 │       ├── products.js         # GET /api/products 产品列表（D1→示例数据回退）
 │       │                       # POST /api/products 新增/更新（需认证）
 │       ├── products/
-│       │   ├── create.js       # POST /api/products/create（需认证）
 │       │   ├── delete.js       # DELETE /api/products/delete?slug=（需认证）
 │       │   └── batch-delete.js # POST /api/products/batch-delete（需认证，批量删除）
 │       ├── admin/
@@ -335,7 +334,6 @@ html[data-theme="dark"] { --bg: #0b1220; --text: #e5e7eb; }
 | GET | `/api/me` | Bearer token | 当前会话状态 |
 | GET | `/api/products?locale=en&slug=` | 否 | 产品列表 / 单个产品（公开） |
 | POST | `/api/products` | Bearer token | 新增或更新产品 |
-| POST | `/api/products/create` | Bearer token | 新增产品（别名） |
 | DELETE | `/api/products/delete?slug=x` | Bearer token | 删除单个产品 |
 | POST | `/api/products/batch-delete` | Bearer token | 批量删除（body: `{slugs: [...]}`） |
 | GET | `/api/admin/products` | Bearer token | 双语完整字段（后台编辑用） |

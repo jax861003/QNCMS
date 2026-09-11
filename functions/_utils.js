@@ -161,6 +161,15 @@ export async function ensureTables(db) {
         )`
       )
       .run();
+    await db
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS rate_limits (
+          bucket TEXT NOT NULL,
+          ip     TEXT NOT NULL,
+          ts     INTEGER NOT NULL
+        )`
+      )
+      .run();
     // Upgrade existing products tables with columns added after the first deploy
     try {
       const cols = await db.prepare('PRAGMA table_info(products)').all();
@@ -181,5 +190,34 @@ export async function ensureTables(db) {
   } catch (e) {
     console.error('ensureTables failed:', e);
     return false;
+  }
+}
+
+/**
+ * Per-IP rate limit backed by D1.
+ * Returns { ok: true } to allow the request, or { ok: false, retryAfter }
+ * (seconds) when the limit is exceeded. Fails open if D1 is unavailable.
+ */
+export async function rateLimit(db, bucket, ip, limit, windowSeconds) {
+  if (!db || typeof db.prepare !== 'function') return { ok: true };
+  const now = Date.now();
+  const cutoff = now - windowSeconds * 1000;
+  try {
+    await db.prepare('DELETE FROM rate_limits WHERE ts < ?').bind(cutoff).run();
+    const row = await db
+      .prepare('SELECT COUNT(*) AS n FROM rate_limits WHERE bucket = ? AND ip = ? AND ts >= ?')
+      .bind(bucket, ip, cutoff)
+      .first();
+    if (row && Number(row.n) >= limit) {
+      return { ok: false, retryAfter: windowSeconds };
+    }
+    await db
+      .prepare('INSERT INTO rate_limits (bucket, ip, ts) VALUES (?, ?, ?)')
+      .bind(bucket, ip, now)
+      .run();
+    return { ok: true };
+  } catch (e) {
+    console.error('rateLimit failed:', e);
+    return { ok: true };
   }
 }

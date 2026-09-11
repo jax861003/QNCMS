@@ -112,7 +112,7 @@ function shellHtml(p, locale, settings) {
   '<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />' +
   '<title>' + esc(p.name) + ' — ' + esc(brand) + '</title>' +
   '<meta name="description" content="' + esc(p.short || p.name || '') + '" />' +
-  '<link rel="icon" href="/images/favicon.jpg" type="image/jpeg" />' +
+  '<link rel="icon" href="/images/favicon.png" type="image/png" />' +
   '<script>(function(){var a;try{a=localStorage.getItem("theme")}catch(e){}if(a!=="light"&&a!=="dark"){a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=a})();</script>' +
   '<style>' +
   ':root{--brand:#2563eb;--brand-2:#7c3aed;--brand-grad:linear-gradient(135deg,#2563eb,#7c3aed);--ink:#0b1020;--ink-soft:#475069;--bg:#fff;--bg-muted:#f5f7fb;--line:#e6e9f2;--card-bg:#fff;--radius-lg:18px;--shadow-lg:0 24px 60px -18px rgba(11,16,32,.18);--ease:cubic-bezier(.22,1,.36,1)}' +
